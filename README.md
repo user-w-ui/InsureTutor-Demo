@@ -89,8 +89,7 @@ Two modes behind one interface — the tutor degrades instead of breaking:
 ```
 raw data/
   mineru-official/           Verbatim MinerU output — never edited by hand
-    content/                 Markdown + JSON (structured, gives page/bbox anchors)
-    assets/images/           Extracted figures
+    content/                 Markdown + JSON + images/ (all three as siblings)
     MANIFEST.md              Provenance: tool, version, params, checksums, date
 src/insuretutor/
   ingest/                    PDF → chunks.json (build-time only)

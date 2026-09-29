@@ -72,9 +72,13 @@ The parts that shape the ingest code:
 - `table.table_body` holds the structured `<table>` HTML — non-empty for all 9.
   `table_caption` / `table_footnote` are **empty arrays**; captions survive only as
   separate `text` blocks, so re-associate them by `page_idx` + proximity.
-- Images live in `assets/images/`, but artifacts reference them as `images/<hash>.jpg`.
-  Resolve `images/x.jpg` → `../assets/images/x.jpg` (relative to `content/`) once in
-  the ingest layer. **Do not rewrite the artifacts to fix this.**
+- Images live in `content/images/`, and both artifacts reference them as
+  `images/<hash>.jpg` — already correct relative to `content/`, because MinerU writes
+  the `.md`, the `.json`, and `images/` as siblings. **Leave that layout alone:** do not
+  move `images/` out of `content/`, or all 33 in-prose links break in any Markdown
+  viewer. There is no remap step; do not rewrite the artifacts.
+- `.md` inlines 33 figures; `.json` carries 42 `img_path` entries. The extra 9 are
+  rasterized table crops — the structured `<table>` HTML is authoritative for those.
 
 ### Retrieval design (decisions already made — see `docs/architecture.md` for reasoning)
 
@@ -100,7 +104,7 @@ The parts that shape the ingest code:
 
 ```
 raw data/source/            original PDF (never read at run time)
-raw data/mineru-official/   frozen parse: content/ + assets/images/ + MANIFEST.md
+raw data/mineru-official/   frozen parse: content/ (.md + .json + images/) + MANIFEST.md
 src/insuretutor/ingest/     PDF artifacts → data/chunks.json (build-time only)
 src/insuretutor/retrieval/  hybrid index + ref-aware rerank
 src/insuretutor/guardrails/ refusal & scope policy

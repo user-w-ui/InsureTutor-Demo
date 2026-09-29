@@ -3,9 +3,10 @@
 **Verbatim tool output. Do not hand-edit anything under `content/`.**
 Regeneration wipes this tree.
 
-The only post-processing applied: files were sorted into `content/` and
-`assets/images/`. Image *references* inside the artifacts still say
-`images/<hash>.jpg` (as the tool wrote them) — see **Path remapping** below.
+The only post-processing applied: the tool's output was flattened one level, so
+`content/` holds the `.md`, the `.json`, and the `images/` folder **as siblings**.
+Nothing inside the artifacts was edited, so the `images/<hash>.jpg` references in
+both files resolve relative to the artifact and open in any Markdown viewer.
 
 | Field | Value |
 |---|---|
@@ -22,9 +23,9 @@ The only post-processing applied: files were sorted into `content/` and
 mineru-official/
 ├── content/
 │   ├── FLEXI-ULife Prime Saver.md    39k chars — prose, 72 headings, 9 HTML tables
-│   └── FLEXI-ULife Prime Saver.json  86 KB — 380 blocks, page + bbox anchors
-└── assets/
-    └── images/*.jpg                  42 figures, 2.5 MB
+│   ├── FLEXI-ULife Prime Saver.json  86 KB — 380 blocks, page + bbox anchors
+│   └── images/*.jpg                  42 figures, 2.5 MB
+└── MANIFEST.md                       this file
 ```
 
 ### Which artifact to use for what
@@ -34,7 +35,7 @@ mineru-official/
 | Page numbers, bboxes → **citation anchors** | `.json` | Markdown has no page info. A citation saying "page 7" is unverifiable against the `.md`. |
 | HTML tables | `.md` | JSON table blocks hold a rasterized `img_path`; the structured `<table>` HTML lives in `table_body` but the rendered table is in the `.md`. |
 | Clean prose for the index | `.json` `text` blocks | Pre-split into 298 text blocks with heading levels. |
-| Figures to show in answers | `assets/images/` | 42 JPEGs. |
+| Figures to show in answers | `content/images/` | 42 JPEGs. |
 
 **JSON block schema** (380 blocks):
 
@@ -68,16 +69,21 @@ Other types: `page_number` (16), `header` (14), `footer` (8), `page_footnote` (1
 `aside_text` (1). **Filter these out before indexing** — page numbers and running
 headers are noise, and `page_number` blocks are literally just digits.
 
-## Path remapping
+## Image paths
 
-Artifacts reference images as `images/<hash>.jpg` (tool-native, relative to the
-artifact). After the sort into `content/` + `assets/images/`, ingest must resolve:
+MinerU writes `.md`, `.json`, and `images/` as **siblings** in one output directory,
+and references each figure as `images/<hash>.jpg` — a path relative to the artifact.
+That layout is preserved here on purpose: leave `images/` next to the `.md` and every
+link resolves, in the Markdown viewer and in code, with no remapping step.
 
-```
-images/foo.jpg  →  ../assets/images/foo.jpg   (relative to content/)
-```
+So there is **nothing to remap** — `images/foo.jpg` is already correct relative to
+`content/`. Do not move `images/` out of `content/`; if you do, all 33 in-prose links
+break in any Markdown viewer.
 
-Resolve this once in `src/insuretutor/ingest/`. Do not rewrite the artifacts.
+Note the two counts differ legitimately: the `.md` inlines 33 figures, the `.json`
+carries 42 `img_path` entries. The extra 9 are the rasterized table crops — the
+structured `<table>` HTML is the authoritative form of those, so they are not inlined
+into the prose.
 
 ## Known gaps
 

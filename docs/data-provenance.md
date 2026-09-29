@@ -20,7 +20,6 @@
 | Model | MinerU VLM (server-side, fine-tuned) |
 | Backend | mineru.net cloud (`api/v4`) |
 | Format | `md,json` |
-| OCR flag | `--ocr` |
 | Timeout | 1800 s |
 | Output | `raw data/mineru-official/` |
 
@@ -63,13 +62,21 @@ Checked against the PDF, not against a prior parse:
 
 | Metric | Value |
 |---|---|
-| Markdown size | 39,325 characters |
-| Traditional Chinese characters | 5,996 |
-| Latin letters | 23,136 (~3,326 English words) |
+| Markdown size | 39,201 characters |
+| Traditional Chinese characters | 5,986 |
+| Latin letters | 23,198 (~3,338 English words) |
 | Headings | 72 (49 CN / 23 EN, paired) |
 | Tables | 9 (59 `<tr>`, 115 `<td>`) |
-| Images | 42 files, 2.5 MB total, referenced as separate `.jpg` |
+| Images | 42 files, 2.5 MB; 33 inlined in the prose, 42 referenced in the JSON |
 | Mojibake (U+FFFD) | 0 |
+
+The committed layout is MinerU's own, one level deep: `content/` holds the `.md`, the
+`.json`, and the `images/` folder as siblings, which is what makes the `images/<hash>.jpg`
+references in both files resolve as written. Nothing inside the artifacts was edited.
+
+The JSON's 42 `img_path` entries against the Markdown's 33 inlined figures is expected,
+not a discrepancy: the 9 extras are rasterized table crops. The structured `<table>` HTML
+in `table_body` is the authoritative form for those, and the image is only a cross-check.
 
 Spot-checks that passed — these are the values citations will rest on:
 
