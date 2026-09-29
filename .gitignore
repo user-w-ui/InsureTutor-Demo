@@ -1,0 +1,49 @@
+# ---- Secrets: never commit ----
+.env
+.env.*
+!.env.example
+*.key
+*credentials*
+secrets/
+# Local-only provenance containing machine paths / tokens
+raw data/**/MANIFEST.local.*
+raw data/**/*.local.json
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.pytest_cache/
+.ruff_cache/
+.mypy_cache/
+htmlcov/
+.coverage
+
+# ---- Node / frontend ----
+node_modules/
+frontend/dist/
+npm-debug.log*
+
+# ---- Model & index artifacts (large, regenerated) ----
+*.faiss
+*.index
+*.bin
+*.onnx
+*.safetensors
+models/
+
+# ---- OS / editor ----
+.DS_Store
+Thumbs.db
+desktop.ini
+.vscode/
+.idea/
+*.swp
+
+# ---- Scratch ----
+tmp/
+scratch/
+*.tmp
+*.log
