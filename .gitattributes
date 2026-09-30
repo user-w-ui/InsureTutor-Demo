@@ -1,0 +1,4 @@
+# These files participate in byte-level provenance and reproducibility checks.
+/data/cleaned/** text eol=lf
+/data/cleaning-rules.json text eol=lf
+/src/insuretutor/ingest/clean.py text eol=lf

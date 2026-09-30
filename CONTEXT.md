@@ -36,9 +36,10 @@ equals `page_idx + 1`. This is the only citation anchor.
 _Avoid_: printed page number, zero-based page index
 
 **Printed page number / 印刷页码**:
-The label printed inside the brochure, read from that page's own `page_number` block.
-Not a constant shift of the physical page: numbering starts after the cover and then
-restarts, so it is metadata only and is never computed by offset.
+The label printed inside the brochure, verified against the original page.
+MinerU's `page_number` is only a candidate: on physical page 6 it extracted the
+section number 1, but the actual printed page number is 5. Store raw labels and
+verified labels separately; never compute unverified labels by offset.
 _Avoid_: PDF physical page, page_idx offset
 
 **Curation / 人工审核记录**:

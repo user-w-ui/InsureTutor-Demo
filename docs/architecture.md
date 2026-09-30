@@ -1,7 +1,9 @@
 # InsureTutor architecture proposal
 
-Status: proposal, 2026-09-30. The repository currently has frozen parsing artifacts,
-package skeletons, and documentation. This runtime is not implemented yet.
+Status: proposal, 2026-09-30. The offline cleaning stage is implemented in
+`src/insuretutor/ingest/clean.py`, with separate output in `data/cleaned/` and pinned
+structure/relationship rules in `data/cleaning-rules.json`. See the README for usage.
+The corpus runtime described below is not implemented yet.
 Requirements: [task-spec.md](task-spec.md).
 
 ## Deployment and startup
@@ -116,25 +118,25 @@ the **only** citation anchor. MinerU bboxes reach 1000 while the PDF page is 595
 original excerpts first. Region highlighting needs a verified coordinate transform.
 Table rows currently may only have a whole-table bbox.
 
-**Do not derive printed page numbers from an offset.** The brochure restarts numbering
-after the cover and carries award text on the front matter, so the printed label is
-not a constant shift of the physical page. Observed labels:
+**Do not derive printed page numbers from an offset.** MinerU can confuse section
+numbers with printed page labels: physical page 6 has section number 1 at the top
+and printed page 5 at the bottom. The earlier claim that numbering restarted was
+an extraction error, disproved by viewing the PDF. Observed raw labels:
 
 | page_idx | Physical page | `page_number` block | Note |
 | --- | --- | --- | --- |
 | 0 | 1 | *(none)* | cover, awards and product strapline |
 | 1 | 2 | `1` | numbering starts here |
 | 4 | 5 | `4` | |
-| 5 | 6 | `1` | **restarts** — a second sequence |
+| 5 | 6 | `1` | **misclassified section number**; PDF printed page is `5` |
 | 11 | 12 | `11` | numbered notes live here |
 | 16 | 17 | `16` | known conflict row |
 | 18 | 19 | `18` | English disclaimer |
 | 19 | 20 | *(none)* | back cover |
 
-Because the offset is not constant, the printed label is **metadata only**: read it
-from that page's own `page_number` block, never compute it. Every citation shows the
-physical page; the printed label may be shown alongside as a secondary hint and must
-be omitted when the page has no `page_number` block.
+The printed label is **metadata only**: preserve the raw extraction and show a
+printed label only after verification against the PDF. Every citation uses the
+physical page. A missing or unverified printed label must not be guessed.
 
 
 ## Runtime flow
@@ -210,7 +212,7 @@ Example payload for a follow-up:
       },
       "resolved_question": "定期提款权益每月最低提款金额是多少？",
       "evidence": [
-        {"id": "E1", "kind": "clause", "pdf_page": 11,
+        {"id": "E1", "kind": "clause", "pdf_page": 10,
          "original_text": "<verbatim clause>", "requires": ["E2"]},
         {"id": "E2", "kind": "note", "pdf_page": 12,
          "original_text": "<verbatim Note 6, including amount and conditions>"}

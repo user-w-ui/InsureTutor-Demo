@@ -1,0 +1,1805 @@
+{
+  "schema_version": 1,
+  "raw_sha256": "23b55338c73de0e8052e2eb83225434e10f3956f24667f4d19fb2add4f1dbbf3",
+  "pdf_sha256": "2043de40845267fdb1f657280438f3ded04edda6692791960415116a5668a475",
+  "review": {
+    "reviewed_by": "Codex",
+    "reviewed_at": "2026-09-30",
+    "method": "Source JSON inspection; PDF visual spot checks on pages 6/8/9/12/16/17 and table crops on pages 7/13/18. Not a human sign-off or full transcription review."
+  },
+  "excluded_types": [
+    "header",
+    "footer",
+    "page_number",
+    "aside_text"
+  ],
+  "metadata_blocks": {
+    "version_code": 378
+  },
+  "note_blocks": {
+    "1": [
+      197,
+      208
+    ],
+    "2": [
+      198,
+      209
+    ],
+    "3": [
+      199,
+      210
+    ],
+    "4": [
+      200,
+      211
+    ],
+    "5": [
+      201,
+      212
+    ],
+    "6": [
+      202,
+      213
+    ],
+    "7": [
+      203,
+      214
+    ],
+    "8": [
+      204,
+      215
+    ],
+    "9": [
+      205,
+      216
+    ],
+    "10": [
+      206,
+      217
+    ]
+  },
+  "literal_markers": {
+    "b83": [
+      {
+        "anchor": "退保費用1",
+        "number": 1
+      }
+    ],
+    "b85": [
+      {
+        "anchor": "保單增值權益2",
+        "number": 2
+      }
+    ],
+    "b88": [
+      {
+        "anchor": "保證可保權益3",
+        "number": 3
+      }
+    ],
+    "b161": [
+      {
+        "anchor": "定期提款權益6",
+        "number": 6
+      },
+      {
+        "anchor": "現金價值7",
+        "number": 7
+      }
+    ],
+    "b177": [
+      {
+        "anchor": "十足保障8",
+        "number": 8
+      }
+    ],
+    "b180": [
+      {
+        "anchor": "末期病症9",
+        "number": 9
+      }
+    ],
+    "b97:r1:c2": [
+      {
+        "anchor": "基本保障額」4",
+        "number": 4
+      },
+      {
+        "anchor": "\"Basic Sum Insured\"4",
+        "number": 4
+      }
+    ],
+    "b97:r3:c2": [
+      {
+        "anchor": "50%」5",
+        "number": 5
+      },
+      {
+        "anchor": "50% of Account Value\"5",
+        "number": 5
+      }
+    ],
+    "b352:r8:c0": [
+      {
+        "anchor": "保證可保權益3",
+        "number": 3
+      },
+      {
+        "anchor": "Guaranteed Insurability Option3",
+        "number": 3
+      }
+    ],
+    "b352:r9:c0": [
+      {
+        "anchor": "失業保障8",
+        "number": 8
+      },
+      {
+        "anchor": "Unemployment Benefit8",
+        "number": 8
+      }
+    ],
+    "b352:r10:c0": [
+      {
+        "anchor": "末期病症保障9",
+        "number": 9
+      },
+      {
+        "anchor": "Terminal Illness Benefit9",
+        "number": 9
+      }
+    ],
+    "b356:r0:c0": [
+      {
+        "anchor": "退保費用10",
+        "number": 10
+      },
+      {
+        "anchor": "Surrender Charge10",
+        "number": 10
+      }
+    ],
+    "b356:r1:c1": [
+      {
+        "anchor": "提款費用10",
+        "number": 10
+      },
+      {
+        "anchor": "withdrawal charge10",
+        "number": 10
+      }
+    ]
+  },
+  "groups": [
+    {
+      "id": "intro",
+      "blocks": [
+        10,
+        11
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "market-context",
+      "blocks": [
+        18,
+        19,
+        26
+      ],
+      "headings": [
+        22,
+        23,
+        25
+      ],
+      "notes": [],
+      "kind": "background",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "generic-coverage",
+      "blocks": [
+        33,
+        34
+      ],
+      "headings": [],
+      "notes": [
+        1
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "generic-premium-rate",
+      "blocks": [
+        36,
+        37
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "generic-payment-flexibility",
+      "blocks": [
+        39,
+        40
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "generic-monthly-interest",
+      "blocks": [
+        42,
+        43
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "generic-cash-withdrawal",
+      "blocks": [
+        45,
+        46
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "generic-disclaimer",
+      "blocks": [
+        48,
+        49
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "disclaimer",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "coverage-summary",
+      "blocks": [
+        54
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "enhancement-summary",
+      "blocks": [
+        55
+      ],
+      "headings": [],
+      "notes": [
+        2,
+        3
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "level-summary",
+      "blocks": [
+        58
+      ],
+      "headings": [
+        57
+      ],
+      "notes": [
+        4
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "increasing-summary",
+      "blocks": [
+        60
+      ],
+      "headings": [
+        57
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "incremental-summary",
+      "blocks": [
+        61
+      ],
+      "headings": [
+        57
+      ],
+      "notes": [
+        5
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "interest-summary",
+      "blocks": [
+        65,
+        66
+      ],
+      "headings": [
+        63
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "guarantee-summary",
+      "blocks": [
+        67
+      ],
+      "headings": [
+        63
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "premium-summary",
+      "blocks": [
+        71
+      ],
+      "headings": [
+        69
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "withdrawal-summary",
+      "blocks": [
+        72
+      ],
+      "headings": [
+        69
+      ],
+      "notes": [
+        6
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "skip-summary",
+      "blocks": [
+        73
+      ],
+      "headings": [
+        69
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "unemployment-summary",
+      "blocks": [
+        77,
+        78
+      ],
+      "headings": [
+        74,
+        76
+      ],
+      "notes": [
+        8
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "supplementary-summary",
+      "blocks": [
+        80
+      ],
+      "headings": [
+        74,
+        76
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "coverage-change",
+      "blocks": [
+        83,
+        84
+      ],
+      "headings": [
+        82
+      ],
+      "notes": [
+        1
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "enhancement",
+      "blocks": [
+        86,
+        87
+      ],
+      "headings": [
+        85
+      ],
+      "notes": [
+        2
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "insurability",
+      "blocks": [
+        89,
+        90
+      ],
+      "headings": [
+        88
+      ],
+      "notes": [
+        3
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "premium-rate",
+      "blocks": [
+        92
+      ],
+      "headings": [
+        91
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "life-stage-example",
+      "blocks": [
+        99,
+        101,
+        107,
+        108,
+        109,
+        111
+      ],
+      "headings": [
+        98,
+        100,
+        102,
+        103,
+        105,
+        106,
+        110
+      ],
+      "notes": [
+        3
+      ],
+      "kind": "illustration",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "interest-guarantee",
+      "blocks": [
+        115,
+        116,
+        117
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "base-interest",
+      "blocks": [
+        118,
+        120
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "additional-interest",
+      "blocks": [
+        121,
+        122
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "rate-date-note",
+      "blocks": [
+        124,
+        127
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "qualifying_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "interest-year20-note",
+      "blocks": [
+        125,
+        128
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "qualifying_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "interest-every5-note",
+      "blocks": [
+        126,
+        129
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "qualifying_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "extra-bonus-frequency",
+      "blocks": [
+        135,
+        136
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "extra-bonus-formula-fragments",
+      "blocks": [
+        137,
+        139,
+        152
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "fragment",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "bonus-rate-15-25",
+      "blocks": [
+        143,
+        144
+      ],
+      "headings": [
+        140,
+        141,
+        142
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "bonus-rate-30",
+      "blocks": [
+        145,
+        146
+      ],
+      "headings": [
+        140,
+        141,
+        142
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "bonus-example",
+      "blocks": [
+        148,
+        149,
+        151,
+        153
+      ],
+      "headings": [
+        147
+      ],
+      "notes": [],
+      "kind": "illustration",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "bonus-rate-disclaimer",
+      "blocks": [
+        154
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "qualifying_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "example-disclaimer",
+      "blocks": [
+        155,
+        156
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "disclaimer",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "premium-increase",
+      "blocks": [
+        158,
+        159
+      ],
+      "headings": [
+        157
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "withdrawal",
+      "blocks": [
+        161,
+        162
+      ],
+      "headings": [
+        160
+      ],
+      "notes": [
+        6,
+        7
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "skip-premiums",
+      "blocks": [
+        164,
+        165
+      ],
+      "headings": [
+        163
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "cash-value-formula-fragments",
+      "blocks": [
+        166,
+        167,
+        168
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "fragment",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "cash-value-risk",
+      "blocks": [
+        169,
+        170
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "risk",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "unemployment",
+      "blocks": [
+        177,
+        178
+      ],
+      "headings": [
+        175,
+        176
+      ],
+      "notes": [
+        8
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "terminal-illness",
+      "blocks": [
+        180,
+        181
+      ],
+      "headings": [
+        179
+      ],
+      "notes": [
+        9
+      ],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "waiver-of-premium",
+      "blocks": [
+        183,
+        189
+      ],
+      "headings": [
+        182,
+        184,
+        186,
+        187,
+        188
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "other-supplementary",
+      "blocks": [
+        185,
+        190
+      ],
+      "headings": [
+        184,
+        186,
+        187
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-1",
+      "blocks": [
+        197,
+        208
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-2",
+      "blocks": [
+        198,
+        209
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-3",
+      "blocks": [
+        199,
+        210
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-4",
+      "blocks": [
+        200,
+        211
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-5",
+      "blocks": [
+        201,
+        212
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-6",
+      "blocks": [
+        202,
+        213
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-7",
+      "blocks": [
+        203,
+        214
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-8",
+      "blocks": [
+        204,
+        215
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-9",
+      "blocks": [
+        205,
+        216
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "note-10",
+      "blocks": [
+        206,
+        217
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "numbered_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "rate-philosophy",
+      "blocks": [
+        221,
+        242
+      ],
+      "headings": [
+        220,
+        241
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "rate-governance",
+      "blocks": [
+        222,
+        243
+      ],
+      "headings": [
+        220,
+        241
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "rate-factors",
+      "blocks": [
+        223,
+        244
+      ],
+      "headings": [
+        220,
+        241
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "investment-performance",
+      "blocks": [
+        224,
+        245
+      ],
+      "headings": [
+        220,
+        241
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "surrender-factor",
+      "blocks": [
+        225,
+        246
+      ],
+      "headings": [
+        220,
+        241
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "rate-smoothing",
+      "blocks": [
+        226,
+        247
+      ],
+      "headings": [
+        220,
+        241
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "investment-objective",
+      "blocks": [
+        228,
+        249
+      ],
+      "headings": [
+        227,
+        248
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "investment-selection",
+      "blocks": [
+        229,
+        250
+      ],
+      "headings": [
+        227,
+        248
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "investment-allocation",
+      "blocks": [
+        230,
+        251
+      ],
+      "headings": [
+        227,
+        248
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "fixed-income-assets",
+      "blocks": [
+        232,
+        253
+      ],
+      "headings": [
+        227,
+        248
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "equity-assets",
+      "blocks": [
+        233,
+        254
+      ],
+      "headings": [
+        227,
+        248
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "investment-strategy-changes",
+      "blocks": [
+        234,
+        255,
+        256
+      ],
+      "headings": [
+        227,
+        248
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "investment-links",
+      "blocks": [
+        235,
+        237,
+        239,
+        258,
+        259,
+        261
+      ],
+      "headings": [
+        227,
+        248
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "term-and-lapse",
+      "blocks": [
+        265,
+        293
+      ],
+      "headings": [
+        264,
+        292
+      ],
+      "notes": [],
+      "kind": "risk",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "termination",
+      "blocks": [
+        267,
+        268,
+        269,
+        270,
+        271,
+        272,
+        295,
+        296,
+        297,
+        298,
+        299,
+        300
+      ],
+      "headings": [
+        266,
+        294
+      ],
+      "notes": [],
+      "kind": "risk",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "maturity",
+      "blocks": [
+        274,
+        302
+      ],
+      "headings": [
+        273,
+        301
+      ],
+      "notes": [],
+      "kind": "risk",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "early-surrender",
+      "blocks": [
+        276,
+        304
+      ],
+      "headings": [
+        275,
+        303
+      ],
+      "notes": [],
+      "kind": "risk",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "inflation-risk",
+      "blocks": [
+        278,
+        306
+      ],
+      "headings": [
+        277,
+        305
+      ],
+      "notes": [],
+      "kind": "risk",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "credit-risk",
+      "blocks": [
+        280,
+        308
+      ],
+      "headings": [
+        279,
+        307
+      ],
+      "notes": [],
+      "kind": "risk",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "suicide-exclusion",
+      "blocks": [
+        282,
+        310
+      ],
+      "headings": [
+        281,
+        309
+      ],
+      "notes": [],
+      "kind": "risk",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "terminal-exclusions",
+      "blocks": [
+        284,
+        285,
+        286,
+        287,
+        288,
+        289,
+        290,
+        312,
+        313,
+        314,
+        315,
+        316,
+        317,
+        318
+      ],
+      "headings": [
+        283,
+        311
+      ],
+      "notes": [],
+      "kind": "exclusion",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "disclosure",
+      "blocks": [
+        321,
+        337
+      ],
+      "headings": [
+        320,
+        336
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "claims",
+      "blocks": [
+        323,
+        324,
+        325,
+        326,
+        339,
+        340
+      ],
+      "headings": [
+        322,
+        338
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "levy",
+      "blocks": [
+        328,
+        342
+      ],
+      "headings": [
+        327,
+        341
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "cooling-off",
+      "blocks": [
+        330,
+        344
+      ],
+      "headings": [
+        329,
+        343
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "surrender-process",
+      "blocks": [
+        332,
+        333,
+        346,
+        347
+      ],
+      "headings": [
+        331,
+        345
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "deferred-payment",
+      "blocks": [
+        335,
+        349
+      ],
+      "headings": [
+        334,
+        348
+      ],
+      "notes": [],
+      "kind": "clause",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "disclaimer-zh",
+      "blocks": [
+        359
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "disclaimer",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "disclaimer-en",
+      "blocks": [
+        360
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "disclaimer",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "company-shareholders",
+      "blocks": [
+        363,
+        365
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "background",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "company-partnership",
+      "blocks": [
+        364,
+        366
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "background",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "company-shareholding-note",
+      "blocks": [
+        372,
+        374
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "qualifying_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "company-ranking-note",
+      "blocks": [
+        373,
+        375
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "qualifying_note",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "front-matter-themes",
+      "blocks": [
+        13,
+        14,
+        15,
+        16,
+        21
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "background",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "generic-product-heading",
+      "blocks": [
+        31,
+        32
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "background",
+      "pairing_status": "same_topic_not_equivalence"
+    },
+    {
+      "id": "company-website",
+      "blocks": [
+        376
+      ],
+      "headings": [],
+      "notes": [],
+      "kind": "background",
+      "pairing_status": "same_topic_not_equivalence"
+    }
+  ],
+  "tables": {
+    "97": {
+      "header_rows": [
+        0
+      ],
+      "skip_rows": [],
+      "context_blocks": [],
+      "row_notes": {
+        "1": [
+          4
+        ],
+        "3": [
+          5
+        ]
+      }
+    },
+    "114": {
+      "header_rows": [
+        0
+      ],
+      "skip_rows": [],
+      "context_blocks": [
+        118,
+        121
+      ],
+      "requires": [
+        "rate-date-note",
+        "interest-year20-note",
+        "interest-every5-note"
+      ],
+      "kind": "illustration"
+    },
+    "150": {
+      "header_rows": [
+        0
+      ],
+      "skip_rows": [],
+      "context_blocks": [
+        148,
+        149
+      ],
+      "requires": [
+        "example-disclaimer",
+        "bonus-rate-disclaimer"
+      ],
+      "kind": "illustration"
+    },
+    "231": {
+      "header_rows": [
+        0
+      ],
+      "skip_rows": [],
+      "context_blocks": [
+        227
+      ],
+      "parallel_table": 252,
+      "requires": [
+        "investment-strategy-changes"
+      ]
+    },
+    "252": {
+      "header_rows": [
+        0
+      ],
+      "skip_rows": [],
+      "context_blocks": [
+        248
+      ],
+      "parallel_table": 231,
+      "requires": [
+        "investment-strategy-changes"
+      ]
+    },
+    "352": {
+      "header_rows": [],
+      "skip_rows": [
+        0,
+        4,
+        12
+      ],
+      "context_blocks": [
+        351
+      ],
+      "row_notes": {
+        "8": [
+          3
+        ],
+        "9": [
+          8
+        ],
+        "10": [
+          9
+        ]
+      },
+      "row_requires": {
+        "1": [
+          "rate-date-note"
+        ],
+        "2": [
+          "rate-date-note",
+          "interest-year20-note",
+          "interest-every5-note"
+        ],
+        "3": [
+          "bonus-rate-disclaimer"
+        ],
+        "5": [
+          "bonus-rate-disclaimer"
+        ],
+        "10": [
+          "terminal-exclusions"
+        ]
+      },
+      "split_rows": {
+        "5": [
+          {
+            "name": "early",
+            "selectors": {
+              "b352:r5:c1": "2.75%",
+              "b352:r5:c2": "15/20/25"
+            }
+          },
+          {
+            "name": "later",
+            "selectors": {
+              "b352:r5:c1": "5.5%",
+              "b352:r5:c2": "30及其後每5年The  $30^{th}$  year and every 5 years thereafter"
+            }
+          }
+        ]
+      }
+    },
+    "354": {
+      "header_rows": [],
+      "skip_rows": [
+        0
+      ],
+      "context_blocks": [],
+      "row_headers": {
+        "1": [
+          0
+        ],
+        "2": [
+          0
+        ],
+        "3": [
+          0
+        ]
+      },
+      "row_notes": {
+        "6": [
+          10
+        ],
+        "7": [
+          10
+        ],
+        "8": [
+          10
+        ]
+      },
+      "conflict_rows": [
+        5
+      ]
+    },
+    "356": {
+      "header_rows": [],
+      "skip_rows": [],
+      "context_blocks": [],
+      "row_notes": {
+        "0": [
+          10
+        ],
+        "1": [
+          6,
+          7,
+          10
+        ]
+      },
+      "row_requires": {
+        "1": [
+          "cash-value-risk"
+        ]
+      }
+    },
+    "357": {
+      "header_rows": [],
+      "skip_rows": [],
+      "context_blocks": [],
+      "row_requires": {
+        "1": [
+          "term-and-lapse"
+        ],
+        "2": [
+          "term-and-lapse"
+        ]
+      }
+    }
+  },
+  "mandatory_links": {
+    "generic-coverage": [
+      "generic-disclaimer"
+    ],
+    "generic-premium-rate": [
+      "generic-disclaimer"
+    ],
+    "generic-payment-flexibility": [
+      "generic-disclaimer",
+      "cash-value-risk",
+      "term-and-lapse"
+    ],
+    "generic-monthly-interest": [
+      "generic-disclaimer"
+    ],
+    "generic-cash-withdrawal": [
+      "generic-disclaimer",
+      "cash-value-risk",
+      "term-and-lapse"
+    ],
+    "withdrawal-summary": [
+      "cash-value-risk",
+      "term-and-lapse"
+    ],
+    "skip-summary": [
+      "cash-value-risk",
+      "term-and-lapse"
+    ],
+    "withdrawal": [
+      "cash-value-risk",
+      "term-and-lapse"
+    ],
+    "skip-premiums": [
+      "cash-value-risk",
+      "term-and-lapse"
+    ],
+    "note-6": [
+      "cash-value-risk",
+      "term-and-lapse"
+    ],
+    "note-7": [
+      "cash-value-risk",
+      "term-and-lapse"
+    ],
+    "coverage-summary": [
+      "coverage-change"
+    ],
+    "guarantee-summary": [
+      "interest-guarantee"
+    ],
+    "interest-summary": [
+      "rate-date-note",
+      "additional-interest",
+      "extra-bonus-frequency"
+    ],
+    "base-interest": [
+      "rate-date-note"
+    ],
+    "additional-interest": [
+      "rate-date-note",
+      "interest-year20-note",
+      "interest-every5-note"
+    ],
+    "extra-bonus-frequency": [
+      "bonus-rate-disclaimer"
+    ],
+    "bonus-rate-15-25": [
+      "bonus-rate-disclaimer"
+    ],
+    "bonus-rate-30": [
+      "bonus-rate-disclaimer"
+    ],
+    "bonus-example": [
+      "example-disclaimer",
+      "bonus-rate-disclaimer"
+    ],
+    "terminal-illness": [
+      "terminal-exclusions"
+    ],
+    "note-9": [
+      "terminal-exclusions"
+    ],
+    "company-shareholders": [
+      "company-shareholding-note",
+      "company-ranking-note"
+    ],
+    "level-summary": [
+      "table-97-row-1"
+    ],
+    "increasing-summary": [
+      "table-97-row-2"
+    ],
+    "incremental-summary": [
+      "table-97-row-3"
+    ]
+  },
+  "block_flags": {
+    "115": [
+      "damaged_text"
+    ],
+    "200": [
+      "damaged_text"
+    ],
+    "201": [
+      "damaged_text"
+    ],
+    "224": [
+      "missing_subject_label"
+    ],
+    "225": [
+      "missing_subject_label"
+    ],
+    "137": [
+      "incomplete_formula"
+    ],
+    "152": [
+      "interleaved_formula_labels"
+    ]
+  },
+  "verified_printed_pages": {
+    "6": "5"
+  },
+  "conflicts": [
+    {
+      "unit": "table-354-row-5",
+      "status": "reviewed_source_conflict",
+      "reason": "PDF page 17 visually confirms CN HKD 40,000 / MOP 400,000 versus EN HKD 400,000 / MOP 40,000. Neither is selected as authoritative."
+    }
+  ],
+  "markup_reference_locations": {
+    "b84": [
+      1
+    ],
+    "b85": [
+      2
+    ],
+    "b88": [
+      3
+    ],
+    "b162": [
+      6,
+      7
+    ],
+    "b178": [
+      8
+    ],
+    "b181": [
+      9
+    ],
+    "b354:r6:c0": [
+      10
+    ],
+    "b354:r7:c0": [
+      10
+    ],
+    "b354:r8:c0": [
+      10
+    ]
+  },
+  "evidence_groups": {
+    "coverage-summary": "coverage-change",
+    "coverage-change": "coverage-change",
+    "level-summary": "level-benefit",
+    "table-97-row-1": "level-benefit",
+    "increasing-summary": "increasing-benefit",
+    "table-97-row-2": "increasing-benefit",
+    "incremental-summary": "incremental-benefit",
+    "table-97-row-3": "incremental-benefit",
+    "base-interest": "base-interest",
+    "table-352-row-1": "base-interest",
+    "additional-interest": "additional-interest",
+    "table-352-row-2": "additional-interest",
+    "guarantee-summary": "interest-guarantee",
+    "interest-guarantee": "interest-guarantee",
+    "table-352-row-6": "interest-guarantee",
+    "extra-bonus-frequency": "extra-bonus-frequency",
+    "table-352-row-3": "extra-bonus-frequency",
+    "bonus-rate-15-25": "bonus-rate-15-25",
+    "table-352-row-5-early": "bonus-rate-15-25",
+    "bonus-rate-30": "bonus-rate-30",
+    "table-352-row-5-later": "bonus-rate-30",
+    "insurability": "insurability",
+    "table-352-row-8": "insurability",
+    "unemployment-summary": "unemployment",
+    "unemployment": "unemployment",
+    "table-352-row-9": "unemployment",
+    "terminal-illness": "terminal-illness",
+    "table-352-row-10": "terminal-illness",
+    "supplementary-summary": "supplementary",
+    "other-supplementary": "supplementary",
+    "table-352-row-11": "supplementary",
+    "skip-summary": "skip-premiums",
+    "skip-premiums": "skip-premiums",
+    "disclaimer-zh": "disclaimer",
+    "disclaimer-en": "disclaimer"
+  }
+}

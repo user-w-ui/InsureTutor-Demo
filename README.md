@@ -8,7 +8,32 @@ Engineer internship. See [`docs/task-spec.md`](docs/task-spec.md) for the origin
 
 **Source document:** `FLEXI-ULife Prime Saver.pdf` — 20-page bilingual
 (Traditional Chinese / English) product brochure, YF Life 萬通保險.
-**Domain language:** Traditional Chinese (source of truth) + English (official parallel text).
+**Domain language:** Traditional Chinese + English, each retained as original evidence.
+Neither language is silently preferred when the brochure disagrees with itself.
+
+## Cleaned data (implemented)
+
+The offline cleaner writes separately to [`data/cleaned/`](data/cleaned/README.md),
+leaving `raw data/` unchanged. Start with the [readable preview](data/cleaned/preview.md),
+[quality report](data/cleaned/report.json), and [table/note map](docs/data-cleaning-map.md).
+The remaining application architecture below is a proposal, not an implemented runtime.
+
+From the repository root, using Python 3.11 or newer (no third-party dependencies
+are needed for cleaning or its tests):
+
+```powershell
+$env:PYTHONPATH = "src"
+python -m insuretutor.ingest.clean
+python -m unittest discover -s tests -v
+```
+
+The source-pinned [`data/cleaning-rules.json`](data/cleaning-rules.json) declares exact
+reference markers, bilingual topic groups, table structure, required evidence, and
+the confirmed source conflict. It does not supply replacement source text.
+`units.jsonl` is the retrieval input; `spans.jsonl` retains original citation anchors.
+Use only indexable units and follow their `requires` links before answering.
+The cleaner preserves damaged text with explicit flags; it does not certify the
+entire brochure or translate the corpus into Simplified Chinese.
 
 ---
 

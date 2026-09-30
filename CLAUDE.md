@@ -41,6 +41,10 @@ install step. Requires Python ≥ 3.11 (developed on 3.13).
 ## Architecture
 
 The current design proposal is [`docs/architecture.md`](docs/architecture.md).
+Offline cleaning is now implemented: `python -m insuretutor.ingest.clean` reads
+`data/cleaning-rules.json` and writes `data/cleaned/` separately from frozen inputs.
+See its generated README, report, and `docs/data-cleaning-map.md`. This intermediate
+dataset is not the proposed runtime `data/corpus.json`.
 It supersedes the earlier retrieval details below: use table-row retrieval, mandatory
 qualifying-note completion, separate language source anchors, and reviewed conflict
 flags. The generated artifact is `data/corpus.json`. Runtime serves the original PDF
@@ -76,11 +80,10 @@ to `data/`. If you think the parse is wrong, verify at the codepoint level first
 ### Page numbering — the one rule to get right
 
 `page_idx + 1` is the **physical PDF page** and is the only citation anchor. The
-brochure's *printed* page label is **not** a constant offset of it: numbering starts
-after the cover and restarts (physical page 6 carries printed `1`). Read the printed
-label from that page's own `page_number` block; never compute it. Full observed
-mapping in [`docs/architecture.md`](docs/architecture.md) — getting this wrong
-corrupts every citation card.
+brochure's *printed* page label must be visually verified: MinerU incorrectly labels
+physical page 6 as `1` by reading the section number; the actual bottom label is `5`.
+The earlier claim of restarted numbering was incorrect. Preserve raw labels separately
+from verified printed labels and never use an inferred offset for citations.
 
 ### Data contract — `raw data/mineru-official/`
 
@@ -93,9 +96,10 @@ The parts that shape the ingest code:
 - Block types: `text` (298, of which 72 carry `text_level` = headings), `table` (9),
   `image`/`chart` (33), plus **noise to filter before indexing**: `page_number` (16),
   `header` (14), `footer` (8), `page_footnote` (1), `aside_text` (1).
-- `table.table_body` holds the structured `<table>` HTML — non-empty for all 9.
-  `table_caption` / `table_footnote` are **empty arrays**; captions survive only as
-  separate `text` blocks, so re-associate them by `page_idx` + proximity.
+- `table.table_body` holds structured `<table>` HTML — non-empty for all 9, but
+  some cells contain merged text that needs structural review. Seven tables have
+  empty `table_caption`; the two tables on physical page 18 have native captions.
+  `table_footnote` arrays are empty. Do not fabricate captions for untitled tables.
 - Images live in `content/images/`, and both artifacts reference them as
   `images/<hash>.jpg` — already correct relative to `content/`, because MinerU writes
   the `.md`, the `.json`, and `images/` as siblings. **Leave that layout alone:** do not
@@ -172,8 +176,8 @@ codepoints, the file is fine and the terminal is lying.
 
 Other specifics worth knowing:
 
-- `page_idx` is **0-based**; `page_idx + 1` is the physical PDF page, and the printed
-  page label is *not* a constant offset of it (see "Page numbering" above).
+- `page_idx` is **0-based**; `page_idx + 1` is the physical PDF page. Raw printed-page
+  candidates can be misclassified (see "Page numbering" above).
 - Shell is PowerShell on this machine — `&&` chaining and heredocs differ. For long
   commit messages write to a temp file and use `git commit -F <file>`.
 - No credentials in the repo. `.env` is gitignored; `.env.example` documents the vars.
@@ -188,8 +192,9 @@ Other specifics worth knowing:
 
 ## Status
 
-Parse is done and verified. Blocked on two reviewed artefacts before `build_corpus` can
-be written: the **nine-table / ten-note map** and the **bilingual glossary**
-(see `docs/architecture.md`). Then: `data/corpus.json`, retrieval + citations,
-guardrails, API + frontend, Docker. Tracked as a checklist in [`README.md`](README.md).
+Parse is frozen. Offline cleaning and its regression tests are implemented; the
+nine-table / ten-note map is in `docs/data-cleaning-map.md`. The output's report
+records remaining damaged text and formula fragments. A bilingual glossary,
+runtime corpus integration, retrieval + citations, guardrails, API + frontend,
+and Docker remain. See [`README.md`](README.md).
 

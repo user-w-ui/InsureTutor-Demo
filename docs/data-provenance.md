@@ -10,7 +10,9 @@
 | Language | Traditional Chinese + English (interleaved, page-by-page parallel) |
 | Publisher | YF Life Insurance International Ltd. 萬通保險 |
 | Document type | Universal life insurance product brochure |
-| Print date (per brochure) | January 2022 |
+| Rate illustration date | January 2022, stated in the physical-page-8 interest-rate footnote; not a verified publication date for the entire file |
+| Version code | `PSP-137-V3-0925B` on the back cover; retained verbatim |
+| PDF metadata dates | Creation 2025-09-17; modification 2025-09-18; metadata does not establish policy effective dates |
 
 ## Extract
 
