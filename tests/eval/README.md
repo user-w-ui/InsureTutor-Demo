@@ -1,6 +1,6 @@
 # `tests/eval/` — judge-facing evaluation set
 
-Seven question/answer items that stress the InsureTutor grounded QA agent, built over
+Ten question/answer items that stress the InsureTutor grounded QA agent, built over
 [`raw data/source/FLEXI-ULife Prime Saver.pdf`](../../raw%20data/source/FLEXI-ULife%20Prime%20Saver.pdf)
 (YF Life 萬通保險, *FLEXI-ULife Prime Saver / 首選靈活萬用壽險計劃*, version `PSP-137-V3-0925B`).
 
@@ -11,10 +11,10 @@ Seven question/answer items that stress the InsureTutor grounded QA agent, built
 | [`test_eval_set.py`](test_eval_set.py) | Contract tests over the *dataset* — not over the tutor. |
 
 ```bash
-pytest tests/eval -v     # 14 tests, all green
+pytest tests/eval -v     # 18 tests, all green
 ```
 
-## What the seven items cover
+## What the ten items cover
 
 | # | id | capability | mode | cites |
 |---|----|-----------|------|-------|
@@ -24,10 +24,38 @@ pytest tests/eval -v     # 14 tests, all green
 | 4 | `q4-incremental-death-benefit-netting` | citation-calculation | numeric | 3 |
 | 5 | `q5-periodic-withdrawal-eligibility` | edge-case-eligibility | numeric | 4 |
 | 6 | `q6-macau-currency-and-lapse` | cross-language | explain | 5 |
-| 7 | `q7-scope-refusal-and-version-code` | scope-refusal | refuse | 0 |
+| 7 | `q7-scope-refusal-and-version-code` | scope-refusal | refuse | 0 (+3 grounding) |
+| 8 | `q8-grandchild-education-vague` | vague-request-triage | explain | 9 |
+| 9 | `q9-vague-overreach-uncovered-needs` | scope-refusal | refuse | 0 (+2 grounding) |
+| 10 | `q10-nonresident-eligibility-not-in-document` | scope-refusal | refuse | 0 (+5 grounding) |
 
 Questions are deliberately mixed Simplified / Traditional / English. Answers are anchored to
 physical PDF pages (`page_idx + 1`), never to the printed page label or an inferred offset.
+
+**No question tells the tutor where to cite.** Earlier drafts asked for "引用位置" outright;
+the graded behaviour is that the agent *finds* its own evidence, so the demand now lives only in
+`rubric`, never in `question`. `test_questions_do_not_tell_the_tutor_where_to_cite` holds that
+line — it fails on 「引用」「哪一條附註」「根據第X頁」 and on any question that names one of its own
+citation unit ids. The one deliberate exception is q2 asking for the figures *in all three
+currencies*: that is a content requirement, not a pointer at a location.
+
+**Q8 is the vague-input item.** It reads like a real customer — no product name, no benefit
+name, no figure, nothing the retriever can match lexically. It has a single bridge into the
+corpus: the physical-page-10 withdrawal clause that names 子女升學 / *children's university
+education funds*. A separate contract test (`test_vague_items_read_like_a_real_user`) keeps it
+vague — if a future edit names an option or a currency figure in the question, the test fails,
+because the item would no longer be testing retrieval.
+
+**Q7, q9 and q10 are three refusals for three different reasons**, and the difference is the
+point. Q7 refuses a question about figures this edition of *this* product does not publish (2025
+crediting rates). Q9 refuses three lines of cover the brochure was never about (medical, travel,
+motor). Q10 refuses a question that is squarely about this product — who may take it out — because
+the brochure states exactly one qualification (issue age 0-75, 0-55 for Increasing Benefit Plus,
+physical page 18) and says nothing whatever about residence, nationality or immigration status.
+The nearest-looking text is a decoy: 香港 / 澳門 throughout the brochure scopes *currency, minimum
+amounts and the premium levy by place of issue*, never eligibility. Each refusal therefore carries
+no citations but does carry `refusal_grounding` — the units a grader reads to see why the refusal
+is right — and each must name its basis rather than shrug.
 
 ## What the contract tests actually enforce
 
@@ -41,7 +69,15 @@ letting the eval set silently drift from the corpus it grades against:
   quote would make it unciteable;
 - footnote-dependent answers reach their note via `requires` / `note_refs`;
 - exactly one conflict item, and it must **not** pick a single answer;
-- exactly one refusal item, and it carries **no** citations;
+- all three refusal items carry **no** citations and must set `must_not_fabricate`, and each must
+  supply `refusal_grounding` — a refusal that cites nothing still has to state what it stands on;
+- every `refusal_grounding` unit id resolves, its `pdf_page` is in that unit's `pages`, and its
+  quote is a literal substring by the same fragment-wise rule the citations get (added after q9
+  shipped pointing at physical page 17 for a unit that lives on 19);
+- no question points the tutor at a citation — no 「引用」「哪一條附註」「根據第X頁」, and no question
+  that names one of its own citation unit ids;
+- the vague-question items stay under 60 characters and leak none of the corpus's own terminology
+  (「定期提款」「現金價值」「USD」…) — an item that names the option has stopped testing retrieval;
 - pages are one-based and ≤ 20;
 - the set never references `tmp/pages` scratch renders.
 

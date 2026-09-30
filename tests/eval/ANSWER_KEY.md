@@ -1,6 +1,6 @@
 # Judge-facing evaluation set — questions, answers, citations
 
-Seven items for evaluating the InsureTutor QA agent against
+Ten items for evaluating the InsureTutor QA agent against
 [`raw data/source/FLEXI-ULife Prime Saver.pdf`](../../raw%20data/source/FLEXI-ULife%20Prime%20Saver.pdf)
 (YF Life 萬通保險, *FLEXI-ULife Prime Saver / 首選靈活萬用壽險計劃*, version `PSP-137-V3-0925B`).
 
@@ -35,6 +35,29 @@ regenerated corpus fails loudly instead of silently drifting.
 | 5 | `q5-periodic-withdrawal-eligibility` | edge-case-eligibility | eligibility gate + a bilingual defect |
 | 6 | `q6-macau-currency-and-lapse` | cross-language | Macau currency set, and "unemployment ≠ free premiums" |
 | 7 | `q7-scope-refusal-and-version-code` | scope-refusal | must refuse 2025 fulfilment ratio; no fabrication |
+| 8 | `q8-grandchild-education-vague` | vague-request-triage | "grandson starts school" — no keywords; reframe to the withdrawal clause |
+| 9 | `q9-vague-overreach-uncovered-needs` | scope-refusal | medical / travel / motor: not in this brochure, must not be filled |
+| 10 | `q10-nonresident-eligibility-not-in-document` | scope-refusal | "can a non-Hong Kong resident apply?" — the brochure is silent; say so |
+
+**No question tells the tutor where to cite.** Earlier drafts asked for 「引用位置」 outright. The
+graded behaviour is that the agent *finds* its own evidence and cites it unprompted, so that demand
+now lives only in `rubric` — never in `question`. `test_questions_do_not_tell_the_tutor_where_to_cite`
+enforces this: it fails on 「引用」「哪一條附註」「根據第X頁」 and on any question naming one of its own
+citation unit ids. The single deliberate exception is Q2 asking for the figures *in all three
+currencies* — that is a content requirement, not a pointer at a location.
+
+Q8 is the **vague-input** item: real customer phrasing, deliberately stripped of the retriever's
+vocabulary. It tests the path from "no keywords" to the right unit — Q8 must find the one clause
+that mentions 子女升學. (The group held two items while 「这个保险怎么样？」 sat beside it; that
+question was replaced by Q10, which is short and keyword-free too but has a definite answer the
+brochure declines to give.)
+
+Q7, q9 and q10 are **three refusals for three different reasons**, which is the point of having
+all three. Q7 refuses a question about figures this edition of *this* product does not publish.
+Q9 refuses cover the brochure was never about. Q10 refuses a question that is squarely about this
+product — who may take it out — because the document states one qualification and is silent on the
+criterion asked. None of the three may be answered from general industry knowledge; each must name
+the basis on which it declines.
 
 ---
 
@@ -402,6 +425,175 @@ costs a rubric point: the page-20 Fortune footnote is dated June 2, 2025.
 **Traps.** Presenting 4% or 0.25% as the 2025 actual rate. Asserting the printed code differs
 from the OCR/manifest string (it does not). Claiming the brochure is entirely a 2022 document —
 it is not, and the back cover proves it.
+
+---
+
+## Q8 — "My grandson starts school this year — what should I buy?"
+
+**Capability:** vague-request-triage · **Languages:** Simplified · **Mode:** `explain`
+
+> 我家孙子今年要上学，要投什么保啊？
+
+**Why this item exists.** It has no keyword the retriever can match on: no product name, no
+benefit name, no number, no insurance vocabulary beyond 投…保. It is also what a real
+prospective customer actually says. Three failure modes are under test — (i) retrieval finds
+nothing because there is no lexical bridge; (ii) retrieval finds the *marketing* word
+「教育基金」 and stops there; (iii) the agent accepts the customer's framing and produces an
+education plan this product is not.
+
+**Correct answer shape.** Re-anchor, then qualify, then hand over the real constraints.
+
+1. **Re-anchor.** "Education" appears in exactly three places, and none of them is a product:
+   `front-matter-themes` (physical page 2) lists 「子女成才教育基金Education Funds」 as one of
+   five *planning themes*; `withdrawal` (physical page 10) says the periodic withdrawal option
+   lets you plan 「各項理財安排（例如子女升學及退休等）」 — the English is explicit:
+   *"children's university education funds and retirement expenses"*; and `life-stage-example`
+   (physical page 7) first exercises that right at 「兒子大學畢業 University Graduation of Mr.
+   Chan's son」. There is no education savings plan, no schooling rider, no education
+   endowment anywhere in the brochure.
+2. **Qualify.** The 10-year gate in note 6 kills the premise outright: 定期提款權益只適用於
+   生效滿10年或以上的保單. A child starting school this year cannot be funded from an option
+   that does not open until year 10. The minimums follow — US$500 / HK$4,000 / MOP4,000 a
+   month (min. one year) or US$6,000 / HK$48,000 / MOP48,000 a year (min. three years), plus
+   the US$25 / HK$200 / MOP200 per-withdrawal charge in note 7.
+3. **Hand over the cost.** Withdrawals reduce the Cash Value while the monthly charges keep
+   running; if the Cash Value cannot cover them the Policy lapses with **zero** value
+   (`cash-value-risk`, fresh on the same physical page 10), and `term-and-lapse` on physical
+   page 14 supplies the 31-day grace period.
+4. **Decline what is not in the brochure.** Who may own the Policy, the issue-age band for the
+   Insured, and whether a grandparent can insure a grandchild are simply **not stated**. Say
+   so. Do not invent them, and do not quote a return.
+
+**Citation posture.** Nine citations, led by the one clause that ties the customer's word
+「上學」 to this product at all (`withdrawal`, physical page 10). An answer that cites only the
+page-2 「教育基金」 theme heading has stopped at the marketing copy — which is precisely what
+this item is designed to detect.
+
+**Rubric.** Must reframe (no standalone education plan). Must give at least one hard
+constraint from note 6/note 7. Must address the collision between "this year" and the 10-year
+gate. Must cite the physical-page-10 子女升學 clause. Must say the ownership/issue-age
+questions are uncovered rather than guess. Must not promise any return or attainable amount.
+
+**Traps.** Treating 「教育基金」 as the product's positioning. Answering "yes, withdrawals are
+flexible" without the 10-year gate. Inventing policy-ownership rules or a projected education
+payout. Answering "the brochure says nothing about education" — it does, in two places.
+Citing the page-7 illustration as if it were a benefit term.
+
+---
+
+## Q9 — An open-ended request, padded with needs the brochure never covers
+
+**Capability:** scope-refusal · **Languages:** Simplified · **Mode:** `refuse`
+
+> 我就想买份保险，你看我该买啥？生病了能不能住院报销？出去旅游出事管吗？车撞了赔不赔？
+
+**Why this item exists.** Q7 refuses an answer because the *data* is absent from a document
+that is otherwise about the right subject. This one refuses for the opposite reason: three of
+the four needs are not what this brochure is about at all. The tempting failure is cross-
+document leakage — filling the medical, travel and motor gaps from general insurance common
+sense, which is fluent, plausible and entirely unsupported.
+
+**Correct answer shape.**
+
+1. **"What should I buy" is not answerable.** The brochure is a single-product sales leaflet
+   (FLEXI-ULife Prime Saver), not advice. Its own disclaimer units and the pervasive
+   non-guarantee language say the material is not a recommendation. The answerable version of
+   the question is "what does this leaflet cover".
+2. **Hospital / medical expenses — not covered.** No hospital benefit, no illness benefit, no
+   surgical benefit appears. The brochure's supplementary protections (waiver of premium,
+   terminal illness, unemployment, and the like, physical pages 8-11) are not medical cover;
+   presenting them as such is the specific error here.
+3. **Travel — not covered.** Nothing in the brochure.
+4. **Motor — not covered.** Nothing in the brochure.
+5. For 2-4, say plainly that they fall outside this brochure's scope, point to the right
+   product materials or a licensed adviser, and stop.
+
+**Citation posture.** A refusal cites **nothing**. `refusal_grounding` records the two units
+that establish the scope line: the disclaimer units (physical page 17) for the
+not-advice point, and `coverage-summary` (physical page 5) whose item list *is* the boundary —
+medical, travel and motor are absent from it, and their absence is the evidence.
+
+**Rubric.** Must state this is one universal life product and not advice. Must address all
+three uncovered needs — medical, travel, motor — individually; missing one costs a point. No
+invented terms, ratios or waiting periods. Must still describe what the leaflet does cover
+rather than returning a bare "I can't help". Citations, if any are offered, must land on this
+product's own coverage list or disclaimer, never on outside knowledge.
+
+**Traps.** Describing medical reimbursement or any hospital/travel/motor payout. Reframing the
+supplementary protections as medical cover. Volunteering an age-and-profile-based product
+recommendation. A flat 「无法回答」 with no account of what the leaflet does contain.
+
+---
+
+## Q10 — "Can a non-Hong Kong resident apply?" — in scope, but not in the document
+
+**Capability:** scope-refusal · **Languages:** Simplified · **Mode:** `refuse`
+
+> 我不是香港本地人能投保吗？
+
+**Why this item exists.** Q7 and Q9 refuse questions the brochure *could* not have answered — the
+first because the data belongs to a year this edition predates, the second because medical, travel
+and motor cover were never what this leaflet is about. Q10 is harder to refuse and therefore the one
+that actually catches a fluent guesser: the question is squarely *about this product*, it is phrased
+plainly, and there is a large body of plausible-sounding industry knowledge to fill the silence with.
+The brochure names exactly one qualification for taking out the policy — issue age — and says nothing
+whatsoever about residence, nationality, citizenship, domicile, right of abode, visa or identity
+documents. Across all 137 cleaned units there is no sentence on the subject. A tutor that answers
+「可以」 or 「不可以」 here is not retrieving; it is recalling.
+
+**Why the obvious neighbours are decoys.** 香港 and 澳門 appear throughout the brochure, and read
+carelessly they look like eligibility language:
+
+| looks like | actually is |
+|---|---|
+| 香港保單:美元/港元　澳門保單:美元/澳門元/港元 (`table-352-row-14`, physical 16) | which **currency** a policy is denominated in, by **place of issue** |
+| minimum sum-insured figures split 香港保單 / 澳門保單 (`table-354-row-1`, physical 17) | which **amount floors** apply, by place of issue |
+| 保費徵費（只適用於香港） (`levy`, physical 15) | a **levy** on policies issued in Hong Kong, not on applicants |
+| two block addresses — 香港北角英皇道…/ 澳門…收回保單 (`cooling-off`, physical 15) | where to **post** a cancellation, not who may buy |
+| two servicing contacts — 香港 (852) 2533 5555 / 澳門 (853) 2832 2622 (`disclaimer-zh`, physical 19) | where to **call**, not who may buy |
+
+Every one of these scopes a currency, an amount, a charge or a service point. None of them is a
+statement about the applicant. The only row that is shaped like an eligibility rule is the issue-age
+row, and it is a trap in the opposite direction: quoting it as the answer asserts a requirement the
+document never framed as one.
+
+**Correct answer shape.**
+
+1. **State the silence plainly.** The brochure records no residence, nationality or immigration
+   requirement, so it cannot be used to answer this question either way. Not "you can" and not "you
+   cannot" — the document does not say.
+2. **Name the one qualification it does give.** 投保年齡 `0-75` 歲, and `0-55` 歲 for 特級遞增壽險保障
+   / Increasing Benefit Plus — `table-357-row-0`, physical page 18. It speaks only to age.
+3. **Defuse the decoys.** Explain that the 香港／澳門 wording marks place of issue and the currency and
+   amount schedule that follows from it, and is not a statement about who may apply.
+4. **Give the positive basis for declining.** The physical-page-19 disclaimer: the leaflet is
+   只供參考 only, 並非保單的一部份 and 未涵蓋保單的所有條款. Eligibility — including any limitation on
+   non-residents, and any proof of address or identity — belongs to the policy document and to
+   underwriting, which is exactly where the brochure says it is not.
+5. **Route it.** A licensed consultant, franchised agent or broker; the hotline the leaflet prints
+   (香港 (852) 2533 5555 / 澳門 (853) 2832 2622).
+6. Re-asked about a specific person (the grandson from Q8), the same answer holds — age is the only
+   stated rule, and residence is still unaddressed.
+
+**Citation posture.** None. The refusal's basis is the *absence* of text, and a citation asserts
+presence — quoting the issue-age row would present it as support for an eligibility claim it does not
+make. The five `refusal_grounding` entries exist for the grader, not for the answer: they name the
+units that show why the refusal is right (`table-357-row-0`, `table-352-row-14`, `levy`,
+`disclaimer-zh`, `disclaimer-en`). The answer must not dress them up as citations.
+
+**Rubric.** Must say the brochure is silent on residence/nationality and therefore cannot answer the
+question; answering 「可以」 or 「不可以」 outright fails. Must not invoke industry habit or what
+insurers "usually" require — that is the specific failure this item is built to catch. Should cite the
+issue-age row as the sole stated qualification while making clear it does not address residence.
+Should read the 香港／澳門 split as place-of-issue currency scoping, not as cross-border eligibility.
+Should use the page-19 disclaimer as the affirmative reason the question falls outside the leaflet,
+and should end with a route to a licensed source rather than a bare 「不知道」.
+
+**Traps.** 「可以投保，本产品不限居留地」 (nothing in the document says this). 「不可以，必须为香港居民」
+(equally unsupported). Quoting 0-75 歲 as if it answered the question. Reading the Hong Kong / Macau
+policy split, or the two addresses, as evidence of cross-border eligibility. Filling the gap with
+「一般来说非居民也可以买，只要……」 or 「香港公司通常会要求香港身分证」. A flat 「不知道」 with no account of
+what the leaflet does and does not contain.
 
 ---
 

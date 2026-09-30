@@ -1,3 +1,10 @@
+# Git detected core.autocrlf=true on the development machine, which warned on
+# every touch of the LF files below. Normalise on staging instead: the working
+# tree, the index and every fresh clone stay LF, and binary files (the source
+# PDF, the 33 MinerU JPEGs, the tokenizer blob) are left untouched by the
+# content check that `text=auto` performs.
+* text=auto eol=lf
+
 # These files participate in byte-level provenance and reproducibility checks.
 /data/cleaned/** text eol=lf
 /data/cleaning-rules.json text eol=lf
@@ -6,3 +13,9 @@
 /data/corpus-rules.json text eol=lf
 /data/corpus.json text eol=lf
 /data/tokenizer/tokenizer.json text eol=lf
+
+# Raster and archive formats: never diffed, never line-converted.
+*.pdf binary
+*.jpg binary
+*.png binary
+*.zip binary
