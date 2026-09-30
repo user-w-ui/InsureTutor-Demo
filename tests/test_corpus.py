@@ -185,7 +185,10 @@ class CorpusTests(unittest.TestCase):
                     self.assertIn(word, unit.text)
 
     def test_offline_rebuild_is_byte_identical_and_inputs_remain_frozen(self):
-        files = list((ROOT / "data/cleaned").iterdir()) + [
+        manifest_path = ROOT / "data/cleaned/manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        files = [manifest_path] + [ROOT / "data/cleaned" / name
+                                  for name in manifest["artifacts"]] + [
             ROOT / "raw data/source/FLEXI-ULife Prime Saver.pdf",
             ROOT / "raw data/mineru-official/content/FLEXI-ULife Prime Saver.json"]
         before = {p: hashlib.sha256(p.read_bytes()).hexdigest() for p in files if p.is_file()}
