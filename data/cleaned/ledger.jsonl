@@ -136,7 +136,7 @@
 {"action": "retained_text", "block_index": 135, "original_type": "text", "pdf_page": 9}
 {"action": "retained_text", "block_index": 136, "original_type": "text", "pdf_page": 9}
 {"action": "retained_text", "block_index": 137, "original_type": "text", "pdf_page": 9}
-{"action": "retained_context_only", "block_index": 138, "original_type": "text", "pdf_page": 9}
+{"action": "empty_text", "block_index": 138, "original_type": "text", "pdf_page": 9}
 {"action": "retained_text", "block_index": 139, "original_type": "text", "pdf_page": 9}
 {"action": "retained_text", "block_index": 140, "original_type": "text", "pdf_page": 9}
 {"action": "retained_text", "block_index": 141, "original_type": "text", "pdf_page": 9}

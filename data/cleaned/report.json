@@ -1,9 +1,10 @@
 {
   "actions": {
     "asset_not_text_indexed": 33,
+    "empty_text": 1,
     "excluded_layout_noise": 38,
     "metadata_only": 1,
-    "retained_context_only": 15,
+    "retained_context_only": 14,
     "retained_table": 9,
     "retained_text": 284
   },
@@ -15,7 +16,7 @@
     }
   ],
   "control_character_occurrences": 4,
-  "indexable_units": 135,
+  "indexable_units": 137,
   "input_blocks": 380,
   "input_types": {
     "aside_text": 1,
@@ -30,69 +31,153 @@
   },
   "issues": [
     {
-      "action": "preserve source; inspect PDF",
+      "action": "PDF page 8 visually reads 利息及額外回報的總額.",
       "issue": "damaged_text",
       "pdf_page": 8,
       "source_key": "b115",
-      "status": "unresolved"
+      "status": "resolved"
     },
     {
-      "action": "preserve source; inspect PDF",
+      "action": "PDF page 9: transcribe the bilingual formula and its visible equals/multiplication signs.",
       "issue": "incomplete_formula",
       "pdf_page": 9,
       "source_key": "b137",
-      "status": "unresolved"
+      "status": "resolved"
     },
     {
-      "action": "preserve source; inspect PDF",
+      "action": "PDF page 9: restore separate bilingual labels in the numerical example.",
       "issue": "interleaved_formula_labels",
       "pdf_page": 9,
       "source_key": "b152",
-      "status": "unresolved"
+      "status": "resolved"
     },
     {
-      "action": "preserve source; inspect PDF",
+      "action": "PDF page 12 Note 4 reads 提取的總金額.",
       "issue": "damaged_text",
       "pdf_page": 12,
       "source_key": "b200",
-      "status": "unresolved"
+      "status": "resolved"
     },
     {
-      "action": "preserve source; inspect PDF",
+      "action": "PDF page 12 Note 5 uses 總額 in both places.",
       "issue": "damaged_text",
       "pdf_page": 12,
       "source_key": "b201",
-      "status": "unresolved"
+      "status": "resolved"
     },
     {
-      "action": "preserve source; inspect PDF",
+      "action": "PDF page 13 visually confirms the omitted label 投資回報.",
       "issue": "missing_subject_label",
       "pdf_page": 13,
       "source_key": "b224",
-      "status": "unresolved"
+      "status": "resolved"
     },
     {
-      "action": "preserve source; inspect PDF",
+      "action": "PDF page 13 visually confirms the omitted label 退保.",
       "issue": "missing_subject_label",
       "pdf_page": 13,
       "source_key": "b225",
-      "status": "unresolved"
+      "status": "resolved"
     }
   ],
   "native_caption_tables": 2,
   "numbered_note_groups": 10,
-  "required_edges": 113,
+  "pdf_corrections": [
+    {
+      "pdf_page": 4,
+      "reason": "PDF page 4: Flexible belongs to the English title, not the Chinese body.",
+      "source_key": "b33"
+    },
+    {
+      "pdf_page": 4,
+      "reason": "PDF page 4: Coverage completes the English title Flexible Coverage.",
+      "source_key": "b34"
+    },
+    {
+      "pdf_page": 4,
+      "reason": "PDF page 4: Chinese title and body confirmed for the bilingual view.",
+      "source_key": "b36"
+    },
+    {
+      "pdf_page": 4,
+      "reason": "PDF page 4: Preferential Premium Rates is the title; restore the uninterrupted body.",
+      "source_key": "b37"
+    },
+    {
+      "pdf_page": 4,
+      "reason": "PDF page 4: Premium belongs to the English title, not the Chinese body.",
+      "source_key": "b39"
+    },
+    {
+      "pdf_page": 4,
+      "reason": "PDF page 4: Flexibility completes the title Premium Flexibility.",
+      "source_key": "b40"
+    },
+    {
+      "pdf_page": 4,
+      "reason": "PDF page 4: Chinese cash withdrawal title and body confirmed.",
+      "source_key": "b45"
+    },
+    {
+      "pdf_page": 4,
+      "reason": "PDF page 4: Flexible cash withdrawal is the title, separate from the body.",
+      "source_key": "b46"
+    },
+    {
+      "pdf_page": 8,
+      "reason": "PDF page 8 visually reads 利息及額外回報的總額.",
+      "source_key": "b115"
+    },
+    {
+      "pdf_page": 12,
+      "reason": "PDF page 12 Note 4 reads 提取的總金額.",
+      "source_key": "b200"
+    },
+    {
+      "pdf_page": 12,
+      "reason": "PDF page 12 Note 5 uses 總額 in both places.",
+      "source_key": "b201"
+    },
+    {
+      "pdf_page": 9,
+      "reason": "PDF page 9: transcribe the bilingual formula and its visible equals/multiplication signs.",
+      "source_key": "b137"
+    },
+    {
+      "pdf_page": 9,
+      "reason": "PDF page 9: restore separate bilingual labels in the numerical example.",
+      "source_key": "b152"
+    },
+    {
+      "pdf_page": 13,
+      "reason": "PDF page 13 visually confirms the omitted label 投資回報.",
+      "source_key": "b224"
+    },
+    {
+      "pdf_page": 13,
+      "reason": "PDF page 13 visually confirms the omitted label 退保.",
+      "source_key": "b225"
+    },
+    {
+      "pdf_page": 10,
+      "reason": "PDF page 10: transcribe the bilingual cash-value formula including equals/minus signs.",
+      "source_key": "b166"
+    }
+  ],
+  "required_edges": 115,
+  "resolved_issue_count": 7,
   "retained_text_blocks": 299,
   "retrieval_units": 137,
   "review": {
-    "method": "Source JSON inspection; PDF visual spot checks on pages 6/8/9/12/16/17 and table crops on pages 7/13/18. Not a human sign-off or full transcription review.",
+    "method": "Source JSON inspection; PDF visual spot checks on pages 6/8/9/12/16/17 and table crops on pages 7/13/18. Not a human sign-off or full transcription review. Targeted PDF page review on 4/8/9/10/12/13 confirms finite text and formula corrections.",
     "reviewed_at": "2026-09-30",
     "reviewed_by": "Codex"
   },
-  "scope": "No source text corrections, translation, vector index, or whole-PDF transcription review.",
-  "source_spans": 442,
-  "status": "cleaned_with_explicit_review_items",
+  "scope": "Finite PDF-verified corrections and bilingual views; independent clean fragments, not final chunks or a vector index. No whole-PDF transcription certification.",
+  "source_spans": 458,
+  "status": "cleaned_ready_for_chunking",
   "tables": 9,
+  "unresolved_issue_count": 0,
   "verified_printed_pages": {
     "6": "5"
   }

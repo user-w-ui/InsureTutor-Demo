@@ -29,11 +29,14 @@ python -m unittest discover -s tests -v
 
 The source-pinned [`data/cleaning-rules.json`](data/cleaning-rules.json) declares exact
 reference markers, bilingual topic groups, table structure, required evidence, and
-the confirmed source conflict. It does not supply replacement source text.
-`units.jsonl` is the retrieval input; `spans.jsonl` retains original citation anchors.
+the confirmed source conflict, and finite PDF-verified text corrections with source
+blocks and physical pages. `units.jsonl` contains clean fragments for the next chunking
+step; `spans.jsonl` provides `evidence_text` and its `text_origin` for citation checks.
+Corrected bilingual views separate language, title, and body. The seven known text
+issues and both formulas are resolved; the page 17 source conflict remains explicit.
 Use only indexable units and follow their `requires` links before answering.
-The cleaner preserves damaged text with explicit flags; it does not certify the
-entire brochure or translate the corpus into Simplified Chinese.
+The cleaner retains original extraction text for provenance and marks PDF-verified
+corrections; it does not certify the entire brochure or translate it into Simplified Chinese.
 
 ---
 
@@ -73,7 +76,8 @@ PDF ──(one-time, offline)──► raw data/ ──(one-time)──► data/
 The parse is frozen, but the corpus is not a raw copy of it: `build_corpus(raw, curation)`
 is a pure function of two committed inputs, so it re-runs to a byte-identical artifact.
 `data/curation.json` is the only hand-authored input — it declares the note links and
-reviewed conflicts that the parse alone cannot prove, and never alters source text.
+reviewed conflicts that the parse alone cannot prove. Current cleaning corrections
+are recorded separately in `data/cleaning-rules.json`; frozen source files never change.
 
 Rationale: the grader gets a container that boots in seconds with no network
 dependency for ingestion, and the citation anchors are **frozen** — reproducible,

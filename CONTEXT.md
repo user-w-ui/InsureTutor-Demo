@@ -7,6 +7,9 @@ It distinguishes document explanations from personalized insurance advice.
 
 **Source span / 原文片段**:
 An occurrence of original text or a table row, in its own language and on its own page.
+Use `evidence_text` for citations; PDF-verified corrections retain the original MinerU
+text, source blocks, and physical page, and are checked against the PDF rather than
+against a substring of the extraction.
 _Avoid_: translation, answer, fact
 
 **Evidence group / 证据组**:
@@ -44,7 +47,8 @@ _Avoid_: PDF physical page, page_idx offset
 
 **Curation / 人工审核记录**:
 The committed, hand-authored input that declares note labels, note links, and reviewed
-conflicts. It may declare relationships; it may never supply or alter source text.
+conflicts. Finite PDF-verified corrections live in `data/cleaning-rules.json` with
+source blocks and physical pages; frozen source files are never altered.
 _Avoid_: OCR output, machine-inferred link, unverified judgement
 
 **Document explanation / 资料解释**:

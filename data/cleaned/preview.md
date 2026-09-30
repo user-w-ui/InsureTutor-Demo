@@ -1,6 +1,6 @@
 # 清洗结果预览
 
-检索文本经过格式规范化，不是原文引句；引用应通过 spans.jsonl 回到原 PDF。
+干净片段，供后续切块。引用使用 spans.jsonl 的 evidence_text；PDF 校对文本按物理页核对，不要求是 MinerU 原块的连续子串。
 
 ## intro
 
@@ -28,8 +28,13 @@ Universal Life has taken over Traditional Life to become the preferred option in
 
 PDF 页：[4]；类型：clause；可索引：True
 
-靈活增減保障額 可於原有保單內增加保障額，無須另購新保單，省卻額外保單Flexible 費用。
-Coverage Simply adjust the original Policy to increase the sum insured. No need to apply for a new Policy, thus saving additional policy charges.
+### zh-Hant · 靈活增減保障額
+
+可於原有保單內增加保障額，無須另購新保單，省卻額外保單費用。
+
+### en · Flexible Coverage
+
+Simply adjust the original Policy to increase the sum insured. No need to apply for a new Policy, thus saving additional policy charges.
 
 必须补齐：generic-disclaimer, note-1
 
@@ -37,8 +42,13 @@ Coverage Simply adjust the original Policy to increase the sum insured. No need 
 
 PDF 页：[4]；类型：clause；可索引：True
 
-優惠保費率 加保時仍按最初投保時年齡計算保費率。
-Preferential The premium rate for new coverage will be based on the insured's Premium Rates age when the Policy was first issued instead of current age.
+### zh-Hant · 優惠保費率
+
+加保時仍按最初投保時年齡計算保費率。
+
+### en · Preferential Premium Rates
+
+The premium rate for new coverage will be based on the insured's age when the Policy was first issued instead of current age.
 
 必须补齐：generic-disclaimer
 
@@ -46,8 +56,13 @@ Preferential The premium rate for new coverage will be based on the insured's Pr
 
 PDF 页：[4]；类型：clause；可索引：True
 
-繳款彈性 如保單已累積現金價值，便可暫停繳交保費，而無須支付貸款Premium 利息。
-Flexibility Allows you to skip payments if the Policy has accumulated a cash value, without any loan interest.
+### zh-Hant · 繳款彈性
+
+如保單已累積現金價值，便可暫停繳交保費，而無須支付貸款利息。
+
+### en · Premium Flexibility
+
+Allows you to skip payments if the Policy has accumulated a cash value, without any loan interest.
 
 必须补齐：generic-disclaimer, cash-value-risk, term-and-lapse
 
@@ -55,8 +70,13 @@ Flexibility Allows you to skip payments if the Policy has accumulated a cash val
 
 PDF 页：[4]；类型：clause；可索引：True
 
-每月派息複式計算
-Monthly interest at a compound rate
+### zh-Hant · 每月派息複式計算
+
+
+
+### en · Monthly interest at a compound rate
+
+
 
 必须补齐：generic-disclaimer
 
@@ -64,8 +84,13 @@ Monthly interest at a compound rate
 
 PDF 页：[4]；类型：clause；可索引：True
 
-靈活提取現金 繼續享有保障，無須減低保障額。
-Flexible cash Still enjoy protection without the need to reduce the sum insured. withdrawal
+### zh-Hant · 靈活提取現金
+
+繼續享有保障，無須減低保障額。
+
+### en · Flexible cash withdrawal
+
+Still enjoy protection without the need to reduce the sum insured.
 
 必须补齐：generic-disclaimer, cash-value-risk, term-and-lapse
 
@@ -251,13 +276,11 @@ Mr. Chan insured with FLEXI-ULife Prime Saver at age 22. The tailor-made plan ca
 
 PDF 页：[8]；类型：clause；可索引：True
 
-您的供款會於扣除任何適用的費用後，存入賬戶價值內，並獲享較一般銀行存款優厚的利息。此外，我們保證無論經濟環境如何，於保單生效滿15年或以上，賬戶價值（包括撥入保單的利息及額外回報的[解析缺字]額）將不會少於每年以派息率2.5%計算而累積的賬戶價值。
+您的供款會於扣除任何適用的費用後，存入賬戶價值內，並獲享較一般銀行存款優厚的利息。此外，我們保證無論經濟環境如何，於保單生效滿15年或以上，賬戶價值（包括撥入保單的利息及額外回報的總額）將不會少於每年以派息率2.5%計算而累積的賬戶價值。
 Your premium will be credited to the Account Value after deduction of any applicable charges and you will enjoy a relatively higher rate of return than most bank deposits.
 In addition, when a Policy has been in force for 15 years or more, the total interest and Extra Bonus credited to the Policy will be such that the Account Value is guaranteed to have accumulated to at least an amount as if the interest rate credited had been 2.5% p.a., regardless of the economic situation.
 
 必须补齐：无
-
-待复核：damaged_text
 
 ## base-interest
 
@@ -313,17 +336,19 @@ Extra Bonus will be credited to the Policy at the end of the 15th policy year an
 
 必须补齐：bonus-rate-disclaimer
 
-## extra-bonus-formula-fragments
+## extra-bonus-formula
 
-PDF 页：[9]；类型：fragment；可索引：False
+PDF 页：[9]；类型：formula；可索引：True
 
-額外回報計算方法Extra Bonus calculation過往5年的平均每月賬戶價值Average Monthly Account Value ofthe preceding 5 years
-額外回報率 Extra Bonus rate
-過往5年的平均每月賬戶價值 額外回報率 額外回報Average Monthly Account Value of Extra Bonus rate Extra Bonusthe preceding 5 years
+### zh-Hant · 額外回報計算方法
 
-必须补齐：无
+額外回報 = 過往5年的平均每月賬戶價值 × 額外回報率
 
-待复核：incomplete_formula, interleaved_formula_labels
+### en · Extra Bonus calculation
+
+Extra Bonus = Average Monthly Account Value of the preceding 5 years × Extra Bonus rate
+
+必须补齐：bonus-rate-disclaimer
 
 ## bonus-rate-15-25
 
@@ -353,11 +378,15 @@ PDF 页：[9]；类型：clause；可索引：True
 
 PDF 页：[9]；类型：illustration；可索引：True
 
-例子 Example
-於第15個保單週年日派發之「額外回報」：
-Extra Bonus to be credited to the Policy at the end of the 15th policy year:
-過往5年平均每月賬戶價值Average Account Value of the preceding 5 years $708,800
-$708,800 x 2.75% = $19,492
+### zh-Hant · 於第15個保單週年日派發之「額外回報」
+
+過往5年的平均每月賬戶價值 × 額外回報率 = 額外回報
+$708,800 × 2.75% = $19,492
+
+### en · Extra Bonus to be credited to the Policy at the end of the 15th policy year
+
+Average Monthly Account Value of the preceding 5 years × Extra Bonus rate = Extra Bonus
+$708,800 × 2.75% = $19,492
 
 必须补齐：example-disclaimer, bonus-rate-disclaimer
 
@@ -408,15 +437,19 @@ When your Policy has accumulated a Cash Value, you may skip premium payments to 
 
 必须补齐：cash-value-risk, term-and-lapse
 
-## cash-value-formula-fragments
+## cash-value-formula
 
-PDF 页：[10]；类型：fragment；可索引：False
+PDF 页：[10]；类型：formula；可索引：True
 
-Cash Value
-Account Value
-適用的退保費用Applicable surrender charge
+### zh-Hant · 現金價值
 
-必须补齐：无
+現金價值 = 賬戶價值 − 適用的退保費用
+
+### en · Cash Value
+
+Cash Value = Account Value − Applicable surrender charge
+
+必须补齐：cash-value-risk
 
 ## cash-value-risk
 
@@ -505,23 +538,19 @@ PDF 页：[12]；类型：numbered_note；可索引：True
 
 PDF 页：[12]；类型：numbered_note；可索引：True
 
-4. 基本保障額須扣除受保人身故日前12個月內曾提取 的[解析缺字]金額。
+4. 基本保障額須扣除受保人身故日前12個月內曾提取的總金額。
 4. The Basic Sum Insured will be net of all withdrawals made in the 12-month period preceding the date of the Insured's death.
 
 必须补齐：无
-
-待复核：damaged_text
 
 ## note-5
 
 PDF 页：[12]；类型：numbered_note；可索引：True
 
-5. 基本保障額及賬戶價值的50%之[解析缺字]額須扣除受保人 身故日前12個月內曾提取的[解析缺字]額的50%。
+5. 基本保障額及賬戶價值的50%之總額須扣除受保人身故日前12個月內曾提取的總額的50%。
 5. The sum of the Basic Sum Insured and 50% of Account Value will be net of 50% of all withdrawals made in the 12-month period preceding the date of the Insured's death.
 
 必须补齐：无
-
-待复核：damaged_text
 
 ## note-6
 
@@ -607,12 +636,10 @@ PDF 页：[13]；类型：clause；可索引：True
 
 派息率理念
 Crediting Interest Rate Philosophy
-：包括所投資的資產賺取的利息 / 紅利收入及市場價格變動。投資表現會受利息 / 紅利收入之波動以及各種市場風險因素如信貸息差、違約風險、股票價格、房地產價格及商品價格之波動及滙率而影響。
+投資回報：包括所投資的資產賺取的利息 / 紅利收入及市場價格變動。投資表現會受利息 / 紅利收入之波動以及各種市場風險因素如信貸息差、違約風險、股票價格、房地產價格及商品價格之波動及滙率而影響。
 Investment performance: This includes interest / dividend income and changes in the market value of the invested assets. Investment performance could be afected by fluctuations in interest / dividend income and various market risk factors, such as credit spread, default risk, fluctuations in equity prices, property prices, commodity prices, exchange rates, etc.
 
 必须补齐：无
-
-待复核：missing_subject_label
 
 ## surrender-factor
 
@@ -620,12 +647,10 @@ PDF 页：[13]；类型：clause；可索引：True
 
 派息率理念
 Crediting Interest Rate Philosophy
-：包括保單失效、退保、部分退保及其他扣減項目及保障支付，以及其對投資的相關影響。
+退保：包括保單失效、退保、部分退保及其他扣減項目及保障支付，以及其對投資的相關影響。
 Surrenders: These may include policy lapses, surrenders, partial surrenders and other deductions and benefit payments; and the corresponding impact on investments.
 
 必须补齐：无
-
-待复核：missing_subject_label
 
 ## rate-smoothing
 

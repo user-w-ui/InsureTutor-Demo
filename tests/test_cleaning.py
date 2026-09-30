@@ -141,14 +141,27 @@ class CleaningTests(unittest.TestCase):
         self.assertIn("HK$400,000 / MOP40,000", unit["text"])
         self.assertEqual(unit["pairing_status"], "reviewed_source_conflict")
 
-    def test_control_characters_not_silently_deleted_or_repaired(self):
+    def test_damaged_text_repaired_only_with_recorded_pdf_corrections(self):
         self.assertEqual(self.result["report"]["control_character_occurrences"], 4)
-        for key in ("b115", "b200", "b201"):
+        for key, count in (("b115", 1), ("b200", 1), ("b201", 2)):
             span = self.spans[key]
             self.assertIn("\x1a", span["raw_text"])
             self.assertNotIn("\x1a", span["clean_text"])
-            self.assertIn("[解析缺字]", span["clean_text"])
-            self.assertIn("damaged_text", span["quality_flags"])
+            self.assertEqual(span["clean_text"].count("總"), count)
+            self.assertNotIn("damaged_text", span["quality_flags"])
+            self.assertEqual(span["text_origin"], "pdf_verified")
+            self.assertEqual(span["raw_block_indices"], [span["block_index"]])
+            self.assertIn("PDF", span["quote_policy"])
+        self.assertTrue(self.spans["b224"]["clean_text"].startswith("投資回報："))
+        self.assertTrue(self.spans["b225"]["clean_text"].startswith("退保："))
+        report = self.result["report"]
+        self.assertEqual(report["resolved_issue_count"], 7)
+        self.assertEqual(report["unresolved_issue_count"], 0)
+        self.assertEqual(report["status"], "cleaned_ready_for_chunking")
+        for span in self.spans.values():
+            for field in ("clean_text", "evidence_text"):
+                self.assertNotRegex(span[field], r"[\x00-\x08\x0b\x0c\x0e-\x1f\x7f]")
+                self.assertNotIn("[解析缺字]", span[field])
 
     def test_missing_captions_not_fabricated(self):
         self.assertEqual(sum(t["caption"] is not None for t in self.result["tables"]), 2)
@@ -156,14 +169,35 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual(next(t for t in self.result["tables"] if t["block_index"] == 356)["caption"],
                          ["保單資料 Policy Information"])
 
-    def test_parallel_text_grouped_and_formula_fragments_not_indexed(self):
+    def test_parallel_text_grouped_and_pdf_formulas_restored(self):
         unit = self.units["insurability"]
         self.assertEqual(unit["source_keys"], ["b89", "b90"])
         self.assertEqual(unit["evidence_group"], self.units["table-352-row-8"]["evidence_group"])
         self.assertIn("asset-allocation-row-1", self.units)
         self.assertNotIn("table-231-row-1", self.units)
-        self.assertFalse(self.units["extra-bonus-formula-fragments"]["indexable"])
-        self.assertFalse(self.units["cash-value-formula-fragments"]["indexable"])
+        expected = {
+            "extra-bonus-formula": (9, "額外回報 = 過往5年的平均每月賬戶價值 × 額外回報率"),
+            "cash-value-formula": (10, "現金價值 = 賬戶價值 − 適用的退保費用"),
+        }
+        for key, (page, text) in expected.items():
+            formula = self.units[key]
+            self.assertTrue(formula["indexable"])
+            self.assertEqual(formula["pages"], [page])
+            self.assertEqual(formula["review_status"], "pdf_verified")
+            self.assertIn(text, formula["text"])
+        for key, title in (("generic-coverage", "Flexible Coverage"),
+                           ("generic-premium-rate", "Preferential Premium Rates"),
+                           ("generic-payment-flexibility", "Premium Flexibility"),
+                           ("generic-cash-withdrawal", "Flexible cash withdrawal")):
+            zh, en = self.units[key]["segments"]
+            self.assertEqual(en["title"], title)
+            self.assertNotRegex(zh["text"], "[A-Za-z]")
+            self.assertEqual(self.units[key]["pages"], [4])
+        self.assertIn("省卻額外保單費用", self.units["generic-coverage"]["text"])
+        self.assertIn("無須支付貸款利息", self.units["generic-payment-flexibility"]["text"])
+        self.assertIn("$708,800 × 2.75% = $19,492", self.units["bonus-example"]["text"])
+        self.assertTrue({"example-disclaimer", "bonus-rate-disclaimer"}
+                        <= set(self.units["bonus-example"]["requires"]))
 
     def test_changed_input_or_stale_literal_fails_closed(self):
         with self.assertRaisesRegex(ValueError, "Source hash"):

@@ -1,17 +1,17 @@
 {
   "artifacts": {
-    "README.md": "50cc88fcce5d54e84637daa34809fffe3203a31c7f6badab00c7c4e09804d9d5",
+    "README.md": "a9ede51322908afc8f0ab8e0b4aa584d5b3e0446e3364f3a82d1d811cedd7cc6",
     "assets.json": "0a71fb401ffad13ef88a5a6c28a591897faf63373de28960e90913a4e1bc79e2",
-    "blocks.jsonl": "7902fc7d195ad4df0ab242b5b97957457ac13472c036f1f01050a45446ee5e38",
-    "ledger.jsonl": "ec6e3dc51a869fb3db3712e8252675440d2d7aebd3b70f134f476e902b73d37c",
-    "preview.md": "eb6f37b7994bddb11c5ad7d4039930ec4279fffc9a5ccd0062fd19c3ad62b77a",
-    "report.json": "15263417d2d43cf3879754a7d9709c7b9bae57b54305a5b5cc1f70849dcf77b8",
-    "spans.jsonl": "c9fc5758086c5a583ed0a14bb3a77204b2782b9ec6a134589ccb1631d97b0e66",
+    "blocks.jsonl": "9512ebab4ed068522431568304132fec8b61820e5534b0cd10c2e597448d73fe",
+    "ledger.jsonl": "40b6c23189d2349399a720bde0d72d8c64b22433451f9338319a7519cc6623c3",
+    "preview.md": "2094d7bfde5710aae7b9dfd1a04c6e10aaff9e1886d31c56138ce8fb42c10fd4",
+    "report.json": "eb559ffce8e67bd09a8ba3141baa524e72fe4c4ce75230a1128827bfc51b154a",
+    "spans.jsonl": "d79e326d500be3eccadfccb66c787e33f1dd8dbf203b6abe46b4e0a5e3f08cf2",
     "tables.json": "7be127e4fd49f22b14e91687798982233ff958cc59562b620657f711832f0dd6",
-    "units.jsonl": "3bec592c79d16f92454bccd771eeb32777023e1820ae6f9f4e71b362625a8995"
+    "units.jsonl": "8b627785d3e4cd0b32ed828472cacc1bac2d30df45619af31397f6a1b41f82aa"
   },
   "citation_policy": "pdf_page is physical, one-based; bbox_raw is not PDF points",
-  "cleaner_sha256": "419ea6d7992f0f263a5ef9b7c7d9c92185bc6e6e681ced920ac679c5341af611",
+  "cleaner_sha256": "6ad34db272e1febe65f726974317b78fb1e0f32fa2126b8422d0d0cecde06a94",
   "metadata": {
     "version_code": {
       "block_index": 378,
@@ -19,7 +19,7 @@
       "raw_text": "PSP-137-V3-0925B"
     }
   },
-  "normalization_policy": "Only raw_text is source quotation; clean_text/text is derived",
+  "normalization_policy": "evidence_text is the citation excerpt; text_origin distinguishes MinerU extraction from PDF-verified transcription. Corrected excerpts are verified against the PDF, not a MinerU substring.",
   "printed_page_labels_raw": [
     {
       "label": "1",
@@ -102,7 +102,7 @@
       "verified": false
     }
   ],
-  "rules_sha256": "4ab673589de13a5e34cce8b84d471d45eb5a1506769164bd985812ca2127aa60",
+  "rules_sha256": "733508efa374e8b5f0f2033ce8548c51f2e961776a0efcb1edeb667b6a0ca668",
   "schema_version": 1,
   "source_id": "flexi-23b55338c73d",
   "source_json": "raw data/mineru-official/content/FLEXI-ULife Prime Saver.json",

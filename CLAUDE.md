@@ -45,6 +45,10 @@ Offline cleaning is now implemented: `python -m insuretutor.ingest.clean` reads
 `data/cleaning-rules.json` and writes `data/cleaned/` separately from frozen inputs.
 See its generated README, report, and `docs/data-cleaning-map.md`. This intermediate
 dataset is not the proposed runtime `data/corpus.json`.
+`units.jsonl` is the next chunking input. Finite corrections in cleaning-rules.json
+restore bilingual columns, missing characters, and formulas; cite spans.evidence_text
+and check pdf_verified text against its physical PDF page. The seven reported text
+issues are resolved; the page 17 source conflict is preserved.
 It supersedes the earlier retrieval details below: use table-row retrieval, mandatory
 qualifying-note completion, separate language source anchors, and reviewed conflict
 flags. The generated artifact is `data/corpus.json`. Runtime serves the original PDF
@@ -68,8 +72,9 @@ mean a multi-minute network-bound boot and citation anchors that drift between r
 
 `build_corpus(raw, curation)` is a pure function of its two committed inputs, so the
 pipeline re-runs to a byte-identical artifact. `data/curation.json` is the only
-hand-authored input — it may declare relationships and flag conflicts, but **never
-supplies or alters source text**. See [`docs/architecture.md`](docs/architecture.md)
+hand-authored relationship input. The current cleaner additionally applies explicit
+PDF-verified corrections from `data/cleaning-rules.json` without altering frozen
+source files. See [`docs/architecture.md`](docs/architecture.md)
 for its schema and for the `Source span` / `Evidence group` / `Retrieval unit` model.
 
 **Consequence for you:** `raw data/` is a frozen, verified input. Do not re-parse it or

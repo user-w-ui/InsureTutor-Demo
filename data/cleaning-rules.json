@@ -5,7 +5,7 @@
   "review": {
     "reviewed_by": "Codex",
     "reviewed_at": "2026-09-30",
-    "method": "Source JSON inspection; PDF visual spot checks on pages 6/8/9/12/16/17 and table crops on pages 7/13/18. Not a human sign-off or full transcription review."
+    "method": "Source JSON inspection; PDF visual spot checks on pages 6/8/9/12/16/17 and table crops on pages 7/13/18. Not a human sign-off or full transcription review. Targeted PDF page review on 4/8/9/10/12/13 confirms finite text and formula corrections."
   },
   "excluded_types": [
     "header",
@@ -582,15 +582,15 @@
       "pairing_status": "same_topic_not_equivalence"
     },
     {
-      "id": "extra-bonus-formula-fragments",
+      "id": "extra-bonus-formula",
       "blocks": [
         137,
-        139,
-        152
+        138,
+        139
       ],
       "headings": [],
       "notes": [],
-      "kind": "fragment",
+      "kind": "formula",
       "pairing_status": "same_topic_not_equivalence"
     },
     {
@@ -629,6 +629,7 @@
         148,
         149,
         151,
+        152,
         153
       ],
       "headings": [
@@ -702,7 +703,7 @@
       "pairing_status": "same_topic_not_equivalence"
     },
     {
-      "id": "cash-value-formula-fragments",
+      "id": "cash-value-formula",
       "blocks": [
         166,
         167,
@@ -710,7 +711,7 @@
       ],
       "headings": [],
       "notes": [],
-      "kind": "fragment",
+      "kind": "formula",
       "pairing_status": "same_topic_not_equivalence"
     },
     {
@@ -1700,6 +1701,12 @@
     ],
     "incremental-summary": [
       "table-97-row-3"
+    ],
+    "extra-bonus-formula": [
+      "bonus-rate-disclaimer"
+    ],
+    "cash-value-formula": [
+      "cash-value-risk"
     ]
   },
   "block_flags": {
@@ -1801,5 +1808,384 @@
     "skip-premiums": "skip-premiums",
     "disclaimer-zh": "disclaimer",
     "disclaimer-en": "disclaimer"
+  },
+  "pdf_corrections": {
+    "b33": {
+      "text": "靈活增減保障額 可於原有保單內增加保障額，無須另購新保單，省卻額外保單費用。",
+      "pdf_page": 4,
+      "source_blocks": [
+        33
+      ],
+      "reason": "PDF page 4: Flexible belongs to the English title, not the Chinese body.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b34": {
+      "text": "Simply adjust the original Policy to increase the sum insured. No need to apply for a new Policy, thus saving additional policy charges.",
+      "pdf_page": 4,
+      "source_blocks": [
+        34
+      ],
+      "reason": "PDF page 4: Coverage completes the English title Flexible Coverage.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b36": {
+      "text": "優惠保費率 加保時仍按最初投保時年齡計算保費率。",
+      "pdf_page": 4,
+      "source_blocks": [
+        36
+      ],
+      "reason": "PDF page 4: Chinese title and body confirmed for the bilingual view.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b37": {
+      "text": "The premium rate for new coverage will be based on the insured's age when the Policy was first issued instead of current age.",
+      "pdf_page": 4,
+      "source_blocks": [
+        37
+      ],
+      "reason": "PDF page 4: Preferential Premium Rates is the title; restore the uninterrupted body.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b39": {
+      "text": "繳款彈性 如保單已累積現金價值，便可暫停繳交保費，而無須支付貸款利息。",
+      "pdf_page": 4,
+      "source_blocks": [
+        39
+      ],
+      "reason": "PDF page 4: Premium belongs to the English title, not the Chinese body.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b40": {
+      "text": "Allows you to skip payments if the Policy has accumulated a cash value, without any loan interest.",
+      "pdf_page": 4,
+      "source_blocks": [
+        40
+      ],
+      "reason": "PDF page 4: Flexibility completes the title Premium Flexibility.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b45": {
+      "text": "靈活提取現金 繼續享有保障，無須減低保障額。",
+      "pdf_page": 4,
+      "source_blocks": [
+        45
+      ],
+      "reason": "PDF page 4: Chinese cash withdrawal title and body confirmed.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b46": {
+      "text": "Still enjoy protection without the need to reduce the sum insured.",
+      "pdf_page": 4,
+      "source_blocks": [
+        46
+      ],
+      "reason": "PDF page 4: Flexible cash withdrawal is the title, separate from the body.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b115": {
+      "text": "您的供款會於扣除任何適用的費用後，存入賬戶價值內，並獲享較一般銀行存款優厚的利息。此外，我們保證無論經濟環境如何，於保單生效滿15年或以上，賬戶價值（包括撥入保單的利息及額外回報的總額）將不會少於每年以派息率2.5%計算而累積的賬戶價值。",
+      "pdf_page": 8,
+      "source_blocks": [
+        115
+      ],
+      "reason": "PDF page 8 visually reads 利息及額外回報的總額.",
+      "resolved_flags": [
+        "damaged_text"
+      ],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b200": {
+      "text": "4.  基本保障額須扣除受保人身故日前12個月內曾提取的總金額。",
+      "pdf_page": 12,
+      "source_blocks": [
+        200
+      ],
+      "reason": "PDF page 12 Note 4 reads 提取的總金額.",
+      "resolved_flags": [
+        "damaged_text"
+      ],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b201": {
+      "text": "5.  基本保障額及賬戶價值的50%之總額須扣除受保人身故日前12個月內曾提取的總額的50%。",
+      "pdf_page": 12,
+      "source_blocks": [
+        201
+      ],
+      "reason": "PDF page 12 Note 5 uses 總額 in both places.",
+      "resolved_flags": [
+        "damaged_text"
+      ],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b137": {
+      "text": "額外回報 = 過往5年的平均每月賬戶價值 × 額外回報率\nExtra Bonus = Average Monthly Account Value of the preceding 5 years × Extra Bonus rate",
+      "pdf_page": 9,
+      "source_blocks": [
+        137,
+        138,
+        139
+      ],
+      "reason": "PDF page 9: transcribe the bilingual formula and its visible equals/multiplication signs.",
+      "resolved_flags": [
+        "incomplete_formula"
+      ],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b152": {
+      "text": "過往5年的平均每月賬戶價值 × 額外回報率 = 額外回報\nAverage Monthly Account Value of the preceding 5 years × Extra Bonus rate = Extra Bonus",
+      "pdf_page": 9,
+      "source_blocks": [
+        152
+      ],
+      "reason": "PDF page 9: restore separate bilingual labels in the numerical example.",
+      "resolved_flags": [
+        "interleaved_formula_labels"
+      ],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b224": {
+      "text": "投資回報：包括所投資的資產賺取的利息 / 紅利收入及市場價格變動。投資表現會受利息 / 紅利收入之波動以及各種市場風險因素如信貸息差、違約風險、股票價格、房地產價格及商品價格之波動及滙率而影響。",
+      "pdf_page": 13,
+      "source_blocks": [
+        224
+      ],
+      "reason": "PDF page 13 visually confirms the omitted label 投資回報.",
+      "resolved_flags": [
+        "missing_subject_label"
+      ],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b225": {
+      "text": "退保：包括保單失效、退保、部分退保及其他扣減項目及保障支付，以及其對投資的相關影響。",
+      "pdf_page": 13,
+      "source_blocks": [
+        225
+      ],
+      "reason": "PDF page 13 visually confirms the omitted label 退保.",
+      "resolved_flags": [
+        "missing_subject_label"
+      ],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    },
+    "b166": {
+      "text": "現金價值 = 賬戶價值 − 適用的退保費用\nCash Value = Account Value − Applicable surrender charge",
+      "pdf_page": 10,
+      "source_blocks": [
+        166,
+        167,
+        168
+      ],
+      "reason": "PDF page 10: transcribe the bilingual cash-value formula including equals/minus signs.",
+      "resolved_flags": [],
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30"
+    }
+  },
+  "pdf_views": {
+    "generic-coverage": {
+      "pdf_page": 4,
+      "source_blocks": [
+        33,
+        34
+      ],
+      "reason": "PDF page 4: keep the two language titles and bodies separate.",
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30",
+      "segments": [
+        {
+          "language": "zh-Hant",
+          "title": "靈活增減保障額",
+          "text": "可於原有保單內增加保障額，無須另購新保單，省卻額外保單費用。"
+        },
+        {
+          "language": "en",
+          "title": "Flexible Coverage",
+          "text": "Simply adjust the original Policy to increase the sum insured. No need to apply for a new Policy, thus saving additional policy charges."
+        }
+      ]
+    },
+    "generic-premium-rate": {
+      "pdf_page": 4,
+      "source_blocks": [
+        36,
+        37
+      ],
+      "reason": "PDF page 4: move the interleaved English title out of the body.",
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30",
+      "segments": [
+        {
+          "language": "zh-Hant",
+          "title": "優惠保費率",
+          "text": "加保時仍按最初投保時年齡計算保費率。"
+        },
+        {
+          "language": "en",
+          "title": "Preferential Premium Rates",
+          "text": "The premium rate for new coverage will be based on the insured's age when the Policy was first issued instead of current age."
+        }
+      ]
+    },
+    "generic-payment-flexibility": {
+      "pdf_page": 4,
+      "source_blocks": [
+        39,
+        40
+      ],
+      "reason": "PDF page 4: join the split English title and restore the Chinese sentence.",
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30",
+      "segments": [
+        {
+          "language": "zh-Hant",
+          "title": "繳款彈性",
+          "text": "如保單已累積現金價值，便可暫停繳交保費，而無須支付貸款利息。"
+        },
+        {
+          "language": "en",
+          "title": "Premium Flexibility",
+          "text": "Allows you to skip payments if the Policy has accumulated a cash value, without any loan interest."
+        }
+      ]
+    },
+    "generic-monthly-interest": {
+      "pdf_page": 4,
+      "source_blocks": [
+        42,
+        43
+      ],
+      "reason": "PDF page 4: these are bilingual row labels, not two body paragraphs.",
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30",
+      "segments": [
+        {
+          "language": "zh-Hant",
+          "title": "每月派息複式計算",
+          "text": ""
+        },
+        {
+          "language": "en",
+          "title": "Monthly interest at a compound rate",
+          "text": ""
+        }
+      ]
+    },
+    "generic-cash-withdrawal": {
+      "pdf_page": 4,
+      "source_blocks": [
+        45,
+        46
+      ],
+      "reason": "PDF page 4: separate the English title from the protection statement.",
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30",
+      "segments": [
+        {
+          "language": "zh-Hant",
+          "title": "靈活提取現金",
+          "text": "繼續享有保障，無須減低保障額。"
+        },
+        {
+          "language": "en",
+          "title": "Flexible cash withdrawal",
+          "text": "Still enjoy protection without the need to reduce the sum insured."
+        }
+      ]
+    },
+    "extra-bonus-formula": {
+      "pdf_page": 9,
+      "source_blocks": [
+        137,
+        138,
+        139
+      ],
+      "reason": "PDF page 9: the formula is visually present in both languages; no arithmetic is inferred.",
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30",
+      "segments": [
+        {
+          "language": "zh-Hant",
+          "title": "額外回報計算方法",
+          "text": "額外回報 = 過往5年的平均每月賬戶價值 × 額外回報率"
+        },
+        {
+          "language": "en",
+          "title": "Extra Bonus calculation",
+          "text": "Extra Bonus = Average Monthly Account Value of the preceding 5 years × Extra Bonus rate"
+        }
+      ]
+    },
+    "bonus-example": {
+      "pdf_page": 9,
+      "source_blocks": [
+        148,
+        149,
+        151,
+        152,
+        153
+      ],
+      "reason": "PDF page 9: preserve the example labels, numbers and equation; currency is not inferred from the bare dollar sign.",
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30",
+      "segments": [
+        {
+          "language": "zh-Hant",
+          "title": "於第15個保單週年日派發之「額外回報」",
+          "text": "過往5年的平均每月賬戶價值 × 額外回報率 = 額外回報\n$708,800 × 2.75% = $19,492"
+        },
+        {
+          "language": "en",
+          "title": "Extra Bonus to be credited to the Policy at the end of the 15th policy year",
+          "text": "Average Monthly Account Value of the preceding 5 years × Extra Bonus rate = Extra Bonus\n$708,800 × 2.75% = $19,492"
+        }
+      ]
+    },
+    "cash-value-formula": {
+      "pdf_page": 10,
+      "source_blocks": [
+        166,
+        167,
+        168
+      ],
+      "reason": "PDF page 10: preserve the displayed bilingual equation and its source labels.",
+      "checked_by": "Codex",
+      "checked_at": "2026-09-30",
+      "segments": [
+        {
+          "language": "zh-Hant",
+          "title": "現金價值",
+          "text": "現金價值 = 賬戶價值 − 適用的退保費用"
+        },
+        {
+          "language": "en",
+          "title": "Cash Value",
+          "text": "Cash Value = Account Value − Applicable surrender charge"
+        }
+      ]
+    }
   }
 }

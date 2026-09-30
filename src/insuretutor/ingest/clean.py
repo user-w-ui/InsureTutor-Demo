@@ -171,21 +171,45 @@ def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
     spans, blocks, tables, assets, ledger, issues = {}, [], [], [], [], []
     unit_map, consumed = {}, set()
 
-    def add_span(key, block_index, value, **extra):
+    def add_span(key, block_index, value, pdf_correction=None, record_issues=True, **extra):
         block = raw[block_index]
         clean, refs, flags = normalize(value, rules["literal_markers"].get(key, []),
                                        rules["markup_reference_locations"].get(key, []))
-        flags = sorted(set(flags + rules["block_flags"].get(str(block_index), [])))
+        if record_issues:
+            flags += rules["block_flags"].get(str(block_index), [])
+        flags = sorted(set(flags))
+        correction = pdf_correction or rules.get("pdf_corrections", {}).get(key)
+        if correction:
+            if not correction["reason"] or any(
+                raw[i]["page_idx"] + 1 != correction["pdf_page"]
+                for i in correction["source_blocks"]
+            ):
+                raise ValueError(f"Invalid PDF correction source: {key}")
+            clean, _, remaining_flags = normalize(correction["text"])
+            if not clean or remaining_flags:
+                raise ValueError(f"PDF correction still contains damaged text: {key}")
+        resolved = set(correction.get("resolved_flags", [])) if correction else set()
+        if record_issues:
+            for flag in flags:
+                issues.append({"source_key": key, "pdf_page": block["page_idx"] + 1,
+                               "issue": flag,
+                               "status": "resolved" if flag in resolved else "unresolved",
+                               "action": correction["reason"] if flag in resolved
+                               else "preserve source; inspect PDF"})
+        flags = [flag for flag in flags if flag not in resolved]
         span = {"id": f"{prefix}/{key}", "source_key": key, "block_index": block_index,
                 "pdf_page": block["page_idx"] + 1, "bbox_raw": block["bbox"],
                 "raw_text": value, "clean_text": clean, "language": language(clean),
                 "note_refs": refs, "quality_flags": flags,
-                "quote_policy": "raw_text_only; normalized text is not a verbatim quotation",
+                "evidence_text": correction["text"] if correction else value,
+                "text_origin": "pdf_verified" if correction else "mineru",
+                "raw_block_indices": correction["source_blocks"] if correction else [block_index],
+                "quote_policy": "PDF-verified transcription; verify against the physical PDF page"
+                if correction else "raw_text_only; normalized text is not a verbatim quotation",
                 **extra}
+        if correction:
+            span["correction_reason"] = correction["reason"]
         spans[key] = span
-        for flag in flags:
-            issues.append({"source_key": key, "pdf_page": span["pdf_page"], "issue": flag,
-                           "status": "unresolved", "action": "preserve source; inspect PDF"})
         return span
 
     def add_unit(key, body_keys, context_keys=(), notes=(), requires=(), kind="clause",
@@ -205,6 +229,7 @@ def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
             "languages": sorted({s["language"] for s in selected}),
             "text": text, "note_refs": refs, "requires": [n for n in needed if n != key],
             "pairing_status": pairing,
+            "text_origins": sorted({s["text_origin"] for s in selected}),
             "quality_flags": sorted({f for s in selected for f in s["quality_flags"]}),
             "indexable": kind != "fragment", **extra,
         }
@@ -258,9 +283,28 @@ def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
         body = [f"b{i}" for i in group["blocks"]]
         headings = [f"b{i}" for i in group["headings"]]
         consumed.update(group["blocks"] + group["headings"])
+        view = rules.get("pdf_views", {}).get(group["id"])
+        segments = []
+        if view:
+            body = []
+            for segment in view["segments"]:
+                key = f"{group['id']}:{segment['language']}"
+                text = "\n".join(part for part in (segment["title"], segment["text"]) if part)
+                first = view["source_blocks"][0]
+                correction = dict(view, text=text)
+                span = add_span(key, first, raw[first].get("text", ""),
+                                pdf_correction=correction, record_issues=False,
+                                language=segment["language"], title=segment["title"])
+                body.append(key)
+                segments.append({"span_id": span["id"], **segment})
         add_unit(group["id"], body, headings, group["notes"],
                  rules["mandatory_links"].get(group["id"], []), group["kind"],
                  group["pairing_status"])
+        if segments:
+            unit_map[group["id"]]["segments"] = segments
+            unit_map[group["id"]]["text"] = "\n".join(
+                normalize(part)[0] for segment in segments
+                for part in (segment["title"], segment["text"]) if part)
 
     for table in tables:
         index = table["block_index"]
@@ -357,7 +401,9 @@ def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
         unit_map[conflict["unit"]]["conflict_detail"] = conflict["reason"]
     # Flag span quality at unit level, even when the other language remains usable.
     for unit in units:
-        unit["review_status"] = "needs_review" if unit["quality_flags"] else "structure_checked"
+        unit["review_status"] = ("needs_review" if unit["quality_flags"] else
+                                 "pdf_verified" if "pdf_verified" in unit["text_origins"] else
+                                 "structure_checked")
         if unit["kind"] == "fragment":
             unit["review_status"] = "needs_visual_transcription"
         unit["evidence_group"] = rules.get("evidence_groups", {}).get(unit["id"], unit["id"])
@@ -377,7 +423,8 @@ def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
         raise ValueError(f"Unused literal marker locations: {matched_literals}")
 
     report = {
-        "status": "cleaned_with_explicit_review_items",
+        "status": "cleaned_ready_for_chunking" if all(i["status"] == "resolved" for i in issues)
+        else "cleaned_with_explicit_review_items",
         "input_blocks": len(raw), "input_types": dict(Counter(b["type"] for b in raw)),
         "actions": dict(Counter(row["action"] for row in ledger)),
         "retained_text_blocks": len(blocks), "tables": len(tables),
@@ -387,9 +434,13 @@ def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
         "numbered_note_groups": len(rules["note_blocks"]),
         "required_edges": sum(len(u["requires"]) for u in units),
         "conflicts": rules["conflicts"], "issues": issues,
+        "resolved_issue_count": sum(i["status"] == "resolved" for i in issues),
+        "unresolved_issue_count": sum(i["status"] != "resolved" for i in issues),
+        "pdf_corrections": [{"source_key": k, "pdf_page": v["pdf_page"], "reason": v["reason"]}
+                            for k, v in rules.get("pdf_corrections", {}).items()],
         "control_character_occurrences": sum(len(CONTROLS.findall(b.get("text", ""))) for b in raw),
         "verified_printed_pages": rules["verified_printed_pages"],
-        "scope": "No source text corrections, translation, vector index, or whole-PDF transcription review.",
+        "scope": "Finite PDF-verified corrections and bilingual views; independent clean fragments, not final chunks or a vector index. No whole-PDF transcription certification.",
         "review": rules["review"],
     }
     manifest = {
@@ -404,7 +455,7 @@ def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
                                      "label": b["text"], "verified": False}
                                     for b in raw if b["type"] == "page_number"],
         "citation_policy": "pdf_page is physical, one-based; bbox_raw is not PDF points",
-        "normalization_policy": "Only raw_text is source quotation; clean_text/text is derived",
+        "normalization_policy": "evidence_text is the citation excerpt; text_origin distinguishes MinerU extraction from PDF-verified transcription. Corrected excerpts are verified against the PDF, not a MinerU substring.",
         "table_positions": "zero-based row and expanded column; bbox is whole table",
     }
     return {"manifest": manifest, "blocks": blocks, "spans": list(spans.values()),
@@ -419,10 +470,15 @@ def write_outputs(result: dict, output: Path, rules_bytes: bytes):
             json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in result[name])
     for name in ("tables", "assets", "report"):
         files[name + ".json"] = json.dumps(result[name], ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-    lines = ["# 清洗结果预览", "", "检索文本经过格式规范化，不是原文引句；引用应通过 spans.jsonl 回到原 PDF。", ""]
+    lines = ["# 清洗结果预览", "", "干净片段，供后续切块。引用使用 spans.jsonl 的 evidence_text；PDF 校对文本按物理页核对，不要求是 MinerU 原块的连续子串。", ""]
     for unit in result["units"]:
-        lines += [f"## {unit['id']}", "", f"PDF 页：{unit['pages']}；类型：{unit['kind']}；可索引：{unit['indexable']}", "",
-                  unit["text"], "", "必须补齐：" + (", ".join(unit["requires"]) or "无"), ""]
+        lines += [f"## {unit['id']}", "", f"PDF 页：{unit['pages']}；类型：{unit['kind']}；可索引：{unit['indexable']}", ""]
+        if unit.get("segments"):
+            for segment in unit["segments"]:
+                lines += [f"### {segment['language']} · {segment['title']}", "", segment["text"], ""]
+        else:
+            lines += [unit["text"], ""]
+        lines += ["必须补齐：" + (", ".join(unit["requires"]) or "无"), ""]
         if unit.get("conflict_detail"):
             lines += ["原文冲突：" + unit["conflict_detail"], ""]
         if unit["quality_flags"]:
@@ -435,24 +491,27 @@ def write_outputs(result: dict, output: Path, rules_bytes: bytes):
 规则位于 `data/cleaning-rules.json`，原始文件保持不变。
 
 - `blocks.jsonl`：保留的文本块、规范化文本、原文、页码和质量标记。
-- `spans.jsonl`：可追溯原文片段，包括表格单元格和精确子串；引用使用 raw_text。
+- `spans.jsonl`：来源片段及 PDF 校对文本；引用使用 evidence_text，text_origin 区分两者。
 - `tables.json`：9 张表的原 HTML、单元格、展开后的合并格网格、原有题注。
-- `units.jsonl`：{report['retrieval_units']} 个检索单元，其中 {report['indexable_units']} 个可进入检索。
+- `units.jsonl`：{report['retrieval_units']} 个干净片段，其中 {report['indexable_units']} 个可用于后续切块和检索。
 - `ledger.jsonl`：所有 380 块的处理去向；排除仅影响派生产物。
 - `assets.json`：图像/图表保留记录，不假定图片都是装饰。
 - `report.json`：计数、缺字、未配对内容、原文冲突、审核范围。
 - `preview.md`：方便人工阅读的规范化检索文本。
 - `manifest.json`：来源哈希、产物哈希、版本号、引用约定。
 
-接入 RAG 时只索引 `indexable=true` 的 unit，按 evidence_group 去重。
+条款、附注、表格行保持独立，最终 chunk 和索引由后续 RAG 步骤完成。
+后续使用 `indexable=true` 的片段，按 evidence_group 去重。
 命中后必须递归补齐 requires；可调用 `expand_required(units, selected_ids)`。
 依赖片段不与主条款争抢 top-k，不可截断必需条件。
 质量标记和 conflict_detail 必须传给回答层，不能只取 text。
-同主题双语保留在同一单元，各自来源 span 独立；未声明翻译等价。
-缺字显示为 `[解析缺字]`，未猜字修订。公式碎片保留但不进入索引。
+同主题双语关联；已校对分栏提供 segments，分别保存语言、标题和正文。
+原有 {report['resolved_issue_count']} 项问题已按原 PDF 修复，未解决项 {report['unresolved_issue_count']}。
+额外回报、算例和现金价值公式已恢复。修订有来源块、物理页码及理由。
+修订引句核对 PDF；raw_text 是原始解析记录，不能用它的子串匹配否定已核对的修订。
 未提供简体自动转换；后续可在检索侧使用项目已有 OpenCC 依赖生成别名。
 
-当前状态：完成结构清洗，仍有显式待复核项；不是全篇无误认证。
+原始文件冻结，生成文件覆盖当前版本，不保存历史版本。第 17 页原文金额冲突仍保留。
 """
     for name, text in files.items():
         (output / name).write_bytes(text.encode("utf-8"))
