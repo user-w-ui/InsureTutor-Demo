@@ -40,7 +40,7 @@ install step. Requires Python ≥ 3.11 (developed on 3.13).
 
 ## Architecture
 
-The current design proposal is [`docs/architecture.md`](docs/architecture.md).
+The current design proposal is [`docs/architecture.zh-CN.md`](docs/architecture.zh-CN.md).
 Offline cleaning is now implemented: `python -m insuretutor.ingest.clean` reads
 `data/cleaning-rules.json` and writes `data/cleaned/` separately from frozen inputs.
 See its generated README, report, and `docs/data-cleaning-map.md`. This intermediate
@@ -74,7 +74,7 @@ mean a multi-minute network-bound boot and citation anchors that drift between r
 pipeline re-runs to a byte-identical artifact. `data/curation.json` is the only
 hand-authored relationship input. The current cleaner additionally applies explicit
 PDF-verified corrections from `data/cleaning-rules.json` without altering frozen
-source files. See [`docs/architecture.md`](docs/architecture.md)
+source files. See [`docs/implementation-notes.zh-CN.md`](docs/implementation-notes.zh-CN.md)
 for its schema and for the `Source span` / `Evidence group` / `Retrieval unit` model.
 
 **Consequence for you:** `raw data/` is a frozen, verified input. Do not re-parse it or
@@ -113,7 +113,7 @@ The parts that shape the ingest code:
 - `.md` inlines 33 figures; `.json` carries 42 `img_path` entries. The extra 9 are
   rasterized table crops — the structured `<table>` HTML is authoritative for those.
 
-### Retrieval design (decisions already made — see `docs/architecture.md` for reasoning)
+### Retrieval design (decisions already made — see `docs/architecture.zh-CN.md` for reasoning)
 
 - **Table-row, clause, and note granularity — not fixed windows.** Index individual
   clauses, disclosures, numbered notes, and table rows (rowspan/colspan resolved,

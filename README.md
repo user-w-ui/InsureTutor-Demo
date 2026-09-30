@@ -6,6 +6,11 @@ verifiable citations, plus guardrails against misuse.
 Take-home task for the NUS Asian Institute of Digital Finance (AIDF) AI Full Stack
 Engineer internship. See [`docs/task-spec.md`](docs/task-spec.md) for the original brief.
 
+**For reviewers:** Start with the [technical architecture (中文)](docs/architecture.zh-CN.md)
+for the system diagram, module boundaries, request flow, retrieval, and safety design.
+Data contracts, source discrepancies, and implementation reminders are in
+[implementation notes (中文)](docs/implementation-notes.zh-CN.md).
+
 **Source document:** `FLEXI-ULife Prime Saver.pdf` — 20-page bilingual
 (Traditional Chinese / English) product brochure, YF Life 萬通保險.
 **Domain language:** Traditional Chinese + English, each retained as original evidence.
@@ -59,63 +64,16 @@ citation-verified answering** — not the chat loop.
 
 ## Architecture
 
-### Build time vs run time
+A single Docker container serves a FastAPI backend and static chat UI. It loads a
+committed corpus into an in-memory lexical index. Application code resolves the
+query, retrieves clauses and required notes, then passes structured evidence to a
+tool-free OpenAI Agents SDK agent. The server validates the draft and constructs
+PDF citations before returning the answer. Without an LLM, it returns labelled
+source excerpts. Multilingual vectors are optional, subject to retrieval evaluation.
 
-The parse is **one-time and deterministic**. The committed artifact — not the PDF —
-is what the container reads.
-
-```
-PDF ──(one-time, offline)──► raw data/ ──(one-time)──► data/corpus.json ──► committed
-                                  ▲                                              │
-                        data/curation.json                                       │
-                        (reviewed links)            docker run ─────────────────┘
-                                                          │
-                                             retrieval + citation + guardrails
-```
-
-The parse is frozen, but the corpus is not a raw copy of it: `build_corpus(raw, curation)`
-is a pure function of two committed inputs, so it re-runs to a byte-identical artifact.
-`data/curation.json` is the only hand-authored input — it declares the note links and
-reviewed conflicts that the parse alone cannot prove. Current cleaning corrections
-are recorded separately in `data/cleaning-rules.json`; frozen source files never change.
-
-Rationale: the grader gets a container that boots in seconds with no network
-dependency for ingestion, and the citation anchors are **frozen** — reproducible,
-diffable, and not subject to a re-parse silently shifting page numbers.
-
-### Pipeline
-
-| Stage | What it does | Where |
-|---|---|---|
-| 1. Parse | PDF → Markdown + JSON + images | `raw data/mineru-official/` (MinerU official API) |
-| 2. Normalize | Traditional → Simplified for **indexing only**; original retained for display | `src/insuretutor/ingest/` |
-| 3. Chunk | Semantic-anchor chunking (clause / footnote / condition as indivisible units) | `src/insuretutor/ingest/` |
-| 4. Index | Hybrid BM25 + vector, in-process, no external service | `src/insuretutor/retrieval/` |
-| 5. Answer | Retrieval → grounded generation → citation verification | `src/insuretutor/api/` |
-| 6. Guard | Refusal / scope / advice-boundary checks | `src/insuretutor/guardrails/` |
-
-### Retrieval decisions
-
-- **Semantic-anchor chunking, not fixed windows.** A chunk is a clause, a numbered
-  footnote, or a self-contained condition table — never split mid-condition.
-- **Traditional → Simplified is one-way, indexing-side only.** OpenCC `t2s` for the
-  search index. The displayed citation always shows the original Traditional text,
-  because that is what the source document actually says and what a human checking
-  the citation will look up. Never convert Simplified back to Traditional for display.
-- **Hybrid BM25 + vector.** BM25 wins on `2.5%`, `51歲`, `400,000`; the vector side
-  wins on paraphrase ("what happens if I stop paying" → 暫停繳付保費 / Skip Premium Payments).
-- **Bilingual pairing.** CN and EN segments of the same fact are grouped into one
-  chunk with a single anchor, so a retrieval hit yields both languages rather than
-  competing duplicates.
-
-### Answer modes
-
-Two modes behind one interface — the tutor degrades instead of breaking:
-
-- **LLM mode** — the user supplies an OpenAI-compatible key at run time. Grounded
-  generation over retrieved context.
-- **Offline / extractive mode** — no key. Returns retrieved passages with citations
-  and no synthesis. Still useful, still correct, still cited.
+See the [technical architecture](docs/architecture.zh-CN.md) for the complete design;
+[data and implementation details](docs/implementation-notes.zh-CN.md) are maintained
+separately. Offline cleaning is implemented; the runtime remains planned.
 
 ---
 
@@ -127,14 +85,16 @@ raw data/
     content/                 Markdown + JSON + images/ (all three as siblings)
     MANIFEST.md              Provenance: tool, version, params, checksums, date
 src/insuretutor/
-  ingest/                    raw artifacts + curation → corpus.json (build-time only)
+  ingest/                    cleaning + corpus construction (build-time only)
   retrieval/                 Lexical index + required-link completion
   guardrails/                Refusal & scope policy
   tutor.py                   Full request lifecycle (to add)
+  generation.py              Tool-free Agents SDK adapter (to add)
   api/                       FastAPI app
 data/
-  curation.json              Hand-authored note links & reviewed conflicts — committed
-  corpus.json                Generated artifact — committed
+  cleaning-rules.json        Source-pinned corrections, structure & evidence links
+  cleaned/                   Generated clean fragments and provenance (implemented)
+  corpus.json                Runtime artifact (planned)
 frontend/                    Single-page chat UI
 docs/                        Task spec, architecture, data provenance
 docker/                      Dockerfile + compose
@@ -159,10 +119,9 @@ See [`docs/data-provenance.md`](docs/data-provenance.md) for the full log.
 
 - [x] Source PDF analysed, parse path determined
 - [x] Official-API parse verified (380 blocks, 20 pages, 9 tables, 72 headings, 42 images)
-- [ ] Nine-table / ten-note map reviewed (**blocks ingest**)
-- [ ] Bilingual glossary drafted (**blocks ingest**)
-- [ ] `curation.json` written
-- [ ] `corpus.json` generated
+- [x] Nine-table / ten-note map and offline cleaner implemented
+- [ ] Bilingual glossary drafted
+- [ ] Cleaned fragments and reviewed metadata integrated into `corpus.json`
 - [ ] Retrieval + citation
 - [ ] Guardrails
 - [ ] API + frontend
