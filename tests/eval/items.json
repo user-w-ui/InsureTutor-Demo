@@ -1,0 +1,456 @@
+{
+  "schema": "insuretutor.eval-set/1",
+  "description": "Judge-facing evaluation set for the InsureTutor grounded QA agent. Every citation resolves against data/cleaned/; pdf_page is the physical PDF page (page_idx + 1), which is the only citation anchor.",
+  "source": {
+    "pdf": "raw data/source/FLEXI-ULife Prime Saver.pdf",
+    "product": "FLEXI-ULife Prime Saver / 首選靈活萬用壽險計劃",
+    "issuer": "YF Life Insurance International Ltd. (萬通保險)",
+    "version_code": "PSP-137-V3-0925B",
+    "printed_page_note": "Printed page labels run one behind the physical page through the body of the brochure; report.json records verified_printed_pages {\"6\": \"5\"}. Always cite the physical page."
+  },
+  "items": [
+    {
+      "id": "q1-two-enhancement-rights",
+      "capability": "concept-separation",
+      "question_languages": [
+        "zh-Hans",
+        "zh-Hant",
+        "en"
+      ],
+      "answer_mode": "explain",
+      "question": "保单里好像有两个「增加基本保障额」的权益，名字很像。请告诉我：哪一个会在每个保单年度自动增加、不需要任何健康证明？哪一个需要我结婚或生孩子才能用？这两个权益分别到什么时候失效？如果我用的是「保证可保权益」，每次最多能加多少？一辈子最多能用几次？",
+      "expected_answer": "这是两个不同的权益，请勿混为一谈：\n\n1) 保单增值权益 Policy Enhancement Option —— 触发条件：无需任何触发事件，基本保障额在每个保单周年日自动增加，无需提供任何投保资料证明（可于投保时同时申请）。失效：有效至受保人51岁的保单周年日止。切勿把它说成需要结婚或生子才能行使。\n\n2) 保证可保权益 Guaranteed Insurability Option —— 触发条件：于注册结婚或子女出世时行使（附注3 亦适用于合法领养18岁以下子女），可选择增加基本保障额而无需提供投保资料证明。行使时限：只适用于保障生效日期一年后行使。失效：至受保人51岁的保单周年日止。注意两者是同一日失效——以「保单周年日」为准，不是「51岁生日当天」。\n\n3) 保证可保权益的额度上限（附注3）：每次行使时，所增加的基本保障额最高为「行使权益前」基本保障额的25%；而同一受保人名下所有「首选灵活万用寿险计划」保单，因每次行使本权益所增加的基本保障额合共最高为50,000美元 / 400,000港元 / 400,000澳门元；此权益最多只可行使两次。\n\n4) 「一表看清」的表述差异（须一并指出，见 conflicts 字段）：产品单张第16页的一表看清（table-352-row-8）写的是「25% 或 50,000美元/400,000港元/400,000澳门元（以较低者为准）」，即每次行使取两者中的较低者；而附注3 把25%与「所有保单合共」的货币上限写成两个并行的限制，并没有「以较低者为准」的措辞，也没有把货币数值限定为「每次」的美元/港元/澳门元。两处货币数值本身一致，差别只在「或…以较低者为准」与「每次25% 且 合共上限」的写法。中文原文须一并标出：第16页中文写作「每次增加之基本保障額為行使權益前基本保障額的25%或50,000美元/400,000港元/400,000澳門元（以較低者為準）；最多可行使權益兩次」，英文写「shall not exceed 25% … or US$50,000/HK$400,000/MOP400,000 (whichever is lower)」；而附注3 中文完全没有「以較低者為準」四字，只写「最高為…的25%，而受保人的所有…保單…合共最高為50,000美元/400,000港元/400,000澳門元」。题目提到「一表看清」时，两种语言的措辞都应给出，不能只引英文的 whichever is lower。",
+      "citations": [
+        {
+          "unit_id": "enhancement",
+          "pdf_page": 6,
+          "quote": "保單增值權益 Policy Enhancement Option\n於每個保單週年，獲自動增加基本保障額，無須提交任何投保資料證明（可於投保時同時申請）。",
+          "note": "自动增加、无需健康证明，是本权益的独有特征"
+        },
+        {
+          "unit_id": "note-2",
+          "pdf_page": 12,
+          "quote": "保單增值權益有效至受保人51歲的保單週年日止。有關其他條款及細則，請參閱保單文件。",
+          "note": "失效日：受保人51岁的保单周年日（附注2）"
+        },
+        {
+          "unit_id": "insurability",
+          "pdf_page": 6,
+          "quote": "註冊結婚或子女出世時，可於無須提供任何投保資料證明的情況下，選擇增加基本保障額，保證受保。",
+          "note": "结婚/子女出世的触发条件（本权益独有）"
+        },
+        {
+          "unit_id": "note-3",
+          "pdf_page": 12,
+          "quote": "保證可保權益只適用於保障生效日期一年後行使，至受保人51歲的保單週年日止。權益亦適用於合法領養18歲以下子女。於每次行使權益時，所增加的基本保障額最高為行使權益前基本保障額的25%，而受保人的所有首選靈活萬用壽險計劃保單，因每次行使保證可保權益所增加的基本保障額合共最高為50,000美元/400,000港元/400,000澳門元；此權益最多只可行使兩次。有關詳情及條款，請參閱保單文件。",
+          "note": "行使时限、25%上限、合共货币上限、最多两次（中文）"
+        },
+        {
+          "unit_id": "note-3",
+          "pdf_page": 12,
+          "quote": "3. The Guaranteed Insurability Option can be exercised one year after the Efective Date of Coverage, and will terminate on the policy anniversary following the Insured's 51st birthday. This option is also applicable to lega adoption of a child under the age of 18. For each time the Guaranteed Insurability Option is exercised, the increase in Basic Sum Insured shall not exceed 25% of the Basic Sum Insured before exercising the option, the aggregate increase in Basic Sum Insured of all FLEXI-ULife Prime Saver policies under the Insured by this option shall not exceed US$50,000/ HK$400,000/MOP400,000, and this option can at most be exercised twice. Please refer to the policy document for the relevant terms and conditions.",
+          "note": "同一附注的英文文本；原文拼写 Efective / lega 为源文件既有错误，引用时应保留原文"
+        },
+        {
+          "unit_id": "table-352-row-8",
+          "pdf_page": 16,
+          "quote": "For each exercise, the increase in Basic Sum Insured shall not exceed 25% of the Basic Sum Insured before exercising this option or US$50,000/HK$400,000/MOP400,000 (whichever is lower). This option can be exercised up to two times",
+          "note": "第16页一表看清：以较低者为准的写法，与附注3不同"
+        },
+        {
+          "unit_id": "table-352-row-8",
+          "pdf_page": 16,
+          "quote": "每次增加之基本保障額為行使權益前基本保障額的25%或50,000美元/400,000港元/400,000澳門元(以較低者為準);最多可行使權益兩次",
+          "note": "第16页一表看清的中文措辞，含「以較低者為準」——与附注3中文不同，题目要求双语并陈。"
+        }
+      ],
+      "rubric": [
+        "必须把两个权益分开回答，且不得把「结婚/生子」安在保单增值权益上（本题最主要的混淆点）。",
+        "必须说出两个权益同日失效：受保人51岁的保单周年日；答「51岁生日」或只给其中一个权益的失效期，均扣分。",
+        "必须给出保证可保权益的三项限制：每次25%、合共50,000美元/400,000港元/400,000澳门元、最多两次。",
+        "加分项：一并指出第16页「以較低者為準」(whichever is lower) 的写法与附注3「每次25% 且 合共上限」的分野，并同时给出中英两种语言的原文措辞。",
+        "不得把25%说成「合共上限的25%」，也不得把货币上限说成「每次」的上限。",
+        "引用须落在第6页（正文两段）与第12页（附注2、附注3）；引第5页只能支持「两项权益同时提供」，不支持任何具体条款。"
+      ],
+      "wrong_answers": [
+        "把「注册结婚或子女出世」当成保单增值权益的触发条件。",
+        "声称其中一个权益在51岁生日当天失效，或只给一个权益的失效年龄。",
+        "只答「最多两次」而漏掉25%与合共货币上限（或反之）。",
+        "把 US$50,000/HK$400,000/MOP400,000 说成每次都可全额增加，忽略25%限制。"
+      ],
+      "conflicts": [
+        {
+          "unit_id": "table-352-row-8",
+          "pairs_with": "note-3",
+          "issue": "第16页一表看清写「25% 或货币上限（以较低者为准）」；附注3写「每次最高25%」加上「同一受保人所有保单合共最高50,000美元/400,000港元/400,000澳门元」，两处限制并非同一结构。",
+          "status": "presentational_difference_not_recorded_as_source_conflict",
+          "guidance": "两者货币数值一致，非数据冲突；答案应同时给出两种写法，并说明一表看清取较低者、附注3为两个并行限制。"
+        }
+      ]
+    },
+    {
+      "id": "q2-minimum-change-amount-conflict",
+      "capability": "citation-integrity",
+      "question_languages": [
+        "zh-Hans",
+        "en"
+      ],
+      "answer_mode": "show-conflict",
+      "must_not_pick_one": true,
+      "question": "I need to increase the sum insured. According to the product brochure, what is the minimum amount of each increase/decrease? Please give me the exact figures in all three currencies. 顺便说一下，这份保单要在哪里看这个规定？如果中英文写的不一样，请你直接告诉我哪个才对。",
+      "expected_answer": "这一项在源文件中本身中英文不一致，必须两个都列出，不得只取其一：\n\n- 中文：每次更改之最低金额为 5,000美元 / 40,000港元 / 400,000澳門元\n- 英文：The minimum amount of increase / decrease is US$5,000 / HK$400,000 / MOP40,000\n\n两者只有在美元一项上一致（US$5,000）。港元与澳门元两项被互换：中文是「港元40,000、澳门元400,000」，英文是「HK$400,000、MOP40,000」。此项已被复核并标记为 reviewed_source_conflict，官方立场是「两者皆不采纳为权威」，因此在没有保单项下文件确认前，正确做法是两个数值都呈现并说明差异，而不是选一个。\n\n出处：产品单张第17页（该页印刷页码标记为16）的「增加/减少保障额」一列。",
+      "citations": [
+        {
+          "unit_id": "table-354-row-5",
+          "pdf_page": 17,
+          "quote": "每次更改之最低金額為5,000美元 / 40,000港元 / 400,000澳門元",
+          "note": "中文版：港元40,000 / 澳门元400,000"
+        },
+        {
+          "unit_id": "table-354-row-5",
+          "pdf_page": 17,
+          "quote": "The minimum amount of increase / decrease is US$5,000 / HK$400,000 / MOP40,000",
+          "note": "英文版：HK$400,000 / MOP40,000；与中文版互换"
+        }
+      ],
+      "rubric": [
+        "必须同时给出中文与英文两组数字；只给一组（即使该组正确）应判为不合格。",
+        "必须明确指出港元与澳门元两项在两种语言间被互换；只指出「数字不同」而不指出互换关系，扣分。",
+        "必须指出美元项 5,000 是两语言一致的。",
+        "必须拒绝在两者之间挑一个为「正确」，或说明须以保单项下文件/核保确认为准。",
+        "引用须落在第17页（印刷页码16）的同一行；引用该页其他行（最低保障额、保费行政费用等）不得分。"
+      ],
+      "wrong_answers": [
+        "回答「HK$400,000/MOP40,000」并声称英文版更权威。",
+        "回答「40,000港元/400,000澳门元」而不提英文版差异。",
+        "把两个语言版本的数字混成一组新的数字。",
+        "引用第16页保证可保权益一行的 HK$400,000/MOP400,000，把该组数字当成这一行的答案。"
+      ],
+      "conflicts": [
+        {
+          "unit_id": "table-354-row-5",
+          "status": "reviewed_source_conflict",
+          "values": [
+            {
+              "language": "zh-Hant",
+              "text": "每次更改之最低金額為5,000美元 / 40,000港元 / 400,000澳門元"
+            },
+            {
+              "language": "en",
+              "text": "The minimum amount of increase / decrease is US$5,000 / HK$400,000 / MOP40,000"
+            }
+          ],
+          "authority": "neither"
+        }
+      ]
+    },
+    {
+      "id": "q3-bonus-rate-year20",
+      "capability": "numeric-precision",
+      "question_languages": [
+        "zh-Hans"
+      ],
+      "answer_mode": "explain",
+      "question": "顾问跟我说：这个计划第20个保单年度会派发额外回报，派发率是2.75%，而且基本派息4%会连同额外利息0.25%一起复利滚存。请问他说的对吗？额外回报到底什么时候派发、用哪个比率？另外这个计划有没有什么「保证」的利率？",
+      "expected_answer": "该顾问的说法有三处需要更正，另有一处遗漏。\n\n1) 派发时间：额外回报并非只在第20年派发。它于第15个保单周年日首次派发，其后每5年一次（第15、20、25、30…年），而第20年只是众多派发时点之一。顾问的话让人以为第20年才是起点，把首次派发整整推迟了5年。\n\n2) 派发率：2.75% 是第15年、20年及25年的现时假设额外回报率；第30年及其后每5年为 5.5%。所以2.75%并非第20年专属，且30年后会跳到5.5%——只说2.75%会漏掉后半段。\n\n3) 利息结构：基本派息现时假设 4% p.a.，是按月派发并以复式计算；额外利息现时假设 0.25% p.a. 则是自保单第1年起计算至第20年、于第20年年终一次性拨入账户价值，其后每5年一次。把「4% 同 0.25% 一齐嚟」当成一个合并年利率，把两个性质、时点都不同的机制混为一谈。\n\n4) 关键对比（原答案遗漏）：额外「回报」(Extra Bonus) 与额外「利息」(Retrospective additional interest) 是两个独立机制，起算年份不同——回报自第15个保单周年日起派发，利息则自第1年累计、第20年终才首次拨入。这正是「第20年」这个数字在册子上真正归属的对象：第20年是额外利息的首次拨入年，不是额外回报的首发年。顾问把两个机制的时间点对调了。\n\n5) 保证部分：计划确实有保证成分，但保证的不是回报率。保单生效满15年或以上，账户价值（包括已拨入的利息及额外回报总额）保证不少于按每年2.5%派息率累积所得的账户价值。这是一条账户价值下限保证，不是2.5%的派息率承诺。\n\n6) 重要提示：4%、0.25%、2.75%、5.5% 全部标示为「现时假设」息率，并非保证，日后或会更改；且表列额外回报率附有「（以派发时适用的额外回报率為準）(subject to the Extra Bonus rate at distribution)」——实际派发依派发当时适用的比率计算，而非表列数字。另，基本派息及额外利息两项息率以本册子2022年1月刊发时为准。",
+      "citations": [
+        {
+          "unit_id": "bonus-rate-15-25",
+          "pdf_page": 9,
+          "quote": "第15年、20年及25年15th year, 20th year and 25th year\n2.75%",
+          "note": "第15/20/25年的现时假设额外回报率 2.75%"
+        },
+        {
+          "unit_id": "extra-bonus-frequency",
+          "pdf_page": 9,
+          "quote": "額外回報於第15個保單週年日及其後每5年派發。",
+          "note": "派发频率：第15个保单周年日及其后每5年"
+        },
+        {
+          "unit_id": "bonus-rate-30",
+          "pdf_page": 9,
+          "quote": "第30年及其後每5年The 30th year and every 5 years thereafter\n5.5%",
+          "note": "第30年及其后每5年为 5.5%"
+        },
+        {
+          "unit_id": "base-interest",
+          "pdf_page": 8,
+          "quote": "基本派息(現時假設息率*）Base Crediting Interest(Current assumed rate*)\n4%每年 p.a.",
+          "note": "基本派息现时假设 4% p.a."
+        },
+        {
+          "unit_id": "additional-interest",
+          "pdf_page": 8,
+          "quote": "額外利息 (現時假設息率*） Retrospective additional interest (Current assumed rate*)\n0.25%每年 p.a.",
+          "note": "额外利息现时假设 0.25% p.a."
+        },
+        {
+          "unit_id": "table-352-row-6",
+          "pdf_page": 16,
+          "quote": "賬戶價值(包括已撥入保單的利息及額外回報的總額)保證不會少於每年以派息率2.5%計算而累積的賬戶價值(適用於已生效滿15年或以上的保單)",
+          "note": "保证：满15年或以上，账户价值保证不少于以2.5% p.a. 累积的金额"
+        },
+        {
+          "unit_id": "rate-date-note",
+          "pdf_page": 8,
+          "quote": "* 上述之現時假設基本派息率及現時假設額外利息息率為本冊子於2022年1月刊發時適用，並非保證，日後或會更改。",
+          "note": "所有现时假设息率以2022年1月刊发时适用，并非保证"
+        },
+        {
+          "unit_id": "bonus-rate-disclaimer",
+          "pdf_page": 9,
+          "quote": "（以派發時適用的額外回報率為準） (subject to the Extra Bonus rate at distribution)",
+          "note": "第9页限定语：派发率以派发时适用者为准，故表列2.75%/5.5%只是现时假设，不是承诺。"
+        },
+        {
+          "unit_id": "interest-year20-note",
+          "pdf_page": 8,
+          "quote": "^ 自保單第1年起計算至第20年，並於第20年年終撥入賬戶價值內。",
+          "note": "额外「利息」的入账时点：第1至20年累计，第20年年终拨入——与额外「回报」第15年首次派发是两个独立机制。"
+        },
+        {
+          "unit_id": "interest-every5-note",
+          "pdf_page": 8,
+          "quote": "而由第20年起，其後每5年派發一次，將由每5年期的第1年起計算至第5年，並於第5年年終時撥入賬戶價值內。",
+          "note": "第20年之后的额外利息周期：每5年一次。"
+        }
+      ],
+      "rubric": [
+        "必须指出额外回报于第15个保单周年日首次派发，而非第20年。",
+        "必须指出第30年及其后每5年的假设额外回报率为5.5%，2.75%只适用于第15、20及25年。",
+        "必须把基本派息（4% p.a.，每月复式）与额外利息（0.25% p.a.）区分为两个不同机制，并说明额外利息于第20年年终首次拨入。",
+        "必须说明保证内容是账户价值下限（生效满15年起，保证不少于按2.5% p.a.累积的账户价值），而非保证派息率或回报率。",
+        "应提及表列额外回报率附有「以派发时适用的额外回报率為準」的限定语。",
+        "应提及这些息率均为「现时假设」、可更改，且基本派息与额外利息以2022年1月刊发时为准。",
+        "必须明确点出额外「回报」（第15年起）与额外「利息」（第20年终首次拨入）是起算年份不同的两个机制——这是「第20年」在册子上的真正归属。",
+        "若回答把 4% + 0.25% 讲成一个合并年利率，或把第20年说成额外回报的首次派发年，不得分。"
+      ],
+      "wrong_answers": [
+        "接受顾问的说法（第20年派2.75%，4%与0.25%合并复利）。",
+        "声称额外回报自第20年起每5年派发，漏掉第15年。",
+        "声称派息率保证为4%（把「现时假设」当成保证）。",
+        "把2.5%说成额外的保证派息率，而不是账户价值的累积下限。"
+      ]
+    },
+    {
+      "id": "q4-incremental-death-benefit-netting",
+      "capability": "citation-calculation",
+      "question_languages": [
+        "en",
+        "zh-Hans"
+      ],
+      "answer_mode": "numeric",
+      "question": "Suppose a Policy is on the Incremental Benefit option. The Basic Sum Insured is US$1,000,000 and the Account Value at the date of death is US$400,000. The insured withdrew US$100,000 eleven months before death. What is the Death Benefit payable? 请给出计算过程，并说明你用哪一条脚注。",
+      "expected_answer": "答：US$1,150,000。\n\n计算过程：\n1) 渐进寿险保障的身故保障为「账户价值」或「基本保障额 + 账户价值的50%」，两者取其较高者。\n   账户价值 = 400,000；基本保障额 + 50% 账户价值 = 1,000,000 + 50% × 400,000 = 1,000,000 + 200,000 = 1,200,000\n2) 适用附注5：基本保障额及账户价值的50%之总额，须扣除受保人身故日前12个月内曾提取的总金额的50%。该笔100,000的提取发生在身故前11个月，落在12个月内，故须扣减 50% × 100,000 = 50,000。\n   1,200,000 − 50,000 = 1,150,000\n3) 取较高者：max(400,000, 1,150,000) = 1,150,000。\n\n因此身故保障为 US$1,150,000。\n\n关键区分：渐进寿险保障用附注5（扣除提取额的50%）；固定寿险保障（Level Benefit）的身故保障为「账户价值」或「基本保障额」两者较高者，用附注4，须扣除身故日前12个月内提取的全额。本题若误用附注4，会得到 1,200,000 − 100,000 = 1,100,000；若完全不扣减，会得到 1,200,000。",
+      "citations": [
+        {
+          "unit_id": "table-97-row-3",
+          "pdf_page": 7,
+          "quote": "「賬戶價值」或「基本保障額 + 賬戶價值的50%」 (兩者取其較高者)",
+          "note": "渐进寿险保障的身故保障定义（第7页）；该行声明 requires note-5"
+        },
+        {
+          "unit_id": "note-5",
+          "pdf_page": 12,
+          "quote": "5. 基本保障額及賬戶價值的50%之總額須扣除受保人身故日前12個月內曾提取的總額的50%。",
+          "note": "附注5：扣除12个月内提取总额的50%"
+        },
+        {
+          "unit_id": "note-4",
+          "pdf_page": 12,
+          "quote": "4. 基本保障額須扣除受保人身故日前12個月內曾提取的總金額。",
+          "note": "附注4：固定寿险保障适用，扣除提取全额——本题的干扰项"
+        }
+      ],
+      "rubric": [
+        "最终数值必须为 US$1,150,000（接受等值表述）。",
+        "必须展示 1,000,000 + 50% × 400,000 = 1,200,000 这一步。",
+        "必须使用附注5的50%扣减（−50,000），并正确引用附注5而非附注4。",
+        "必须说明该项提取落在身故前12个月内，故触发扣减。",
+        "必须体现「两者取其较高者」的比较（400,000 vs 1,150,000）。",
+        "只给答案不给过程，或引用第16页一表看清的其他行，扣分。"
+      ],
+      "wrong_answers": [
+        "US$1,200,000 —— 完全忽略12个月内提取的扣减。",
+        "US$1,100,000 —— 误用附注4，扣减提取全额。",
+        "US$1,250,000 —— 误把50%加在错误基数上或重复计入账户价值。",
+        "US$900,000 —— 误用固定寿险保障并在错误基数上扣减。"
+      ],
+      "depends_on_notes": [
+        5
+      ]
+    },
+    {
+      "id": "q5-periodic-withdrawal-eligibility",
+      "capability": "edge-case-eligibility",
+      "question_languages": [
+        "zh-Hant",
+        "en"
+      ],
+      "answer_mode": "numeric",
+      "question": "我份保單生效咗 3 年。我想用「定期提款權益」，每月自動攞錢出嚟，可以嗎？如果可以，每月最少要攞幾多？提款年期有冇最低要求？要唔要交手續費或者提款費用？另外，如果我唔係用定期提款，而係自己每次主動提款，又點計費？",
+      "expected_answer": "答：以「生效滿3年」为前提，暂时不符合定期提款权益的资格，须待保单生效满10年或以上才可行使。\n\n1) 资格门槛：定期提款权益只适用于生效满10年或以上的保单。保单生效3年，未达标。\n2) 假设已满10年，现行规定：每月提款金额最低为 500美元 / 4,000港元 / 4,000澳门元，提款年期最短一年；每年提款金额最低为 6,000美元 / 48,000港元 / 48,000澳门元，提款年期最短三年。\n3) 费用：定期提款权益可获豁免支付提款费用。但如欲更改已确认的定期提款权益，须支付手续费。\n4) 若改为自行主动提取现金价值：次数不限，但现时每次提款收取 25美元 / 200港元 / 200澳门元 的提款费用（不获豁免）。\n5) 附带提醒：提取现金价值会减少计划所累积的现金价值，而每月费用仍会被扣除；若现金价值不足以支付每月费用，保单有可能终止而没有任何价值。\n\n源文件缺陷提示（须向用户说明）：附注6 的英文版写「US$500/HK$/MOP4,000」，港元金额在英文版中是缺失的；中文版「4,000港元」才是完整的。因此若只依据英文附注6，无法得出港元的每月最低金额。",
+      "citations": [
+        {
+          "unit_id": "note-6",
+          "pdf_page": 12,
+          "quote": "定期提款權益只適用於生效滿10年或以上的保單，並可獲豁免支付提款費用。按現行規定，每月提款金額最低為500美元/4,000港元/4,000澳門元，提款年期最短一年；",
+          "note": "中文附注6：10年门槛、每月最低500美元/4,000港元/4,000澳门元、最短一年、豁免提款费"
+        },
+        {
+          "unit_id": "note-6",
+          "pdf_page": 12,
+          "quote": "6. Automatic periodic withdrawal option is only applicable if the Policy has been in force for at least 10 years, the withdrawal charge will be waived. Current requirement on minimum monthly withdrawal amount is US$500/HK$/MOP4,000, with minimum withdrawal period of one year;",
+          "note": "英文附注6：港元金额缺失（US$500/HK$/MOP4,000），须以中文版补足"
+        },
+        {
+          "unit_id": "note-6",
+          "pdf_page": 12,
+          "quote": "而每年提款金額最低為6,000美元/48,000港元/48,000澳門元，提款年期最短三年。",
+          "note": "每年最低6,000美元/48,000港元/48,000澳门元，最短三年"
+        },
+        {
+          "unit_id": "table-356-row-1",
+          "pdf_page": 18,
+          "quote": "現時每次收取25美元/200港元/200澳門元提款費用;定期提款權益則可獲豁免",
+          "note": "主动提款的费用：每次25美元/200港元/200澳门元；定期提款权益豁免"
+        }
+      ],
+      "rubric": [
+        "必须首先指出保单生效满10年或以上的门槛，并据此判定生效3年的保单不符合资格。",
+        "必须给出每月最低金额（500美元/4,000港元/4,000澳门元）与最短年期（一年）。",
+        "必须指出定期提款权益豁免提款费，但更改已确认的权益须付手续费；普通提款每次收25美元/200港元/200澳门元。",
+        "加分项：主动指出英文附注6 港元金额缺失，须以中文版为准。",
+        "引用须落在第12页附注6 与第18页的提款费用行。"
+      ],
+      "wrong_answers": [
+        "回答「可以，你现在就能用」——忽略10年门槛。",
+        "把最低每月金额答成 6,000美元/48,000港元/48,000澳门元（那是每年的最低金额）。",
+        "声称定期提款权益也要每次收25美元/200港元/200澳门元的提款费。",
+        "遗漏更改已确认安排须付手续费这一点。"
+      ],
+      "depends_on_notes": [
+        6,
+        7
+      ]
+    },
+    {
+      "id": "q6-macau-currency-and-lapse",
+      "capability": "cross-language",
+      "question_languages": [
+        "en",
+        "zh-Hant",
+        "zh-Hans"
+      ],
+      "answer_mode": "explain",
+      "question": "For a policy issued in Macau, which currencies can it be denominated in, and what payment modes are available? 另外，如果我中途暂停缴付保费，什么情况下这份保单会失效？还有，市面上都说这个计划有失业保障，是不是我失业就可以一直不用交保费？",
+      "expected_answer": "1) 保单货币（澳门保单）：美元 / 澳门元 / 港元。香港保单则为美元 / 港元。这一项中英对照一致。\n2) 缴费方式：每年 / 每半年 / 每季 / 每月缴付。\n3) 失效机制：提取现金、减低或暂停缴付保费，会减少计划所累积的现金价值，而每月费用仍会被扣除。若现金价值不足以支付每月费用，而在保费到期日起计31天宽限期届满前仍未缴付保费，保单便会终止而没有任何价值（即失效且价值为零）。注意：第14页的失效条款并没有把「保单内已有现金价值」列为暂停缴付的前提条件；关键在于暂停缴付令现金价值累积减少，一旦不足以支付每月费用且过了宽限期，保单即失效。\n4) 失业保障不是「不用再交保费」：若投保人于保单有效期内不幸遭裁员或遣散，可享有长达365日的「特惠宽限期」，在该期限内仍可继续享有十足保障；但这是把保障与缴费宽限至最长365天，不是永久豁免保费。此外失业保障只适用于基本计划，不适用于附加保障。须与一般保费宽限期（31天）区分。\n\n补充：暂停缴付保费另见「暂停缴付保费」条款，其表述为「只要保单内已累积有足够的现金价值，您可暂停缴付保费」；回答时应以第14页失效条款的因果链为准，不要把该表述当成失效的前置条件。",
+      "citations": [
+        {
+          "unit_id": "table-352-row-14",
+          "pdf_page": 16,
+          "quote": "香港保單:美元/港元澳門保單:美元/澳門元/港元Policy issued in Hong Kong: US$ / HK$Policy issued in Macau: US$ / MOP / HK$",
+          "note": "澳门保单货币：美元/澳门元/港元；香港保单：美元/港元"
+        },
+        {
+          "unit_id": "table-352-row-15",
+          "pdf_page": 16,
+          "quote": "每年/每半年/每季/每月繳付Annual / Semi-annual / Quarterly / Monthly Payment",
+          "note": "缴费方式四项：每年/每半年/每季/每月"
+        },
+        {
+          "unit_id": "unemployment",
+          "pdf_page": 11,
+          "quote": "萬一投保人於保單有效期內不幸遭裁員或遣散，即可享有長達365日的「特惠寬限期」，於該期限內仍可繼續享有十足保障。",
+          "note": "失业保障：365日特惠宽限期，期间仍享十足保障"
+        },
+        {
+          "unit_id": "note-8",
+          "pdf_page": 12,
+          "quote": "8. 失業保障只適用於基本計劃。",
+          "note": "失业保障只适用于基本计划"
+        },
+        {
+          "unit_id": "term-and-lapse",
+          "pdf_page": 14,
+          "quote": "如現金價值不足以支付每月費用，而在保費到期日起計31天寬限期屆滿前仍未繳付保費，保單便會終止而沒有任何價值。",
+          "note": "失效条件：现金价值不足支付每月费用且在31天宽限期届满前未缴保费"
+        }
+      ],
+      "rubric": [
+        "货币必须答出澳门保单为美元/澳门元/港元（三个齐全），并可与香港保单（美元/港元）区分。",
+        "缴费方式四项齐全：每年/每半年/每季/每月。",
+        "失效机制须同时含三个要素：现金价值不足以支付每月费用、31天宽限期、保单终止且没有任何价值。",
+        "失业保障须答成「长达365日的特惠宽限期、期间仍享十足保障」，且须指出只适用于基本计划；不得答成永久豁免保费。",
+        "不得把「保单内已有现金价值」当成暂停缴付保费的前提条件——第14页的失效条款并未如此表述。"
+      ],
+      "wrong_answers": [
+        "回答澳门保单货币为「美元/港元」，沿用香港保单的货币组合。",
+        "把失业保障说成「失业期间完全不用缴保费」或「保费豁免」。",
+        "把失业保障说成适用于基本计划及附加保障。",
+        "把失效条件说成「只要暂停缴付保费，保单立即失效」。",
+        "把31天的普通宽限期与365日的特惠宽限期混为一谈或以365日取代31日。"
+      ],
+      "depends_on_notes": [
+        8
+      ]
+    },
+    {
+      "id": "q7-scope-refusal-and-version-code",
+      "capability": "scope-refusal",
+      "question_languages": [
+        "en",
+        "zh-Hans"
+      ],
+      "answer_mode": "refuse",
+      "must_not_fabricate": true,
+      "answer_mode_note": "本题含可回答部分（文件版本代码、利率时点）与必须拒绝的部分（2025年履行比率、实际派息率）。整题计为 refuse 型，因为核心考点是拒绝编造。",
+      "question": "Two questions. (a) This brochure is version PS... could you confirm the exact product/version code printed on the brochure? (b) Our clients keep asking about the 2025 fulfilment ratio (履行比率) and the actual crediting interest rate this plan paid out in 2025. Can you give me those numbers from the brochure?",
+      "expected_answer": "(a) 可回答：本产品单张的版本代码为 PSP-137-V3-0925B，印刷于封底（物理第20页）。须说明该代码承载于元数据路径：MinerU 将该文本块标记为 aside_text，清理流程将其路由到 manifest 的 metadata.version_code（block_index 378, pdf_page 20），因此它不是索引单元，不应声称可在正文索引中检索到，也不应给它编造 unit_id。\n\n(b) 必须拒绝，且不得编造数字：本册子并未载有2025年的履行比率，也未载有任何实际派息或分红实现率数据。册子只载有两项「现时假设」息率——基本派息现时假设 4% p.a. 与额外利息现时假设 0.25% p.a.，而附注明确说明这些息率以本册子于2022年1月刊发时适用、并非保证、日后或会更改。既然册子的息率参考时点是2022年1月，就不能用它回答2025年的实际派息数字。\n\n注意区分「册子不能回答」与「册子不含任何2025年内容」——不要把话说成后者。封底两个「**」附注确实印有2025年日期，但那是公司股东排名的引注（按2025年6月2日《FORTUNE 500》公布的2024年收入排行榜合併計算），与派息率、履行比率无关。正确的说法是：册子不含2025年度的实际派息／履行比率数据，不是因为册子整份停留在2022年。\n\n可提供的替代指引：本册子的投资政策章节指引用户浏览公司网页查阅 historical crediting interest rate；履行比率与分红实现率一般见于保险公司的分红实现率／履行比率专页，而非产品销售册子。应向用户说明正确的查询来源，而不是给一个凭空数字。",
+      "citations": [],
+      "refusal_grounding": [
+        {
+          "unit_id": "rate-date-note",
+          "pdf_page": 8,
+          "quote": "* The current assumed base crediting interest rate and the current assumed retrospective additional interest rate are quoted as of the print date of this brochure in January 2022, and are not guaranteed",
+          "note": "英文。两项息率以2022年1月刊发时为准、并非保证，因此不能用来回答2025年实际派息。"
+        },
+        {
+          "unit_id": "rate-date-note",
+          "pdf_page": 8,
+          "quote": "* 上述之現時假設基本派息率及現時假設額外利息息率為本冊子於2022年1月刊發時適用，並非保證，日後或會更改。",
+          "note": "中文对应条款。"
+        },
+        {
+          "unit_id": "company-ranking-note",
+          "pdf_page": 20,
+          "quote": "** The “Five Largest US Life Insurance Companies” are ranked according to the results of “Insurance: Life, Health (Mutual)” and “Insurance: Life, Health (Stock)” on total revenues for 2024, and based on the FORTUNE 500 as published on June 2, 2025.",
+          "note": "反例：册子确实印有2025年日期，但属股东排行榜引注，与派息率无关。拒绝理由应限于「无2025年派息／履行比率数据」，不可扩大为「册子只含2022年内容」。"
+        }
+      ],
+      "citations_excluded": [
+        {
+          "what": "PSP-137-V3-0925B",
+          "why": "该版本代码存于 data/cleaned/manifest.json 的 metadata.version_code（block 378 / pdf_page 20 / aside_text），未进入 units.jsonl，不构成可引用的索引单元；不可为它编造 unit_id 或页码引用。"
+        }
+      ],
+      "rubric": [
+        "必须明确拒绝提供2025年履行比率与实际派息率，并说明本册子不含这些数据。",
+        "不得编造任何履行比率、分红实现率或2025年实际派息数字。",
+        "应说明册子中的息率为「现时假设」且以2022年1月刊发时为准，因此不能回答2025年的实际数字。",
+        "应给出正确的替代来源（公司网站的投资策略／历史派息率或分红实现率页面），而非只答「不知道」。",
+        "加分项：指出版本代码 PSP-137-V3-0925B 位于封底（第20页）且走元数据路径（aside_text / manifest metadata），而非正文索引。",
+        "若声称「册子整份内容停留在2022年、不含任何2025年信息」，属事实错误——封底股东附注印有2025年6月2日《FORTUNE 500》引注；如此回答应扣分（但不改变拒绝本身正确）。",
+        "若声称已在册子正文中找到2025年派息／履行比率数字，即属编造，本题不得分。"
+      ],
+      "wrong_answers": [
+        "给出任何具体的2025年履行比率或实际派息率数字。",
+        "把现时假设的4% p.a. 或0.25% p.a. 当成2025年实际派息率回答。",
+        "声称册子载有履行比率而答不出来源。",
+        "答「册子没有」但完全不给出任何可查来源。",
+        "宣称「册子只含2022年的内容／完全不含2025年资料」——封底股东附注印有2025年6月2日《FORTUNE 500》引注，此说不实。",
+        "断言封底印的是 P5P-137-V3-0925B（把印刷体S误读为5），或宣称印刷版本与 OCR／manifest 版本不一致——两者实为同一字符串，不存在差异。"
+      ]
+    }
+  ]
+}
