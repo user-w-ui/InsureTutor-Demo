@@ -11,7 +11,7 @@ Ten question/answer items that stress the InsureTutor grounded QA agent, built o
 | [`test_eval_set.py`](test_eval_set.py) | Contract tests over the *dataset* — not over the tutor. |
 
 ```bash
-pytest tests/eval -v     # 18 tests, all green
+pytest tests/eval -v     # 19 tests, all green
 ```
 
 ## What the ten items cover
@@ -37,7 +37,10 @@ the graded behaviour is that the agent *finds* its own evidence, so the demand n
 `rubric`, never in `question`. `test_questions_do_not_tell_the_tutor_where_to_cite` holds that
 line — it fails on 「引用」「哪一條附註」「根據第X頁」 and on any question that names one of its own
 citation unit ids. The one deliberate exception is q2 asking for the figures *in all three
-currencies*: that is a content requirement, not a pointer at a location.
+currencies*: that is a content requirement, not a pointer at a location. A companion test,
+`test_answer_key_blockquote_matches_items_json_question`, requires every question to appear
+verbatim as a blockquote in `ANSWER_KEY.md` — the two files are one question in two views, and
+nothing kept them in step until an edit to one and not the other was caught by an audit.
 
 **Q8 is the vague-input item.** It reads like a real customer — no product name, no benefit
 name, no figure, nothing the retriever can match lexically. It has a single bridge into the
@@ -76,6 +79,8 @@ letting the eval set silently drift from the corpus it grades against:
   shipped pointing at physical page 17 for a unit that lives on 19);
 - no question points the tutor at a citation — no 「引用」「哪一條附註」「根據第X頁」, and no question
   that names one of its own citation unit ids;
+- every question also appears verbatim as a blockquote in `ANSWER_KEY.md`, so the human-readable key
+  cannot drift from `items.json`;
 - the vague-question items stay under 60 characters and leak none of the corpus's own terminology
   (「定期提款」「現金價值」「USD」…) — an item that names the option has stopped testing retrieval;
 - pages are one-based and ≤ 20;

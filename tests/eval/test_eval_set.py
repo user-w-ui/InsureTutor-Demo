@@ -307,6 +307,35 @@ class EvalSetTests(unittest.TestCase):
                         f"{item['id']}: the question names a unit id",
                     )
 
+    def test_answer_key_blockquote_matches_items_json_question(self):
+        """``ANSWER_KEY.md`` and ``items.json`` are two views of one question.
+
+        The key is the human-readable artifact a judge reads; ``items.json`` is
+        what the tests and the harness consume. Nothing kept them in step, and
+        they drifted the moment a question was edited in one place: after the
+        "don't ask where to cite" edit, the key's Q4 blockquote still carried the
+        dropped 「并说明你用哪一条脚注」 sentence for hours. A judge reading the key
+        would have seen the tutor asked to hand over its provenance — the exact
+        behaviour the edit removed — while every contract test passed.
+
+        Comparing the blockquotes to ``items.json`` catches that, and it catches
+        the milder drift too: a reworded question, a stray trailing space, a
+        typo fixed in one file only.
+        """
+        key = (ITEMS_PATH.parent / "ANSWER_KEY.md").read_text(encoding="utf-8")
+        # Author guidance sits in the body; the question is the blockquote under
+        # the `## Qn —` heading, so collect all quoted lines and require each
+        # question to appear verbatim among them.
+        quoted = [line[2:].strip() for line in key.splitlines() if line.startswith("> ")]
+        self.assertTrue(quoted, "the key quotes its questions")
+        for item in self.items:
+            with self.subTest(item=item["id"]):
+                self.assertIn(
+                    item["question"].strip(),
+                    quoted,
+                    f"{item['id']}: ANSWER_KEY.md no longer quotes the current question",
+                )
+
     def test_clarify_and_refuse_never_assert(self):
         """Neither mode may ship a settled answer in ``expected_answer``.
 

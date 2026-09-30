@@ -241,7 +241,12 @@ itself is dated **the 15th policy year**, which independently confirms correctio
 
 **Capability:** citation-calculation · **Languages:** English / Simplified · **Mode:** `numeric`
 
-> Suppose a Policy is on the Incremental Benefit option. The Basic Sum Insured is US$1,000,000 and the Account Value at the date of death is US$400,000. The insured withdrew US$100,000 eleven months before death. What is the Death Benefit payable? 请给出计算过程，并说明你用哪一条脚注。
+> Suppose a Policy is on the Incremental Benefit option. The Basic Sum Insured is US$1,000,000 and the Account Value at the date of death is US$400,000. The insured withdrew US$100,000 eleven months before death. What is the Death Benefit payable?
+
+The question deliberately does **not** say which footnote governs it. Incremental Benefit nets the
+withdrawal under `note-5` (50% of withdrawals in the final 12 months); Level Benefit uses `note-4`
+(100%). Choosing wrongly changes the number, so the expected answer must name the footnote it used
+and say why — but that requirement is graded in `rubric`, never stated in the question.
 
 **Answer: US$1,150,000**
 
