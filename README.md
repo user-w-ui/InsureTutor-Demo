@@ -37,12 +37,18 @@ The parse is **one-time and deterministic**. The committed artifact — not the 
 is what the container reads.
 
 ```
-PDF ──(one-time, offline)──► raw data/ ──(one-time)──► data/chunks.json ──► committed
-                                                                                │
-                                              docker run ───────────────────────┘
-                                                    │
-                                       retrieval + citation + guardrails
+PDF ──(one-time, offline)──► raw data/ ──(one-time)──► data/corpus.json ──► committed
+                                  ▲                                              │
+                        data/curation.json                                       │
+                        (reviewed links)            docker run ─────────────────┘
+                                                          │
+                                             retrieval + citation + guardrails
 ```
+
+The parse is frozen, but the corpus is not a raw copy of it: `build_corpus(raw, curation)`
+is a pure function of two committed inputs, so it re-runs to a byte-identical artifact.
+`data/curation.json` is the only hand-authored input — it declares the note links and
+reviewed conflicts that the parse alone cannot prove, and never alters source text.
 
 Rationale: the grader gets a container that boots in seconds with no network
 dependency for ingestion, and the citation anchors are **frozen** — reproducible,
@@ -92,11 +98,14 @@ raw data/
     content/                 Markdown + JSON + images/ (all three as siblings)
     MANIFEST.md              Provenance: tool, version, params, checksums, date
 src/insuretutor/
-  ingest/                    PDF → chunks.json (build-time only)
-  retrieval/                 Hybrid index + rerank
+  ingest/                    raw artifacts + curation → corpus.json (build-time only)
+  retrieval/                 Lexical index + required-link completion
   guardrails/                Refusal & scope policy
+  tutor.py                   Full request lifecycle (to add)
   api/                       FastAPI app
-data/                        Build artifacts (chunks.json) — committed
+data/
+  curation.json              Hand-authored note links & reviewed conflicts — committed
+  corpus.json                Generated artifact — committed
 frontend/                    Single-page chat UI
 docs/                        Task spec, architecture, data provenance
 docker/                      Dockerfile + compose
@@ -121,7 +130,10 @@ See [`docs/data-provenance.md`](docs/data-provenance.md) for the full log.
 
 - [x] Source PDF analysed, parse path determined
 - [x] Official-API parse verified (380 blocks, 20 pages, 9 tables, 72 headings, 42 images)
-- [ ] `chunks.json` generated
+- [ ] Nine-table / ten-note map reviewed (**blocks ingest**)
+- [ ] Bilingual glossary drafted (**blocks ingest**)
+- [ ] `curation.json` written
+- [ ] `corpus.json` generated
 - [ ] Retrieval + citation
 - [ ] Guardrails
 - [ ] API + frontend
