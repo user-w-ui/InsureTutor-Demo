@@ -7,16 +7,16 @@
 
 离线清洗已经实现：`src/insuretutor/ingest/clean.py` 读取
 `data/cleaning-rules.json`，产物写入 `data/cleaned/`，原始 MinerU 输出保持冻结。
-运行时 `data/corpus.json`、检索与对话服务尚未实现。
+第 1 步已实现 `data/corpus.json` 和完整证据组装；检索与对话服务尚未实现。
 
 - [清洗产物说明](../data/cleaned/README.md)：现有文件格式、生成命令与质量报告。
 - [九表／十注释映射](data-cleaning-map.md)：已核对的结构、关系与处理状态。
 - [清洗调研记录](data-cleaning-plan.md)：解析问题与最初处理依据。
 - [数据溯源](data-provenance.md)：原始文件、解析过程与校对记录。
 
-以下保留运行时证据模型的设计草案。已有清洗规则及产物是后续构建 corpus 的输入；
-`data/curation.json` 尚未建立，其中拟议的标签、关系与冲突已有部分记录在
-`data/cleaning-rules.json`。实现时应复用这些记录，统一元数据来源，避免维护两份判断。
+清洗规则是脚注、必需关系、质量标记和已知冲突的唯一来源；`data/corpus-rules.json`
+仅补充语言边界、上下文／表头关联，以及两条独立免责声明的中英对应关系。
+无需另建 `data/curation.json`。
 
 ## 离线摄入与证据模型
 
@@ -24,44 +24,32 @@
 输出：带版本号的 `data/corpus.json`，包含源片段、检索单元、关系与溯源信息。
 不要编辑 MinerU 的原始输出。更正与缺失链接属于派生数据，须附原始 block ID 与理由。
 
-### 关系元数据草案 —— `data/curation.json`（待整合）
+### 第 1 步：运行时语料与语言视图（已实现）
 
-关系元数据必须随代码提交，不能依赖运行时推断。此前拟议的 curation 文件用于记录
-解析结果无法独立确定的两类信息：注释编号恢复（物理第 12 页的注释 6 是一个无编号的
-block），以及同一主题的中英文原文是否一致。判断须可复核并带来源。
-corpus 构建应是冻结输入、清洗规则与关系元数据的确定性函数，重跑应得到逐字节一致的产物。
+`src/insuretutor/corpus.py` 集中定义 Pydantic 数据模型和两个入口：
 
-三条硬性规则：
+- `build_corpus(...) → Corpus`：读取冻结的清洗产物、有限规则和本地 tokenizer。
+- `assemble_evidence(corpus, unit_ids) → EvidenceBundle`：恢复完整父单元，复用清洗模块的
+  `expand_required`，补齐上下文和表头，按来源 ID 去重，并保留冲突与质量标记。
 
-- **curation 只能声明关系、标记冲突。它绝不能提供或改动源文本。** 每一处引文仍然
-  会落到源 block 与物理 PDF 页上。已有清洗规则中的 PDF 核实更正须保留抽取原文、
-  `evidence_text` 与 `text_origin`，以便区分直接抽取与经核实的更正。
-- 每个条目都带 `reason` 与 `reviewed_by`/`reviewed_at`，读者由此能区分经审核的判断
-  与机器推断。
-- 未经关系元数据明确核对的语言配对都是 `unreviewed`，绝不被默认为一致。
+保留 137 个逻辑单元、458 个来源片段与全部原关系。每个单元均有中英视图，共 275 条
+检索子块（中文 137、英文 138）；英文排除条款较长，分为两块。两条独立免责声明通过
+`parallel_units` 显式连接，各自 ID 保留。主题 `evidence_group` 不用于归并不同事实。
 
-```jsonc
-{
-  "note_labels": [
-    // MinerU 丢掉了这条注释的编号；此处是恢复，不是发明。
-    {"page_idx": 11, "block_id": "<raw block id>", "note_number": 6,
-     "reason": "MinerU dropped the leading '6.' on this block", "reviewed_by": "..."}
-  ],
-  "note_links": [
-    // 某条编号注释限定的是哪项权益。这无法来自邻近关系：注释位于物理第 12 页，
-    // 而它们所限定的权益位于物理第 5-11 页。
-    {"note_number": 3, "target": "guaranteed-insurability-option",
-     "reason": "附註 3 caps this option's increase at 25%", "reviewed_by": "..."}
-  ],
-  "conflicts": [
-    // 经审核的分歧。两个版本都保留；任何一方都不是权威。
-    {"subject": "minimum-increase-decrease-amount", "page_idx": 16,
-     "zh_block_id": "<raw block id>", "en_block_id": "<raw block id>",
-     "note": "CN gives 40,000港元 / 400,000澳門元; EN gives HK$400,000 / MOP40,000",
-     "reviewed_by": "..."}
-  ]
-}
-```
+规则文件包含 142 个经核对的片段分段规则。字符范围使用原始 `evidence_text` 中的
+Unicode 字符索引，左闭右开；每条规则固定该原文的 SHA-256。已有 PDF 核实 `segments`
+优先使用，其余按核对后的来源分段组合。英文视图禁止中文字符；中文可包含原文网址、
+公司名和货币代码。共享数字按实际所属语言表头进入视图，避免把中文表的数字接到英文
+表头。完整双语覆盖不等于两种表述语义一致。
+
+E5 tokenizer 固定仓库版本 `614241f622f53c4eeff9890bdc4f31cfecc418b3`，文件随仓库提供；
+使用 `tokenizers==0.21.4` 测长。包括 `passage: `、标题、表头、正文和特殊 token，
+目标 256、上限 512，不自动截断，不设重叠窗口。超长单句先按短语拆分。子块均映射回
+完整父单元，必需脚注不会随检索文本切分而丢失。OpenCC 仅改检索文本，引文保持原样。
+
+构建校验来源／父子／必需关系、完整双语覆盖、来源字符范围和表头归属。测试核对所有
+来源、提款与可保权益脚注、金额冲突、现有评测引文和页码，以及断网构建的字节一致性。
+本步不加载 embedding 权重，不调用模型 API。生成命令见 README。
 
 | 记录 | 用途 | 重要字段 |
 | --- | --- | --- |
@@ -70,8 +58,9 @@ corpus 构建应是冻结输入、清洗规则与关系元数据的确定性函�
 | 检索单元（Retrieval unit） | 条款、注释或表格行的检索表示 | ID、source span ID、规范化文本、标题/术语别名、必需引用 |
 | 关系（Relationship） | 保留必要条件 | qualifies、exception、parallel_text、conflicts_with，或可选的相关项 |
 
-证据组并不主张语言对等。配对状态为 reviewed_consistent、reviewed_conflict 或
-unreviewed。当金额或条件不一致时，保留两个语言版本；不要宣布任一语言为权威。
+证据组并不主张语言对等。沿用清洗产物的 `same_topic_not_equivalence` 与
+`reviewed_source_conflict`；语言边界核对不升级为语义一致性认证。当金额或条件不一致时，
+保留两个语言版本；不要宣布任一语言为权威。
 
 摄入规则：
 
@@ -139,8 +128,7 @@ PDF 点值。优先使用页码链接与原文摘录。区域高亮需要经过�
 token。对语料库与查询应用完全相同的规范化。经审核的双语词汇表用于添加保险术语别名。
 
 中文与英文视图指向同一批证据组。检索别名不会成为来源。避免把繁体、简体与英文的
-重复内容一并放进生成上下文。若加入多种检索视图或稠密检索，用 RRF 融合排名，并按
-证据组去重。分数不是置信概率，也无法确立事实支撑。
+重复内容一并放进生成上下文。多种检索视图与稠密检索按逻辑单元 ID 归并，再用 RRF 融合排名。分数不是置信概率，也无法确立事实支撑。
 
 排名之后，Retriever 模块：
 
@@ -250,7 +238,7 @@ Pydantic 与确定性检查校验：
 
 用实现证据来定夺：
 
-- 词法检索是否需要多语言嵌入。
+- 已选 E5-small 混合召回相对 BM25／向量单路召回的增益、CPU 延迟与量化质量。
 - 现有九表／十注释映射在运行时 corpus 中的完整保留。
 - 提供方对结构化输出的支持、延迟与答案质量。
 - 评估之后的检索与上下文预算。

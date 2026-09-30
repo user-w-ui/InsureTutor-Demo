@@ -2,3 +2,7 @@
 /data/cleaned/** text eol=lf
 /data/cleaning-rules.json text eol=lf
 /src/insuretutor/ingest/clean.py text eol=lf
+/src/insuretutor/corpus.py text eol=lf
+/data/corpus-rules.json text eol=lf
+/data/corpus.json text eol=lf
+/data/tokenizer/tokenizer.json text eol=lf

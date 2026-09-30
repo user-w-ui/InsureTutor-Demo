@@ -16,7 +16,7 @@ Data contracts, source discrepancies, and implementation reminders are in
 **Domain language:** Traditional Chinese + English, each retained as original evidence.
 Neither language is silently preferred when the brochure disagrees with itself.
 
-## Cleaned data (implemented)
+## Cleaned data and runtime corpus (implemented)
 
 The offline cleaner writes separately to [`data/cleaned/`](data/cleaned/README.md),
 leaving `raw data/` unchanged. Start with the [readable preview](data/cleaned/preview.md),
@@ -43,6 +43,32 @@ Use only indexable units and follow their `requires` links before answering.
 The cleaner retains original extraction text for provenance and marks PDF-verified
 corrections; it does not certify the entire brochure or translate it into Simplified Chinese.
 
+### Build the runtime corpus
+
+```powershell
+python -m pip install -e ".[dev]"
+$env:PYTHONPATH = "src"
+python -m insuretutor.corpus
+python -m pytest -q
+```
+
+[`data/corpus.json`](data/corpus.json) preserves all 137 logical units and 458 source
+spans, with 275 retrieval children: 137 Chinese and 138 English. Every unit has both
+language views; the longer English exclusion list needs two children. English views
+contain no Chinese. Chinese search text uses OpenCC Simplified forms; citations keep
+the original `evidence_text`, physical PDF page and raw bbox.
+
+[`corpus-rules.json`](data/corpus-rules.json) records reviewed language boundaries,
+table/context associations, and the explicitly paired standalone disclaimers.
+Footnote links and source conflicts remain owned by the cleaner. The pinned E5
+[tokenizer](data/tokenizer/README.md) is included for offline length checks; model
+weights and embedding generation are deferred to Step 2.
+
+The two data entry points are in [`insuretutor.corpus`](src/insuretutor/corpus.py):
+`build_corpus() -> Corpus` and `assemble_evidence(corpus, unit_ids) -> EvidenceBundle`.
+Assembly restores full parents, follows required notes, adds headers/context and
+retains both conflict sources. Rebuilds are byte-identical, and tests use no model API.
+
 ---
 
 ## Why this is harder than "just a RAG"
@@ -65,15 +91,17 @@ citation-verified answering** — not the chat loop.
 ## Architecture
 
 A single Docker container serves a FastAPI backend and static chat UI. It loads a
-committed corpus into an in-memory lexical index. Application code resolves the
-query, retrieves clauses and required notes, then passes structured evidence to a
+committed corpus and precomputed vectors for BM25 + NumPy hybrid retrieval.
+Application code resolves the query, retrieves clauses and required notes, then passes structured evidence to a
 tool-free OpenAI Agents SDK agent. The server validates the draft and constructs
 PDF citations before returning the answer. Without an LLM, it returns labelled
-source excerpts. Multilingual vectors are optional, subject to retrieval evaluation.
+source excerpts. Query embeddings run locally on CPU with multilingual-e5-small
+through FastEmbed; the model and tokenizer are bundled in the Docker image.
 
 See the [technical architecture](docs/architecture.zh-CN.md) for the complete design;
 [data and implementation details](docs/implementation-notes.zh-CN.md) are maintained
-separately. Offline cleaning is implemented; the runtime remains planned.
+separately. Cleaning, corpus construction and evidence assembly are implemented;
+retrieval and the conversation runtime remain planned.
 
 ---
 
@@ -85,7 +113,8 @@ raw data/
     content/                 Markdown + JSON + images/ (all three as siblings)
     MANIFEST.md              Provenance: tool, version, params, checksums, date
 src/insuretutor/
-  ingest/                    cleaning + corpus construction (build-time only)
+  corpus.py                  Corpus models, offline builder, evidence assembly
+  ingest/                    cleaning (build-time only)
   retrieval/                 Lexical index + required-link completion
   guardrails/                Refusal & scope policy
   tutor.py                   Full request lifecycle (to add)
@@ -94,7 +123,9 @@ src/insuretutor/
 data/
   cleaning-rules.json        Source-pinned corrections, structure & evidence links
   cleaned/                   Generated clean fragments and provenance (implemented)
-  corpus.json                Runtime artifact (planned)
+  corpus-rules.json          Reviewed language boundaries and context associations
+  corpus.json                Runtime artifact (implemented)
+  tokenizer/                 Pinned E5 tokenizer only, no embedding weights
 frontend/                    Single-page chat UI
 docs/                        Task spec, architecture, data provenance
 docker/                      Dockerfile + compose
@@ -121,7 +152,7 @@ See [`docs/data-provenance.md`](docs/data-provenance.md) for the full log.
 - [x] Official-API parse verified (380 blocks, 20 pages, 9 tables, 72 headings, 42 images)
 - [x] Nine-table / ten-note map and offline cleaner implemented
 - [ ] Bilingual glossary drafted
-- [ ] Cleaned fragments and reviewed metadata integrated into `corpus.json`
+- [x] Cleaned fragments and reviewed metadata integrated into `corpus.json`
 - [ ] Retrieval + citation
 - [ ] Guardrails
 - [ ] API + frontend

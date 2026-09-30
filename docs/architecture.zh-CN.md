@@ -1,27 +1,32 @@
 # InsureTutor 技术架构
 
-状态：2026-09-30，离线清洗已实现，运行时仍为设计方案。
+状态：2026-09-30，离线清洗、语料构建与证据补全已实现，检索与对话运行时待实现。
 需求见 [任务说明](task-spec.md)；数据契约、原文差异、实现细节与验证待办见
 [实现备忘](implementation-notes.zh-CN.md)。
 
 ## 总体结构
 
 单容器、单 FastAPI/Uvicorn 进程，提供聊天 UI、对话 API 和原始 PDF。
-检索索引与会话保存在进程内；离线生成并提交语料产物，容器启动时只加载与建索引。
+检索索引与会话保存在进程内；语料与文档向量离线生成，容器启动时加载产物并构建词法索引。
 
 ```mermaid
 flowchart TD
     subgraph Offline[离线构建]
         Raw[PDF / 冻结的 MinerU 输出] --> Clean[清洗与关系核对]
         Clean --> Corpus[版本化 corpus.json]
+        Corpus --> Encode[离线 E5 文档编码]
+        Encode --> Vectors[向量矩阵 / 单元 ID 映射]
     end
     subgraph Runtime[运行时：一个 Docker 容器]
         UI[聊天 UI] --> API[FastAPI]
         API --> Tutor[Tutor：对话编排]
         Session[有界 SessionStore] <--> Tutor
         Corpus --> Retrieval[内存检索与证据补全]
-        Tutor --> Retrieval
-        Retrieval --> Generation[无工具 OpenAI Agents SDK]
+        Vectors --> Retrieval
+        Model[镜像内 E5 模型 / tokenizer] --> Retrieval
+        Tutor -->|查询| Retrieval
+        Retrieval -->|EvidenceBundle| Tutor
+        Tutor --> Generation[无工具 OpenAI Agents SDK]
         Generation --> Validate[答案校验与引用构建]
         Validate --> API
         PDF[白名单 PDF 端点] --> UI
@@ -32,8 +37,8 @@ flowchart TD
 
 | 模块 | 技术与接口 | 职责 |
 | --- | --- | --- |
-| 离线构建 | Python；清洗产物 → `data/corpus.json` | 生成检索单元、来源锚点与必需证据关系 |
-| Retrieval | `rank-bm25`、OpenCC；`retrieve(query_context) → EvidenceBundle` | 三语规范化、排名、去重、补全脚注与例外 |
+| 离线构建 | Python；清洗产物 → corpus、向量矩阵及 ID 映射 | 生成检索单元、来源锚点、必需关系与文档向量 |
+| Retrieval | `Retriever` 接口；NumPy、`rank-bm25`、OpenCC、FastEmbed | 三语规范化、混合排名、去重、补全脚注与例外 |
 | Tutor | 应用代码；`answer(ChatTurn) → ChatResult` | 范围判定、会话、查询解析、生成与降级 |
 | Generation | OpenAI Agents SDK；`generate(AnswerInput) → DraftAnswer` | `Agent(tools=[])`，结构化输入与输出，限定超时与重试 |
 | Guardrails | Pydantic 与应用校验 | 校验来源、引用、冲突与回答边界 |
@@ -42,6 +47,18 @@ flowchart TD
 
 Tutor 控制完整请求生命周期。检索由应用调用，结果传入 Generation；模型不决定检索、
 不执行工具。当前规模不引入 RAG 框架、向量数据库或独立检索服务。
+
+### 检索接口
+
+```python
+class Retriever(Protocol):
+    async def retrieve(self, context: QueryContext) -> EvidenceBundle: ...
+```
+
+`QueryContext` 包含原始问题、解析后的查询与响应语言；`EvidenceBundle` 包含完整证据单元、
+来源锚点、必需关系及冲突／质量标记。Tutor 只依赖该接口，具体实现在应用启动时注入。
+NumPy 搜索、BM25、融合和证据补全封装在实现内部；未来替换 FAISS 或其他检索后端，
+保持输入／输出契约即可，不改 Tutor 的调用流程。
 
 ## 对话请求流程
 
@@ -54,13 +71,49 @@ Tutor 控制完整请求生命周期。检索由应用调用，结果传入 Gene
 普通问题一次生成调用；追问按需增加一次查询改写。最多一次格式修复。
 模型未配置、超时或草稿校验失败时，返回明确标注的原文摘录。
 
-## 三语检索与结构化注入
+## 本地 embedding 与混合召回
 
-- 以条款、表格行、编号脚注为检索单元；命中主体后沿显式关系补全限定证据。
-- 查询与索引使用相同规范化：OpenCC 繁转简、中文字符二元组、英文单词及数字／货币。
-  双语术语别名连接中英文查询；别名只用于检索，原文用于引用。
-- 中英文检索视图关联到同一主题证据组，各自保留来源锚点。按组去重，冲突时保留双方。
-- 默认词法检索。三语评测证明释义召回不足时才增加多语言向量，并以 RRF 融合排名。
+- 模型采用 `intfloat/multilingual-e5-small`：384 维、最长 512 token，中英文共用向量空间。
+  FastEmbed 封装 ONNX Runtime，在 CPU 推理，无需 PyTorch 或外部 embedding API。
+- 问题使用 `query: ` 前缀，文档使用 `passage: ` 前缀；采用带 attention mask 的均值池化，
+  文档与查询向量均做 L2 归一化。
+- 文档向量提前计算。运行时只编码新问题，NumPy 矩阵乘法全量计算余弦相似度。
+  目前仅百余个逻辑单元，即使展开为数百条检索视图，矩阵仍很小；FAISS 的精确扫描不会
+  改善召回语义或脚注补全，因此首版采用已有 NumPy，减少额外依赖与部署配置。
+- BM25 与向量双路召回，以 RRF 融合排名。每一路先归并到逻辑单元，同一单元的中英文
+  视图及子块取最高得分，再融合，避免重复视图增加票数；分数不作为作答置信概率。
+- 查询与检索文本统一规范化。中文使用 OpenCC 繁转简；BM25 保留中文字符二元组、英文
+  单词、数字与货币。经核对的双语术语别名只用于检索，不作为可引用原文。
+
+模型与 tokenizer 在镜像构建时按固定版本准备，运行时仅从本地加载。FP32 ONNX 作为
+基线；INT8 通过目标 CPU 性能和三语召回验证后替换，并使用同一模型产物重算文档向量。
+记录语料、模型、tokenizer、规范化和编码配置版本，启动时校验向量与当前配置匹配。
+
+## 分块与证据补全
+
+| 层次 | 边界与用途 |
+| --- | --- |
+| 原子证据单元 | 完整条款、携带表头／单位的逻辑表格行、完整脚注、风险或免责声明 |
+| 检索视图／子块 | 中英文分别编码；长单元按完整句子或子条件拆分，命中后恢复完整单元 |
+| 证据关系 | `parent_unit_id` 恢复父单元；`requires` 补齐限定证据；双语对应与冲突关系保留各自来源 |
+
+沿用清洗产物的结构与显式关系。检索文本携带已核对的标题、所属权益和表头；按模型
+tokenizer 测长，确保标题、前缀与正文一起满足长度限制，避免自动截断限定条件。
+
+中英文视图连接到同一逻辑事实单元，保留各自页码与来源锚点；简体仅为检索视图。
+全部逻辑单元均提供中英视图；英文视图不含中文，长内容可按各语言的 token 长度分别拆分。
+同主题不等于原文一致，语言配对状态与冲突标记必须传递到回答层。
+
+命中后恢复完整单元，递归补全必需脚注、例外与风险说明，再加入双语来源并对源片段去重。
+已知冲突强制保留双方。脚注允许关联多个条款，不按页面邻近猜测归属，也不与主条款
+争抢 top-k。按完整证据组控制预算；超限时舍弃较低排名的组，保留入选组的完整条件。
+
+借鉴 [LlamaIndex 节点引用](https://developers.llamaindex.ai/python/framework/integrations/retrievers/recursive_retriever_nodes/)
+的小块召回／父块恢复，以及 [Contextual Retrieval](https://www.anthropic.com/engineering/contextual-retrieval)
+的上下文前缀思路。跨页脚注与双语连接由显式关系处理，不依赖父子块命中比例自动合并。
+
+## 结构化注入
+
 - 固定策略放在应用指令中；问题、有限历史与 `EvidenceBundle` 作为序列化数据输入。
 - 模型只输出状态与 `claims[{text, evidence_ids}]`。引用文本、页码和 URL 由服务端构建。
 
@@ -89,6 +142,7 @@ Tutor 控制完整请求生命周期。检索由应用调用，结果传入 Gene
 UI 展示聊天、语言选择、请求等待状态、原文摘录和页码链接；冲突与摘录模式明确标识。
 回答遵循请求语言，引用保留来源语言。
 
-Docker 包含锁定依赖、代码、静态 UI、语料与 PDF；启动校验语料格式、哈希及关系完整性。
+Docker 包含锁定依赖、代码、静态 UI、语料、向量、embedding 模型与 tokenizer、源 PDF；
+启动校验语料格式、哈希、关系完整性与向量配置。
 运行时不解析 PDF、不下载模型。一个 worker，重启清空会话；密钥通过环境变量传入。
 日志记录请求 ID、阶段耗时、证据 ID 与降级原因。

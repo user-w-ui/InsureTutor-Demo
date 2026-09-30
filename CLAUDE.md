@@ -17,12 +17,11 @@ are where the difficulty actually lives, not the chat loop.
 ```bash
 # Install (editable, with optional extras)
 pip install -e ".[dev]"
-pip install -e ".[dev,embed]"     # adds sentence-transformers, only if eval shows it is needed
 
 # Test
 pytest                             # all
-pytest tests/test_chunking.py      # one file
-pytest tests/test_chunking.py::test_footnote_stays_with_referent   # one test
+pytest tests/test_corpus.py         # corpus contracts
+pytest tests/test_corpus.py::CorpusTests::test_required_notes_are_full_and_source_deduplicated
 
 # Lint
 ruff check src tests
@@ -32,7 +31,7 @@ ruff format src tests
 uvicorn insuretutor.api.main:app --reload --port 8000
 
 # Regenerate the corpus artifact (build-time only, offline, deterministic)
-python -m insuretutor.ingest.build_corpus
+python -m insuretutor.corpus
 ```
 
 `pyproject.toml` sets `pythonpath = ["src"]`, so tests import `insuretutor` without an
@@ -44,7 +43,12 @@ The current design proposal is [`docs/architecture.zh-CN.md`](docs/architecture.
 Offline cleaning is now implemented: `python -m insuretutor.ingest.clean` reads
 `data/cleaning-rules.json` and writes `data/cleaned/` separately from frozen inputs.
 See its generated README, report, and `docs/data-cleaning-map.md`. This intermediate
-dataset is not the proposed runtime `data/corpus.json`.
+dataset feeds the implemented runtime `data/corpus.json` builder in `src/insuretutor/corpus.py`.
+`build_corpus()` and `assemble_evidence()` are the shared data entry points. Every
+logical unit has Chinese and English search views; English views contain no Chinese.
+`data/corpus-rules.json` records only reviewed language boundaries and context/table
+associations, plus the explicit parallel disclaimer units. Required-note links remain
+in cleaning-rules.json. Tokenizer assets are local; this step loads no model weights.
 `units.jsonl` is the next chunking input. Finite corrections in cleaning-rules.json
 restore bilingual columns, missing characters, and formulas; cite spans.evidence_text
 and check pdf_verified text against its physical PDF page. The seven reported text
@@ -59,23 +63,24 @@ when MinerU labels them `page_footnote`.
 ### The load-bearing decision: parse once, commit the artifact
 
 ```
-   BUILD TIME (offline, deterministic, committed)         RUN TIME
-   PDF ──► MinerU ──► raw data/ ──┐
-                                  ├──► data/corpus.json
-              data/curation.json ─┘          │
-                                  docker run ─┘──► guardrail ──► retrieve ──► generate ──► verify
+BUILD TIME                              RUN TIME
+PDF → MinerU → raw data/ → cleaner
+           cleaning-rules.json ─┘
+                data/cleaned/ ──┐
+          corpus-rules.json ────┼→ corpus.json → retrieve → generate → verify
+           pinned tokenizer ────┘
 ```
 
 The container reads `data/corpus.json` and has no knowledge of MinerU, no PDF parsing
 dependency, and no network need at startup. Re-parsing inside the container would
 mean a multi-minute network-bound boot and citation anchors that drift between runs.
 
-`build_corpus(raw, curation)` is a pure function of its two committed inputs, so the
-pipeline re-runs to a byte-identical artifact. `data/curation.json` is the only
-hand-authored relationship input. The current cleaner additionally applies explicit
-PDF-verified corrections from `data/cleaning-rules.json` without altering frozen
-source files. See [`docs/implementation-notes.zh-CN.md`](docs/implementation-notes.zh-CN.md)
-for its schema and for the `Source span` / `Evidence group` / `Retrieval unit` model.
+`build_corpus()` reads frozen cleaned artifacts, finite language/context rules and
+an exact local tokenizer revision. Canonical output is byte-identical for unchanged
+inputs. The cleaner owns footnotes, reviewed source conflicts and PDF-verified
+corrections; the corpus builder preserves them without changing source texts.
+See [`docs/implementation-notes.zh-CN.md`](docs/implementation-notes.zh-CN.md) for
+source offsets, language pairing, evidence completion and known source differences.
 
 **Consequence for you:** `raw data/` is a frozen, verified input. Do not re-parse it or
 hand-edit it. All transformation logic belongs in `src/insuretutor/ingest/` and outputs
@@ -120,18 +125,20 @@ The parts that shape the ingest code:
   headers carried into each row). The failure mode this prevents is concrete: `附註 3`
   holds the Guaranteed Insurability limits (25% cap, 51st birthday, max twice). Split it
   from the benefit it qualifies and the retriever surfaces the option name with no cap —
-  confidently wrong. Junctions are declared in `curation.json`, not by proximity: the
+  confidently wrong. Junctions are declared in `data/cleaning-rules.json`, not by proximity: the
   notes sit on physical page 12 while the benefits they qualify are on pages 5-11, so
   **spatial distance carries no signal here**. Missing note numbers (note 6) are
-  recovered in curation.
+  recovered in cleaning-rules.json.
 - **Traditional → Simplified is one-way and index-side only** (OpenCC `t2s`). Display
   always shows the original Traditional, because a citation exists so a human can check
   it against the source. Never `s2t` on output. Simplified aliases are never citable.
-- **Lexical first, vector only if measured necessary.** Start with rank-bm25 over
-  deterministic tokens (Chinese character bigrams, English words, number/currency
-  tokens). BM25 carries exact numbers (`2.5%`, `51歲`, `400,000`). Add multilingual
-  embeddings only if the three-language evaluation set shows missing paraphrase recall —
-  they are optional so the container can start with no model download.
+- **Local hybrid retrieval.** Use rank-bm25 over deterministic tokens (Chinese
+  character bigrams, English words, number/currency tokens) alongside precomputed
+  multilingual-e5-small vectors. FastEmbed encodes queries locally on CPU; NumPy
+  performs exact cosine search. Bundle model and tokenizer in Docker. Collapse
+  language views to logical units before RRF fusion, then complete required evidence.
+  Tutor depends only on the injected `Retriever` interface; backend changes preserve
+  `QueryContext -> EvidenceBundle` and require no changes to the calling flow.
 - **No RAG framework, no vector DB.** 40k characters fit in memory; a framework would
   abstract away the one part that is actually graded.
 - **Citation verification is load-bearing — and bounded.** Emit a citation only if the
@@ -151,9 +158,12 @@ The parts that shape the ingest code:
 ```
 raw data/source/            original PDF (served as a static citation target; never parsed)
 raw data/mineru-official/   frozen parse: content/ (.md + .json + images/) + MANIFEST.md
-data/curation.json          hand-authored links, note labels, reviewed conflicts
+data/cleaning-rules.json    source corrections, note links, reviewed conflicts
+data/corpus-rules.json      language boundaries and context/table associations
+data/tokenizer/            pinned tokenizer only, no weights
 data/corpus.json            generated artifact (build-time only producer)
-src/insuretutor/ingest/     raw artifacts + curation → data/corpus.json
+src/insuretutor/corpus.py   cleaned artifacts + rules → corpus; evidence assembly
+src/insuretutor/ingest/     raw artifacts + cleaning rules → data/cleaned/
 src/insuretutor/retrieval/  lexical index + required-link completion + budgeting
 src/insuretutor/guardrails/ refusal & scope policy
 src/insuretutor/tutor.py    full request lifecycle (to add)
@@ -190,16 +200,15 @@ Other specifics worth knowing:
 - The mineru.net **upload takes ~4 minutes**; pass `--timeout 1800`. The default 300 s
   fails on upload size, not on parsing — it is not a network or token problem.
 - A block's `text` is the *only* place a note's number can appear, and MinerU sometimes
-  drops it (physical page 12, note 6). Recover it in `curation.json`; do not regex-guess.
+  drops it (physical page 12, note 6). Recover it in `data/cleaning-rules.json`; do not regex-guess.
 - Confirm the conflict row before citing it: physical page 17's minimum
   increase/decrease row disagrees between CN and EN (`40,000港元`/`400,000澳門元` vs
   `HK$400,000`/`MOP40,000`). Show both; never pick one.
 
 ## Status
 
-Parse is frozen. Offline cleaning and its regression tests are implemented; the
-nine-table / ten-note map is in `docs/data-cleaning-map.md`. The output's report
-records remaining damaged text and formula fragments. A bilingual glossary,
-runtime corpus integration, retrieval + citations, guardrails, API + frontend,
-and Docker remain. See [`README.md`](README.md).
-
+Parse and cleaned artifacts are frozen. Cleaning, corpus construction and complete
+bilingual evidence assembly are implemented and tested. Corpus tests cover source
+coverage, footnote conditions, page anchors, source conflicts, tokenizer limits and
+offline byte-identical builds. Retrieval, generation, guardrails, API/frontend and
+Docker remain. See [`README.md`](README.md).
