@@ -1,0 +1,3714 @@
+{
+  "environment": {
+    "cpu": "AMD64 Family 25 Model 117 Stepping 2, AuthenticAMD",
+    "latency_ms": {
+      "max": 55.973,
+      "median": 30.524,
+      "p95": 49.702
+    },
+    "latency_scope": "warm rank() including CPU query encoding, lexical/dense fusion; excludes bundle recovery and startup",
+    "os": "Windows-11-10.0.26200-SP0",
+    "packages": {
+      "fastembed": "0.8.1",
+      "numpy": "2.3.5",
+      "onnxruntime": "1.24.2"
+    },
+    "python": "3.13.5",
+    "retrieval_latency_ms": {
+      "median": 40.677,
+      "p95": 59.868
+    },
+    "threads": 2
+  },
+  "evaluator_items_sha256": "912bbc32a7e4e39a36e23b9df1e832333a08e4e286497b60f4e0d4dbe749e7c9",
+  "metric_definition": "Macro unit Recall@5 over primary targets; exact core-unit coverage after ranked top-8 whole-closure recovery (may undercount equivalent evidence in other table rows). 21 equivalent queries plus 7 original queries; excludes refusal cases. Required-evidence coverage checks requires closure of retrieved units, independently of relevance. Additional source examples are reported separately. No relevance acceptance threshold is specified.",
+  "offline_checks": {
+    "document_reencode_max_abs_error": 0.0,
+    "fastembed_tokenizer_matches_precheck": true,
+    "network_blocked_for_initialization_and_inference": true,
+    "passed": true,
+    "providers": [
+      "CPUExecutionProvider"
+    ],
+    "repeated_query_identical": true
+  },
+  "results": [
+    {
+      "id": "q1",
+      "language": "en",
+      "latency_ms": 43.623,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "generic-coverage",
+            "generic-disclaimer",
+            "insurability",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "premium-increase",
+            "table-352-row-8",
+            "table-354-row-5",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "coverage-summary",
+            "table-356-row-0",
+            "premium-increase",
+            "generic-coverage",
+            "table-354-row-5"
+          ],
+          "source_characters": 4545,
+          "top5": [
+            "insurability",
+            "enhancement",
+            "note-3",
+            "table-352-row-8",
+            "coverage-summary"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "enhancement-summary",
+            "increasing-summary",
+            "insurability",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-8",
+            "table-356-row-0",
+            "table-97-row-2"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "coverage-summary",
+            "table-356-row-0",
+            "enhancement-summary",
+            "premium-rate",
+            "increasing-summary"
+          ],
+          "source_characters": 4600,
+          "top5": [
+            "insurability",
+            "enhancement",
+            "note-3",
+            "table-352-row-8",
+            "coverage-summary"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "enhancement-summary",
+            "increasing-summary",
+            "insurability",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-8",
+            "table-356-row-0",
+            "table-97-row-2"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "enhancement-summary",
+            "premium-rate",
+            "coverage-summary",
+            "increasing-summary",
+            "table-356-row-0"
+          ],
+          "source_characters": 4600,
+          "top5": [
+            "insurability",
+            "note-3",
+            "enhancement",
+            "table-352-row-8",
+            "enhancement-summary"
+          ]
+        }
+      },
+      "question": "The policy has two options to increase the Basic Sum Insured. Which increases it automatically each year without health evidence, and which applies on marriage or childbirth? When does each expire? For Guaranteed Insurability, what is the maximum increase each time and the lifetime number of exercises?"
+    },
+    {
+      "id": "q1",
+      "language": "zh-Hans",
+      "latency_ms": 35.969,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "coverage-change",
+            "enhancement",
+            "enhancement-summary",
+            "insurability",
+            "life-stage-example",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-8",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "table-352-row-8",
+            "enhancement",
+            "enhancement-summary",
+            "coverage-change",
+            "premium-rate",
+            "table-356-row-0",
+            "life-stage-example"
+          ],
+          "source_characters": 4577,
+          "top5": [
+            "insurability",
+            "table-352-row-8",
+            "note-3",
+            "enhancement",
+            "enhancement-summary"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "enhancement-summary",
+            "generic-coverage",
+            "generic-disclaimer",
+            "insurability",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-8",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "coverage-summary",
+            "premium-rate",
+            "table-356-row-0",
+            "generic-coverage",
+            "enhancement-summary"
+          ],
+          "source_characters": 4417,
+          "top5": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "note-3",
+            "coverage-summary"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "generic-coverage",
+            "generic-disclaimer",
+            "insurability",
+            "note-1",
+            "note-2",
+            "note-3",
+            "note-4",
+            "note-5",
+            "table-352-row-6",
+            "table-352-row-8"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "note-5",
+            "coverage-summary",
+            "note-4",
+            "generic-coverage",
+            "table-352-row-6"
+          ],
+          "source_characters": 4062,
+          "top5": [
+            "insurability",
+            "enhancement",
+            "note-3",
+            "table-352-row-8",
+            "note-5"
+          ]
+        }
+      },
+      "question": "保单里有两个增加基本保障额的权益，哪个每年自动增加无需健康证明，哪个在结婚或生孩子时用？分别何时失效？保证可保权益每次最多增加多少，一生最多几次？"
+    },
+    {
+      "id": "q1",
+      "language": "zh-Hant",
+      "latency_ms": 24.198,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "coverage-change",
+            "enhancement",
+            "enhancement-summary",
+            "insurability",
+            "life-stage-example",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-8",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "table-352-row-8",
+            "enhancement",
+            "enhancement-summary",
+            "coverage-change",
+            "premium-rate",
+            "table-356-row-0",
+            "life-stage-example"
+          ],
+          "source_characters": 4577,
+          "top5": [
+            "insurability",
+            "table-352-row-8",
+            "note-3",
+            "enhancement",
+            "enhancement-summary"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "enhancement-summary",
+            "generic-coverage",
+            "generic-disclaimer",
+            "insurability",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-8",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "coverage-summary",
+            "premium-rate",
+            "table-356-row-0",
+            "generic-coverage",
+            "enhancement-summary"
+          ],
+          "source_characters": 4417,
+          "top5": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "note-3",
+            "coverage-summary"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "generic-coverage",
+            "generic-disclaimer",
+            "insurability",
+            "note-1",
+            "note-2",
+            "note-3",
+            "note-4",
+            "note-5",
+            "table-352-row-6",
+            "table-352-row-8"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "note-5",
+            "coverage-summary",
+            "note-4",
+            "generic-coverage",
+            "table-352-row-6"
+          ],
+          "source_characters": 4062,
+          "top5": [
+            "insurability",
+            "enhancement",
+            "note-3",
+            "table-352-row-8",
+            "note-5"
+          ]
+        }
+      },
+      "question": "保單裏有兩個增加基本保障額的權益，哪個每年自動增加無需健康證明，哪個在結婚或生孩子時用？分別何時失效？保證可保權益每次最多增加多少，一生最多幾次？"
+    },
+    {
+      "id": "q1",
+      "language": "original",
+      "latency_ms": 37.112,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "coverage-change",
+            "enhancement",
+            "enhancement-summary",
+            "insurability",
+            "life-stage-example",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-8",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "enhancement-summary",
+            "coverage-change",
+            "life-stage-example",
+            "premium-rate",
+            "table-356-row-0"
+          ],
+          "source_characters": 4577,
+          "top5": [
+            "insurability",
+            "enhancement",
+            "table-352-row-8",
+            "note-3",
+            "enhancement-summary"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "enhancement-summary",
+            "generic-coverage",
+            "generic-disclaimer",
+            "insurability",
+            "note-1",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-8"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "enhancement",
+            "insurability",
+            "table-352-row-8",
+            "coverage-change",
+            "premium-rate",
+            "generic-coverage",
+            "enhancement-summary",
+            "coverage-summary"
+          ],
+          "source_characters": 3522,
+          "top5": [
+            "enhancement",
+            "insurability",
+            "table-352-row-8",
+            "note-3",
+            "coverage-change"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "generic-coverage",
+            "generic-disclaimer",
+            "insurability",
+            "note-1",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "table-352-row-6",
+            "table-352-row-8"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "enhancement",
+            "insurability",
+            "table-352-row-8",
+            "coverage-change",
+            "generic-coverage",
+            "coverage-summary",
+            "table-352-row-6",
+            "premium-rate"
+          ],
+          "source_characters": 3797,
+          "top5": [
+            "enhancement",
+            "insurability",
+            "table-352-row-8",
+            "coverage-change",
+            "note-3"
+          ]
+        }
+      },
+      "question": "保单里好像有两个「增加基本保障额」的权益，名字很像。请告诉我：哪一个会在每个保单年度自动增加、不需要任何健康证明？哪一个需要我结婚或生孩子才能用？这两个权益分别到什么时候失效？如果我用的是「保证可保权益」，每次最多能加多少？一辈子最多能用几次？"
+    },
+    {
+      "id": "q2",
+      "language": "en",
+      "latency_ms": 33.712,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "generic-coverage",
+            "generic-disclaimer",
+            "note-1",
+            "note-10",
+            "note-3",
+            "note-6",
+            "table-354-row-5",
+            "table-354-row-7",
+            "table-356-row-0",
+            "term-and-lapse"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "coverage-change",
+            "generic-coverage",
+            "table-356-row-0",
+            "coverage-summary",
+            "note-3",
+            "note-6",
+            "table-354-row-7"
+          ],
+          "source_characters": 6353,
+          "top5": [
+            "table-354-row-5",
+            "coverage-change",
+            "generic-coverage",
+            "note-1",
+            "table-356-row-0"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "generic-coverage",
+            "generic-disclaimer",
+            "note-1",
+            "note-10",
+            "note-3",
+            "note-5",
+            "note-6",
+            "table-352-row-8",
+            "table-354-row-5",
+            "table-356-row-0",
+            "table-97-row-3",
+            "term-and-lapse"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "coverage-change",
+            "generic-coverage",
+            "coverage-summary",
+            "table-356-row-0",
+            "table-352-row-8",
+            "table-97-row-3",
+            "note-6"
+          ],
+          "source_characters": 6295,
+          "top5": [
+            "table-354-row-5",
+            "coverage-change",
+            "note-1",
+            "generic-coverage",
+            "coverage-summary"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "generic-coverage",
+            "generic-disclaimer",
+            "note-1",
+            "note-10",
+            "note-3",
+            "note-5",
+            "table-352-row-8",
+            "table-354-row-5",
+            "table-356-row-0",
+            "table-97-row-3"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "coverage-change",
+            "table-352-row-8",
+            "generic-disclaimer",
+            "coverage-summary",
+            "table-97-row-3",
+            "table-356-row-0",
+            "generic-coverage"
+          ],
+          "source_characters": 4074,
+          "top5": [
+            "table-354-row-5",
+            "coverage-change",
+            "note-1",
+            "table-352-row-8",
+            "generic-disclaimer"
+          ]
+        }
+      },
+      "question": "I need to increase the sum insured. What is the minimum amount of each increase or decrease in all three currencies? Where is this provision in the brochure? If the Chinese and English differ, which version is correct?"
+    },
+    {
+      "id": "q2",
+      "language": "zh-Hans",
+      "latency_ms": 25.456,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "coverage-change",
+            "enhancement",
+            "insurability",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "note-4",
+            "premium-rate",
+            "table-352-row-8",
+            "table-354-row-5",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "coverage-change",
+            "table-356-row-0",
+            "table-352-row-8",
+            "premium-rate",
+            "enhancement",
+            "insurability",
+            "note-4"
+          ],
+          "source_characters": 4213,
+          "top5": [
+            "table-354-row-5",
+            "coverage-change",
+            "table-356-row-0",
+            "table-352-row-8",
+            "premium-rate"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "note-1",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "rate-date-note",
+            "table-352-row-8",
+            "table-354-row-5"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "table-352-row-8",
+            "note-1",
+            "enhancement",
+            "coverage-change",
+            "premium-rate",
+            "coverage-summary",
+            "rate-date-note"
+          ],
+          "source_characters": 3475,
+          "top5": [
+            "table-354-row-5",
+            "table-352-row-8",
+            "note-1",
+            "enhancement",
+            "coverage-change"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "base-interest",
+            "enhancement",
+            "generic-disclaimer",
+            "note-1",
+            "note-2",
+            "note-3",
+            "note-5",
+            "rate-date-note",
+            "table-352-row-8",
+            "table-354-row-5"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "note-1",
+            "rate-date-note",
+            "table-352-row-8",
+            "enhancement",
+            "base-interest",
+            "generic-disclaimer",
+            "note-5"
+          ],
+          "source_characters": 3205,
+          "top5": [
+            "table-354-row-5",
+            "note-1",
+            "rate-date-note",
+            "table-352-row-8",
+            "enhancement"
+          ]
+        }
+      },
+      "question": "我要增加基本保障额。产品册规定每次增加或减少的最低金额是多少？请列出三种货币的准确数字、规定位置。如果中英文不同，哪个版本才对？"
+    },
+    {
+      "id": "q2",
+      "language": "zh-Hant",
+      "latency_ms": 23.993,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "coverage-change",
+            "enhancement",
+            "insurability",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-3",
+            "note-4",
+            "premium-rate",
+            "table-352-row-8",
+            "table-354-row-5",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "coverage-change",
+            "table-356-row-0",
+            "table-352-row-8",
+            "premium-rate",
+            "enhancement",
+            "insurability",
+            "note-4"
+          ],
+          "source_characters": 4213,
+          "top5": [
+            "table-354-row-5",
+            "coverage-change",
+            "table-356-row-0",
+            "table-352-row-8",
+            "premium-rate"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "note-1",
+            "note-2",
+            "note-3",
+            "premium-rate",
+            "rate-date-note",
+            "table-352-row-8",
+            "table-354-row-5"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "table-352-row-8",
+            "note-1",
+            "enhancement",
+            "coverage-change",
+            "premium-rate",
+            "coverage-summary",
+            "rate-date-note"
+          ],
+          "source_characters": 3475,
+          "top5": [
+            "table-354-row-5",
+            "table-352-row-8",
+            "note-1",
+            "enhancement",
+            "coverage-change"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "base-interest",
+            "enhancement",
+            "generic-disclaimer",
+            "note-1",
+            "note-2",
+            "note-3",
+            "note-5",
+            "rate-date-note",
+            "table-352-row-8",
+            "table-354-row-5"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "note-1",
+            "rate-date-note",
+            "table-352-row-8",
+            "enhancement",
+            "base-interest",
+            "generic-disclaimer",
+            "note-5"
+          ],
+          "source_characters": 3205,
+          "top5": [
+            "table-354-row-5",
+            "note-1",
+            "rate-date-note",
+            "table-352-row-8",
+            "enhancement"
+          ]
+        }
+      },
+      "question": "我要增加基本保障額。產品冊規定每次增加或減少的最低金額是多少？請列出三種貨幣的準確數字、規定位置。如果中英文不同，哪個版本纔對？"
+    },
+    {
+      "id": "q2",
+      "language": "original",
+      "latency_ms": 51.055,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "generic-coverage",
+            "generic-disclaimer",
+            "note-1",
+            "note-10",
+            "note-3",
+            "note-6",
+            "table-354-row-5",
+            "table-354-row-7",
+            "table-356-row-0",
+            "term-and-lapse"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "coverage-change",
+            "generic-coverage",
+            "table-356-row-0",
+            "coverage-summary",
+            "note-3",
+            "note-6",
+            "table-354-row-7"
+          ],
+          "source_characters": 6353,
+          "top5": [
+            "table-354-row-5",
+            "coverage-change",
+            "generic-coverage",
+            "note-1",
+            "table-356-row-0"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-coverage",
+            "generic-disclaimer",
+            "generic-monthly-interest",
+            "note-1",
+            "note-10",
+            "table-354-row-4",
+            "table-354-row-5",
+            "table-356-row-0"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-354-row-5",
+            "coverage-summary",
+            "table-356-row-0",
+            "generic-disclaimer",
+            "disclaimer-en",
+            "generic-coverage",
+            "table-354-row-4",
+            "generic-monthly-interest"
+          ],
+          "source_characters": 3019,
+          "top5": [
+            "table-354-row-5",
+            "coverage-summary",
+            "table-356-row-0",
+            "generic-disclaimer",
+            "coverage-change"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "coverage-change",
+            "coverage-summary",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-disclaimer",
+            "generic-monthly-interest",
+            "note-1",
+            "premium-rate",
+            "premium-summary",
+            "table-354-row-4",
+            "table-354-row-5"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "generic-disclaimer",
+            "disclaimer-en",
+            "coverage-summary",
+            "table-354-row-5",
+            "table-354-row-4",
+            "generic-monthly-interest",
+            "premium-rate",
+            "premium-summary"
+          ],
+          "source_characters": 2169,
+          "top5": [
+            "generic-disclaimer",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "coverage-summary",
+            "table-354-row-5"
+          ]
+        }
+      },
+      "question": "I need to increase the sum insured. According to the product brochure, what is the minimum amount of each increase/decrease? Please give me the exact figures in all three currencies. 顺便说一下，这份保单要在哪里看这个规定？如果中英文写的不一样，请你直接告诉我哪个才对。"
+    },
+    {
+      "id": "q3",
+      "language": "en",
+      "latency_ms": 39.518,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "bonus-rate-15-25",
+            "bonus-rate-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9"
+          ],
+          "core_coverage": 0.5,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-114-row-8",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-9",
+            "bonus-rate-15-25"
+          ],
+          "source_characters": 1365,
+          "top5": [
+            "table-114-row-8",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "bonus-rate-15-25",
+            "bonus-rate-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9"
+          ],
+          "core_coverage": 0.5,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.16666666666666666,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-114-row-8",
+            "bonus-rate-15-25",
+            "table-114-row-1",
+            "table-114-row-2",
+            "table-114-row-9",
+            "table-114-row-12",
+            "table-114-row-7",
+            "table-114-row-3"
+          ],
+          "source_characters": 1365,
+          "top5": [
+            "table-114-row-8",
+            "bonus-rate-15-25",
+            "table-114-row-1",
+            "table-114-row-2",
+            "table-114-row-9"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "base-interest",
+            "bonus-rate-15-25",
+            "bonus-rate-disclaimer",
+            "interest-every5-note",
+            "interest-guarantee",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-2",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9"
+          ],
+          "core_coverage": 0.6,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.3333333333333333,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "bonus-rate-15-25",
+            "interest-guarantee",
+            "table-114-row-8",
+            "table-114-row-9",
+            "base-interest",
+            "table-114-row-2",
+            "table-114-row-7",
+            "table-114-row-1"
+          ],
+          "source_characters": 2006,
+          "top5": [
+            "bonus-rate-15-25",
+            "interest-guarantee",
+            "table-114-row-8",
+            "table-114-row-9",
+            "base-interest"
+          ]
+        }
+      },
+      "question": "An adviser says the Extra Bonus in policy year 20 is 2.75%, and Base Crediting Interest of 4% compounds together with the 0.25% additional interest. Is that correct? When is the Extra Bonus paid and at which rates? Does the plan have a guaranteed interest rate?"
+    },
+    {
+      "id": "q3",
+      "language": "zh-Hans",
+      "latency_ms": 35.855,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "bonus-example",
+            "bonus-rate-15-25",
+            "bonus-rate-disclaimer",
+            "example-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-8",
+            "table-352-row-5-early"
+          ],
+          "core_coverage": 0.5,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.16666666666666666,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "bonus-rate-15-25",
+            "table-352-row-5-early",
+            "table-114-row-8",
+            "bonus-example",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3"
+          ],
+          "source_characters": 1854,
+          "top5": [
+            "bonus-rate-15-25",
+            "table-352-row-5-early",
+            "table-114-row-8",
+            "bonus-example",
+            "table-114-row-1"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "bonus-rate-15-25",
+            "bonus-rate-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9"
+          ],
+          "core_coverage": 0.5,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.16666666666666666,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-114-row-8",
+            "table-114-row-12",
+            "table-114-row-9",
+            "table-114-row-7",
+            "bonus-rate-15-25",
+            "table-114-row-1",
+            "table-114-row-3",
+            "table-114-row-2"
+          ],
+          "source_characters": 1365,
+          "top5": [
+            "table-114-row-8",
+            "table-114-row-12",
+            "table-114-row-9",
+            "table-114-row-7",
+            "bonus-rate-15-25"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9",
+            "table-352-row-2"
+          ],
+          "core_coverage": 0.3,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-15-25",
+            "bonus-rate-30",
+            "bonus-rate-disclaimer",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-114-row-8",
+            "table-114-row-9",
+            "table-114-row-7",
+            "table-114-row-12",
+            "table-352-row-2",
+            "table-114-row-3",
+            "table-114-row-2",
+            "table-114-row-1"
+          ],
+          "source_characters": 1481,
+          "top5": [
+            "table-114-row-8",
+            "table-114-row-9",
+            "table-114-row-7",
+            "table-114-row-12",
+            "table-352-row-2"
+          ]
+        }
+      },
+      "question": "顾问说第20个保单年度额外回报为2.75%，基本派息4%连同额外利息0.25%一起复利滚存，对吗？额外回报什么时候派、用什么比率？计划有没有保证利率？"
+    },
+    {
+      "id": "q3",
+      "language": "zh-Hant",
+      "latency_ms": 35.034,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "bonus-example",
+            "bonus-rate-15-25",
+            "bonus-rate-disclaimer",
+            "example-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-8",
+            "table-352-row-5-early"
+          ],
+          "core_coverage": 0.5,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.16666666666666666,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "bonus-rate-15-25",
+            "table-352-row-5-early",
+            "table-114-row-8",
+            "bonus-example",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3"
+          ],
+          "source_characters": 1854,
+          "top5": [
+            "bonus-rate-15-25",
+            "table-352-row-5-early",
+            "table-114-row-8",
+            "bonus-example",
+            "table-114-row-1"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "bonus-rate-15-25",
+            "bonus-rate-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9"
+          ],
+          "core_coverage": 0.5,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.16666666666666666,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-114-row-8",
+            "table-114-row-12",
+            "table-114-row-9",
+            "table-114-row-7",
+            "bonus-rate-15-25",
+            "table-114-row-1",
+            "table-114-row-3",
+            "table-114-row-2"
+          ],
+          "source_characters": 1365,
+          "top5": [
+            "table-114-row-8",
+            "table-114-row-12",
+            "table-114-row-9",
+            "table-114-row-7",
+            "bonus-rate-15-25"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9",
+            "table-352-row-2"
+          ],
+          "core_coverage": 0.3,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-15-25",
+            "bonus-rate-30",
+            "bonus-rate-disclaimer",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-114-row-8",
+            "table-114-row-9",
+            "table-114-row-7",
+            "table-114-row-12",
+            "table-352-row-2",
+            "table-114-row-3",
+            "table-114-row-2",
+            "table-114-row-1"
+          ],
+          "source_characters": 1481,
+          "top5": [
+            "table-114-row-8",
+            "table-114-row-9",
+            "table-114-row-7",
+            "table-114-row-12",
+            "table-352-row-2"
+          ]
+        }
+      },
+      "question": "顧問說第20個保單年度額外回報爲2.75%，基本派息4%連同額外利息0.25%一起復利滾存，對嗎？額外回報什麼時候派、用什麼比率？計劃有沒有保證利率？"
+    },
+    {
+      "id": "q3",
+      "language": "original",
+      "latency_ms": 47.187,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "bonus-example",
+            "bonus-rate-disclaimer",
+            "example-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9"
+          ],
+          "core_coverage": 0.4,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-15-25",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "bonus-example",
+            "table-114-row-8",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-9"
+          ],
+          "source_characters": 1667,
+          "top5": [
+            "bonus-example",
+            "table-114-row-8",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "bonus-example",
+            "bonus-rate-disclaimer",
+            "example-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9"
+          ],
+          "core_coverage": 0.4,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-15-25",
+            "bonus-rate-30",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-114-row-8",
+            "table-114-row-12",
+            "table-114-row-7",
+            "table-114-row-1",
+            "table-114-row-9",
+            "bonus-example",
+            "table-114-row-2",
+            "table-114-row-3"
+          ],
+          "source_characters": 1667,
+          "top5": [
+            "table-114-row-8",
+            "table-114-row-12",
+            "table-114-row-7",
+            "table-114-row-1",
+            "table-114-row-9"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "interest-every5-note",
+            "interest-year20-note",
+            "rate-date-note",
+            "table-114-row-1",
+            "table-114-row-12",
+            "table-114-row-2",
+            "table-114-row-3",
+            "table-114-row-7",
+            "table-114-row-8",
+            "table-114-row-9",
+            "table-352-row-2"
+          ],
+          "core_coverage": 0.3,
+          "missing_additional": [],
+          "missing_core": [
+            "additional-interest",
+            "base-interest",
+            "bonus-rate-15-25",
+            "bonus-rate-30",
+            "bonus-rate-disclaimer",
+            "extra-bonus-frequency",
+            "table-352-row-6"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-114-row-8",
+            "table-114-row-7",
+            "table-114-row-9",
+            "table-114-row-12",
+            "table-352-row-2",
+            "table-114-row-3",
+            "table-114-row-2",
+            "table-114-row-1"
+          ],
+          "source_characters": 1481,
+          "top5": [
+            "table-114-row-8",
+            "table-114-row-7",
+            "table-114-row-9",
+            "table-114-row-12",
+            "table-352-row-2"
+          ]
+        }
+      },
+      "question": "顾问跟我说：这个计划第20个保单年度会派发额外回报，派发率是2.75%，而且基本派息4%会连同额外利息0.25%一起复利滚存。请问他说的对吗？额外回报到底什么时候派发、用哪个比率？另外这个计划有没有什么「保证」的利率？"
+    },
+    {
+      "id": "q4",
+      "language": "en",
+      "latency_ms": 41.068,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "note-10",
+            "note-3",
+            "note-4",
+            "note-5",
+            "note-9",
+            "table-352-row-10",
+            "table-352-row-7",
+            "table-352-row-8",
+            "table-354-row-7",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions",
+            "terminal-illness"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-97-row-3",
+            "table-97-row-1",
+            "table-352-row-8",
+            "table-97-row-2",
+            "table-352-row-7",
+            "terminal-illness",
+            "table-354-row-7",
+            "table-352-row-10"
+          ],
+          "source_characters": 6265,
+          "top5": [
+            "table-97-row-3",
+            "note-5",
+            "table-97-row-1",
+            "table-352-row-8",
+            "note-4"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "incremental-summary",
+            "note-3",
+            "note-4",
+            "note-5",
+            "note-9",
+            "suicide-exclusion",
+            "table-352-row-8",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions",
+            "terminal-illness"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-352-row-8",
+            "terminal-illness",
+            "suicide-exclusion",
+            "incremental-summary"
+          ],
+          "source_characters": 5238,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "table-97-row-1",
+            "note-4",
+            "table-97-row-2"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "incremental-summary",
+            "note-3",
+            "note-4",
+            "note-5",
+            "note-9",
+            "suicide-exclusion",
+            "table-352-row-8",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions",
+            "terminal-illness"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "table-97-row-1",
+            "terminal-illness",
+            "table-97-row-2",
+            "suicide-exclusion",
+            "incremental-summary",
+            "table-352-row-8"
+          ],
+          "source_characters": 5238,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "table-97-row-1",
+            "note-4",
+            "terminal-illness"
+          ]
+        }
+      },
+      "question": "Suppose a Policy is on the Incremental Benefit option. The Basic Sum Insured is US$1,000,000 and Account Value at death is US$400,000. The insured withdrew US$100,000 eleven months before death. What Death Benefit is payable?"
+    },
+    {
+      "id": "q4",
+      "language": "zh-Hans",
+      "latency_ms": 34.753,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "incremental-summary",
+            "note-10",
+            "note-3",
+            "note-4",
+            "note-5",
+            "note-9",
+            "table-352-row-10",
+            "table-352-row-7",
+            "table-352-row-8",
+            "table-354-row-7",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-97-row-3",
+            "table-97-row-1",
+            "table-352-row-7",
+            "table-97-row-2",
+            "incremental-summary",
+            "table-354-row-7",
+            "table-352-row-8",
+            "table-352-row-10"
+          ],
+          "source_characters": 6049,
+          "top5": [
+            "table-97-row-3",
+            "note-5",
+            "table-97-row-1",
+            "note-4",
+            "table-352-row-7"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "incremental-summary",
+            "note-4",
+            "note-5",
+            "note-9",
+            "table-352-row-10",
+            "table-352-row-7",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-352-row-7",
+            "table-352-row-10",
+            "incremental-summary"
+          ],
+          "source_characters": 3475,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-1",
+            "table-97-row-2"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "note-4",
+            "note-5",
+            "note-6",
+            "note-7",
+            "note-9",
+            "table-352-row-10",
+            "table-352-row-7",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "term-and-lapse",
+            "terminal-exclusions",
+            "withdrawal"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-2",
+            "table-97-row-1",
+            "table-352-row-7",
+            "withdrawal",
+            "table-352-row-10"
+          ],
+          "source_characters": 6225,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-2",
+            "table-97-row-1"
+          ]
+        }
+      },
+      "question": "保单选择渐进寿险保障，基本保障额1,000,000美元，身故时账户价值400,000美元，身故前11个月提取过100,000美元。应付身故保障是多少？"
+    },
+    {
+      "id": "q4",
+      "language": "zh-Hant",
+      "latency_ms": 23.585,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "incremental-summary",
+            "note-10",
+            "note-3",
+            "note-4",
+            "note-5",
+            "note-9",
+            "table-352-row-10",
+            "table-352-row-7",
+            "table-352-row-8",
+            "table-354-row-7",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-97-row-3",
+            "table-97-row-1",
+            "table-352-row-7",
+            "table-97-row-2",
+            "incremental-summary",
+            "table-354-row-7",
+            "table-352-row-8",
+            "table-352-row-10"
+          ],
+          "source_characters": 6049,
+          "top5": [
+            "table-97-row-3",
+            "note-5",
+            "table-97-row-1",
+            "note-4",
+            "table-352-row-7"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "incremental-summary",
+            "note-4",
+            "note-5",
+            "note-9",
+            "table-352-row-10",
+            "table-352-row-7",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-352-row-7",
+            "table-352-row-10",
+            "incremental-summary"
+          ],
+          "source_characters": 3475,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-1",
+            "table-97-row-2"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "note-4",
+            "note-5",
+            "note-6",
+            "note-7",
+            "note-9",
+            "table-352-row-10",
+            "table-352-row-7",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "term-and-lapse",
+            "terminal-exclusions",
+            "withdrawal"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-2",
+            "table-97-row-1",
+            "table-352-row-7",
+            "withdrawal",
+            "table-352-row-10"
+          ],
+          "source_characters": 6225,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-2",
+            "table-97-row-1"
+          ]
+        }
+      },
+      "question": "保單選擇漸進壽險保障，基本保障額1,000,000美元，身故時賬戶價值400,000美元，身故前11個月提取過100,000美元。應付身故保障是多少？"
+    },
+    {
+      "id": "q4",
+      "language": "original",
+      "latency_ms": 30.177,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "note-3",
+            "note-4",
+            "note-5",
+            "note-9",
+            "table-352-row-7",
+            "table-352-row-8",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions",
+            "terminal-illness"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-1",
+            "table-352-row-8",
+            "table-97-row-2",
+            "table-352-row-7",
+            "terminal-illness"
+          ],
+          "source_characters": 4906,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-1",
+            "table-352-row-8"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "note-3",
+            "note-4",
+            "note-5",
+            "note-9",
+            "suicide-exclusion",
+            "table-352-row-8",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions",
+            "terminal-illness"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-1",
+            "table-97-row-2",
+            "terminal-illness",
+            "table-352-row-8",
+            "suicide-exclusion"
+          ],
+          "source_characters": 5137,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "note-4",
+            "table-97-row-1",
+            "table-97-row-2"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "incremental-summary",
+            "maturity",
+            "note-4",
+            "note-5",
+            "note-9",
+            "suicide-exclusion",
+            "table-97-row-1",
+            "table-97-row-2",
+            "table-97-row-3",
+            "terminal-exclusions",
+            "terminal-illness"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-5",
+            "table-97-row-3",
+            "table-97-row-1",
+            "terminal-illness",
+            "table-97-row-2",
+            "suicide-exclusion",
+            "incremental-summary",
+            "maturity"
+          ],
+          "source_characters": 4061,
+          "top5": [
+            "note-5",
+            "table-97-row-3",
+            "table-97-row-1",
+            "note-4",
+            "terminal-illness"
+          ]
+        }
+      },
+      "question": "Suppose a Policy is on the Incremental Benefit option. The Basic Sum Insured is US$1,000,000 and the Account Value at the date of death is US$400,000. The insured withdrew US$100,000 eleven months before death. What is the Death Benefit payable?"
+    },
+    {
+      "id": "q5",
+      "language": "en",
+      "latency_ms": 30.87,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "interest-every5-note",
+            "interest-year20-note",
+            "note-10",
+            "note-6",
+            "note-7",
+            "rate-date-note",
+            "table-114-row-3",
+            "table-354-row-6",
+            "table-354-row-7",
+            "table-354-row-8",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "table-354-row-7",
+            "table-354-row-6",
+            "table-114-row-3",
+            "table-354-row-8"
+          ],
+          "source_characters": 6226,
+          "top5": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "cash-value-risk"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "interest-every5-note",
+            "interest-year20-note",
+            "note-10",
+            "note-6",
+            "note-7",
+            "rate-date-note",
+            "table-114-row-3",
+            "table-354-row-6",
+            "table-354-row-7",
+            "table-354-row-8",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "table-354-row-8",
+            "table-114-row-3",
+            "table-354-row-7",
+            "table-354-row-6"
+          ],
+          "source_characters": 6226,
+          "top5": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "cash-value-risk"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "generic-disclaimer",
+            "interest-every5-note",
+            "interest-year20-note",
+            "note-10",
+            "note-6",
+            "note-7",
+            "note-8",
+            "rate-date-note",
+            "table-114-row-3",
+            "table-354-row-8",
+            "table-356-row-1",
+            "term-and-lapse",
+            "unemployment",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal-summary",
+            "withdrawal",
+            "table-356-row-1",
+            "table-354-row-8",
+            "generic-disclaimer",
+            "unemployment",
+            "table-114-row-3"
+          ],
+          "source_characters": 5585,
+          "top5": [
+            "note-6",
+            "withdrawal-summary",
+            "withdrawal",
+            "table-356-row-1",
+            "term-and-lapse"
+          ]
+        }
+      },
+      "question": "My policy has been effective for 3 years. Can I use the automatic periodic withdrawal option monthly? What are the minimum monthly amount, withdrawal period and fees? How are manual withdrawals charged?"
+    },
+    {
+      "id": "q5",
+      "language": "zh-Hans",
+      "latency_ms": 21.323,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "enhancement",
+            "note-10",
+            "note-2",
+            "note-3",
+            "note-6",
+            "note-7",
+            "table-354-row-5",
+            "table-354-row-6",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "table-354-row-6",
+            "table-354-row-5",
+            "enhancement",
+            "note-3"
+          ],
+          "source_characters": 5541,
+          "top5": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "note-7"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "enhancement",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "note-10",
+            "note-2",
+            "note-5",
+            "note-6",
+            "note-7",
+            "table-354-row-6",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "table-356-row-1",
+            "table-354-row-6",
+            "withdrawal-summary",
+            "note-5",
+            "generic-cash-withdrawal"
+          ],
+          "source_characters": 4918,
+          "top5": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "table-356-row-1",
+            "table-354-row-6"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "enhancement",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-10",
+            "note-2",
+            "note-4",
+            "note-5",
+            "note-6",
+            "note-7",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 0.5,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "note-5",
+            "generic-cash-withdrawal",
+            "note-4",
+            "generic-payment-flexibility",
+            "table-356-row-1"
+          ],
+          "source_characters": 4850,
+          "top5": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "note-5",
+            "generic-cash-withdrawal"
+          ]
+        }
+      },
+      "question": "保单生效3年，能用定期提款权益每月自动提款吗？每月最低金额、提款年期和手续费是什么？如果自行主动提款如何收费？"
+    },
+    {
+      "id": "q5",
+      "language": "zh-Hant",
+      "latency_ms": 20.805,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "enhancement",
+            "note-10",
+            "note-2",
+            "note-3",
+            "note-6",
+            "note-7",
+            "table-354-row-5",
+            "table-354-row-6",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "table-354-row-6",
+            "table-354-row-5",
+            "enhancement",
+            "note-3"
+          ],
+          "source_characters": 5541,
+          "top5": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "note-7"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "enhancement",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "note-10",
+            "note-2",
+            "note-5",
+            "note-6",
+            "note-7",
+            "table-354-row-6",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "table-356-row-1",
+            "table-354-row-6",
+            "withdrawal-summary",
+            "note-5",
+            "generic-cash-withdrawal"
+          ],
+          "source_characters": 4918,
+          "top5": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "table-356-row-1",
+            "table-354-row-6"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "enhancement",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-10",
+            "note-2",
+            "note-4",
+            "note-5",
+            "note-6",
+            "note-7",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 0.5,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "note-5",
+            "generic-cash-withdrawal",
+            "note-4",
+            "generic-payment-flexibility",
+            "table-356-row-1"
+          ],
+          "source_characters": 4850,
+          "top5": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "note-5",
+            "generic-cash-withdrawal"
+          ]
+        }
+      },
+      "question": "保單生效3年，能用定期提款權益每月自動提款嗎？每月最低金額、提款年期和手續費是什麼？如果自行主動提款如何收費？"
+    },
+    {
+      "id": "q5",
+      "language": "original",
+      "latency_ms": 55.973,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "note-10",
+            "note-3",
+            "note-6",
+            "note-7",
+            "table-354-row-6",
+            "table-354-row-8",
+            "table-356-row-0",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "table-354-row-6",
+            "table-356-row-0",
+            "table-354-row-8",
+            "note-3"
+          ],
+          "source_characters": 5722,
+          "top5": [
+            "note-6",
+            "withdrawal-summary",
+            "table-356-row-1",
+            "withdrawal",
+            "note-7"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-6",
+            "note-7",
+            "premium-increase",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal",
+            "table-356-row-1",
+            "premium-increase",
+            "withdrawal-summary",
+            "enhancement",
+            "generic-cash-withdrawal",
+            "coverage-summary"
+          ],
+          "source_characters": 5332,
+          "top5": [
+            "note-6",
+            "withdrawal",
+            "table-356-row-1",
+            "premium-increase",
+            "withdrawal-summary"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "enhancement",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "note-1",
+            "note-10",
+            "note-2",
+            "note-5",
+            "note-6",
+            "note-7",
+            "premium-increase",
+            "table-356-row-1",
+            "term-and-lapse",
+            "withdrawal"
+          ],
+          "core_coverage": 1.0,
+          "missing_additional": [],
+          "missing_core": [],
+          "recall_at_5": 1.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "table-356-row-1",
+            "generic-cash-withdrawal",
+            "coverage-summary",
+            "note-5",
+            "premium-increase"
+          ],
+          "source_characters": 5565,
+          "top5": [
+            "note-6",
+            "withdrawal",
+            "enhancement",
+            "table-356-row-1",
+            "generic-cash-withdrawal"
+          ]
+        }
+      },
+      "question": "我份保單生效咗 3 年。我想用「定期提款權益」，每月自動攞錢出嚟，可以嗎？如果可以，每月最少要攞幾多？提款年期有冇最低要求？要唔要交手續費或者提款費用？另外，如果我唔係用定期提款，而係自己每次主動提款，又點計費？"
+    },
+    {
+      "id": "q6",
+      "language": "en",
+      "latency_ms": 27.0,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "cooling-off",
+            "early-surrender",
+            "levy",
+            "note-8",
+            "premium-rate",
+            "table-352-row-14",
+            "term-and-lapse",
+            "unemployment"
+          ],
+          "core_coverage": 0.8,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-15"
+          ],
+          "recall_at_5": 0.5,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "cooling-off",
+            "term-and-lapse",
+            "cash-value-risk",
+            "levy",
+            "table-352-row-14",
+            "unemployment",
+            "early-surrender",
+            "premium-rate"
+          ],
+          "source_characters": 3933,
+          "top5": [
+            "cooling-off",
+            "term-and-lapse",
+            "cash-value-risk",
+            "levy",
+            "table-352-row-14"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "cooling-off",
+            "generic-disclaimer",
+            "note-8",
+            "skip-summary",
+            "table-352-row-14",
+            "term-and-lapse",
+            "unemployment"
+          ],
+          "core_coverage": 0.8,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-15"
+          ],
+          "recall_at_5": 0.5,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-352-row-14",
+            "cooling-off",
+            "note-8",
+            "unemployment",
+            "generic-disclaimer",
+            "term-and-lapse",
+            "cash-value-risk",
+            "skip-summary"
+          ],
+          "source_characters": 3362,
+          "top5": [
+            "table-352-row-14",
+            "cooling-off",
+            "note-8",
+            "unemployment",
+            "generic-disclaimer"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "cooling-off",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-disclaimer",
+            "note-6",
+            "note-8",
+            "skip-summary",
+            "table-352-row-14",
+            "term-and-lapse",
+            "unemployment",
+            "withdrawal-summary"
+          ],
+          "core_coverage": 0.8,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-15"
+          ],
+          "recall_at_5": 0.25,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-352-row-14",
+            "generic-disclaimer",
+            "skip-summary",
+            "withdrawal-summary",
+            "note-8",
+            "unemployment",
+            "disclaimer-en",
+            "cooling-off"
+          ],
+          "source_characters": 4687,
+          "top5": [
+            "table-352-row-14",
+            "generic-disclaimer",
+            "skip-summary",
+            "withdrawal-summary",
+            "note-8"
+          ]
+        }
+      },
+      "question": "For a policy issued in Macau, which currencies and payment modes are available? If I stop paying premiums, when will the policy lapse? Does Unemployment Protection mean I can stop paying premiums forever while unemployed?"
+    },
+    {
+      "id": "q6",
+      "language": "zh-Hans",
+      "latency_ms": 19.942,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-8",
+            "skip-premiums",
+            "skip-summary",
+            "table-352-row-15",
+            "table-352-row-9",
+            "term-and-lapse",
+            "unemployment",
+            "unemployment-summary"
+          ],
+          "core_coverage": 0.8,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-14"
+          ],
+          "recall_at_5": 0.25,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "skip-summary",
+            "skip-premiums",
+            "note-8",
+            "table-352-row-15",
+            "unemployment-summary",
+            "unemployment",
+            "generic-payment-flexibility",
+            "table-352-row-9"
+          ],
+          "source_characters": 2724,
+          "top5": [
+            "skip-summary",
+            "skip-premiums",
+            "note-8",
+            "table-352-row-15",
+            "unemployment-summary"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-8",
+            "skip-premiums",
+            "skip-summary",
+            "table-352-row-15",
+            "term-and-lapse",
+            "unemployment-summary"
+          ],
+          "core_coverage": 0.6,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-14",
+            "unemployment"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "skip-premiums",
+            "generic-payment-flexibility",
+            "skip-summary",
+            "generic-cash-withdrawal",
+            "note-8",
+            "table-352-row-15",
+            "disclaimer-en",
+            "unemployment-summary"
+          ],
+          "source_characters": 3118,
+          "top5": [
+            "skip-premiums",
+            "cash-value-risk",
+            "generic-payment-flexibility",
+            "skip-summary",
+            "generic-cash-withdrawal"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-1",
+            "note-6",
+            "skip-premiums",
+            "skip-summary",
+            "table-352-row-14",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.4,
+          "missing_additional": [],
+          "missing_core": [
+            "note-8",
+            "table-352-row-15",
+            "unemployment"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "generic-payment-flexibility",
+            "generic-cash-withdrawal",
+            "skip-premiums",
+            "disclaimer-en",
+            "skip-summary",
+            "note-6",
+            "table-352-row-14",
+            "coverage-summary"
+          ],
+          "source_characters": 4479,
+          "top5": [
+            "generic-payment-flexibility",
+            "cash-value-risk",
+            "generic-cash-withdrawal",
+            "skip-premiums",
+            "disclaimer-en"
+          ]
+        }
+      },
+      "question": "澳门签发的保单有哪些货币和缴费方式？暂停缴付保费会在什么情况下失效？失业保障是不是让我失业以后一直不用交保费？"
+    },
+    {
+      "id": "q6",
+      "language": "zh-Hant",
+      "latency_ms": 20.522,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-8",
+            "skip-premiums",
+            "skip-summary",
+            "table-352-row-15",
+            "table-352-row-9",
+            "term-and-lapse",
+            "unemployment",
+            "unemployment-summary"
+          ],
+          "core_coverage": 0.8,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-14"
+          ],
+          "recall_at_5": 0.25,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "skip-summary",
+            "skip-premiums",
+            "note-8",
+            "table-352-row-15",
+            "unemployment-summary",
+            "unemployment",
+            "generic-payment-flexibility",
+            "table-352-row-9"
+          ],
+          "source_characters": 2724,
+          "top5": [
+            "skip-summary",
+            "skip-premiums",
+            "note-8",
+            "table-352-row-15",
+            "unemployment-summary"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-8",
+            "skip-premiums",
+            "skip-summary",
+            "table-352-row-15",
+            "term-and-lapse",
+            "unemployment-summary"
+          ],
+          "core_coverage": 0.6,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-14",
+            "unemployment"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "skip-premiums",
+            "generic-payment-flexibility",
+            "skip-summary",
+            "generic-cash-withdrawal",
+            "note-8",
+            "table-352-row-15",
+            "disclaimer-en",
+            "unemployment-summary"
+          ],
+          "source_characters": 3118,
+          "top5": [
+            "skip-premiums",
+            "cash-value-risk",
+            "generic-payment-flexibility",
+            "skip-summary",
+            "generic-cash-withdrawal"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-1",
+            "note-6",
+            "skip-premiums",
+            "skip-summary",
+            "table-352-row-14",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.4,
+          "missing_additional": [],
+          "missing_core": [
+            "note-8",
+            "table-352-row-15",
+            "unemployment"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "generic-payment-flexibility",
+            "generic-cash-withdrawal",
+            "skip-premiums",
+            "disclaimer-en",
+            "skip-summary",
+            "note-6",
+            "table-352-row-14",
+            "coverage-summary"
+          ],
+          "source_characters": 4479,
+          "top5": [
+            "generic-payment-flexibility",
+            "cash-value-risk",
+            "generic-cash-withdrawal",
+            "skip-premiums",
+            "disclaimer-en"
+          ]
+        }
+      },
+      "question": "澳門簽發的保單有哪些貨幣和繳費方式？暫停繳付保費會在什麼情況下失效？失業保障是不是讓我失業以後一直不用交保費？"
+    },
+    {
+      "id": "q6",
+      "language": "original",
+      "latency_ms": 36.428,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "cash-value-risk",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "note-8",
+            "skip-premiums",
+            "skip-summary",
+            "table-352-row-9",
+            "table-357-row-2",
+            "term-and-lapse",
+            "unemployment",
+            "unemployment-summary"
+          ],
+          "core_coverage": 0.6,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-14",
+            "table-352-row-15"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "note-8",
+            "skip-summary",
+            "skip-premiums",
+            "unemployment-summary",
+            "table-352-row-9",
+            "generic-payment-flexibility",
+            "unemployment",
+            "table-357-row-2"
+          ],
+          "source_characters": 2707,
+          "top5": [
+            "note-8",
+            "skip-summary",
+            "skip-premiums",
+            "unemployment-summary",
+            "cash-value-risk"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "investment-links",
+            "note-8",
+            "skip-premiums",
+            "skip-summary",
+            "term-and-lapse",
+            "unemployment-summary"
+          ],
+          "core_coverage": 0.4,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-14",
+            "table-352-row-15",
+            "unemployment"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "skip-summary",
+            "note-8",
+            "generic-payment-flexibility",
+            "skip-premiums",
+            "disclaimer-en",
+            "unemployment-summary",
+            "investment-links",
+            "generic-cash-withdrawal"
+          ],
+          "source_characters": 3426,
+          "top5": [
+            "skip-summary",
+            "note-8",
+            "generic-payment-flexibility",
+            "skip-premiums",
+            "cash-value-risk"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "generic-payment-flexibility",
+            "investment-links",
+            "note-1",
+            "note-8",
+            "skip-summary",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.4,
+          "missing_additional": [],
+          "missing_core": [
+            "table-352-row-14",
+            "table-352-row-15",
+            "unemployment"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "generic-disclaimer",
+            "disclaimer-en",
+            "generic-payment-flexibility",
+            "investment-links",
+            "generic-cash-withdrawal",
+            "coverage-summary",
+            "skip-summary",
+            "note-8"
+          ],
+          "source_characters": 4035,
+          "top5": [
+            "generic-disclaimer",
+            "disclaimer-en",
+            "disclaimer-zh",
+            "generic-payment-flexibility",
+            "investment-links"
+          ]
+        }
+      },
+      "question": "For a policy issued in Macau, which currencies can it be denominated in, and what payment modes are available? 另外，如果我中途暂停缴付保费，什么情况下这份保单会失效？还有，市面上都说这个计划有失业保障，是不是我失业就可以一直不用交保费？"
+    },
+    {
+      "id": "q8",
+      "language": "en",
+      "latency_ms": 11.666,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "bonus-rate-15-25",
+            "bonus-rate-disclaimer",
+            "company-ranking-note",
+            "company-shareholders",
+            "company-shareholding-note",
+            "credit-risk",
+            "generic-product-heading",
+            "levy",
+            "market-context",
+            "suicide-exclusion"
+          ],
+          "core_coverage": 0.0,
+          "missing_additional": [
+            "front-matter-themes",
+            "life-stage-example"
+          ],
+          "missing_core": [
+            "cash-value-risk",
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "suicide-exclusion",
+            "generic-product-heading",
+            "company-ranking-note",
+            "company-shareholders",
+            "bonus-rate-15-25",
+            "credit-risk",
+            "levy",
+            "market-context"
+          ],
+          "source_characters": 2546,
+          "top5": [
+            "suicide-exclusion",
+            "generic-product-heading",
+            "company-ranking-note",
+            "company-shareholders",
+            "bonus-rate-15-25"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "company-ranking-note",
+            "company-shareholders",
+            "company-shareholding-note",
+            "company-website",
+            "enhancement-summary",
+            "generic-disclaimer",
+            "generic-product-heading",
+            "life-stage-example",
+            "note-2",
+            "note-3",
+            "suicide-exclusion"
+          ],
+          "core_coverage": 0.0,
+          "missing_additional": [
+            "front-matter-themes"
+          ],
+          "missing_core": [
+            "cash-value-risk",
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "company-website",
+            "suicide-exclusion",
+            "enhancement-summary",
+            "generic-product-heading",
+            "company-ranking-note",
+            "life-stage-example",
+            "company-shareholders",
+            "generic-disclaimer"
+          ],
+          "source_characters": 3556,
+          "top5": [
+            "company-website",
+            "suicide-exclusion",
+            "enhancement-summary",
+            "generic-product-heading",
+            "company-ranking-note"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "company-website",
+            "enhancement-summary",
+            "front-matter-themes",
+            "generic-disclaimer",
+            "incremental-summary",
+            "life-stage-example",
+            "note-2",
+            "note-3",
+            "note-5",
+            "table-352-row-8",
+            "table-354-row-4",
+            "table-97-row-3"
+          ],
+          "core_coverage": 0.0,
+          "missing_additional": [],
+          "missing_core": [
+            "cash-value-risk",
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "company-website",
+            "enhancement-summary",
+            "life-stage-example",
+            "generic-disclaimer",
+            "table-354-row-4",
+            "incremental-summary",
+            "table-352-row-8",
+            "front-matter-themes"
+          ],
+          "source_characters": 3392,
+          "top5": [
+            "company-website",
+            "enhancement-summary",
+            "life-stage-example",
+            "generic-disclaimer",
+            "table-354-row-4"
+          ]
+        }
+      },
+      "question": "My grandson starts school this year. What insurance should I buy?"
+    },
+    {
+      "id": "q8",
+      "language": "zh-Hans",
+      "latency_ms": 10.757,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "fixed-income-assets"
+          ],
+          "core_coverage": 0.0,
+          "missing_additional": [
+            "front-matter-themes",
+            "life-stage-example"
+          ],
+          "missing_core": [
+            "cash-value-risk",
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "fixed-income-assets"
+          ],
+          "source_characters": 402,
+          "top5": [
+            "fixed-income-assets"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "fixed-income-assets",
+            "front-matter-themes",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "insurability",
+            "life-stage-example",
+            "note-3",
+            "table-357-row-0",
+            "table-357-row-1",
+            "table-357-row-2",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.25,
+          "missing_additional": [],
+          "missing_core": [
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "fixed-income-assets",
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal",
+            "table-357-row-0",
+            "life-stage-example"
+          ],
+          "source_characters": 4431,
+          "top5": [
+            "fixed-income-assets",
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "front-matter-themes",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "insurability",
+            "life-stage-example",
+            "note-1",
+            "note-3",
+            "table-357-row-0",
+            "table-357-row-1",
+            "table-357-row-2",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.25,
+          "missing_additional": [],
+          "missing_core": [
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal",
+            "table-357-row-0",
+            "life-stage-example",
+            "coverage-summary"
+          ],
+          "source_characters": 4856,
+          "top5": [
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal"
+          ]
+        }
+      },
+      "question": "我家孙子今年要上学，要投什么保啊？"
+    },
+    {
+      "id": "q8",
+      "language": "zh-Hant",
+      "latency_ms": 14.195,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "fixed-income-assets"
+          ],
+          "core_coverage": 0.0,
+          "missing_additional": [
+            "front-matter-themes",
+            "life-stage-example"
+          ],
+          "missing_core": [
+            "cash-value-risk",
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "fixed-income-assets"
+          ],
+          "source_characters": 402,
+          "top5": [
+            "fixed-income-assets"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "fixed-income-assets",
+            "front-matter-themes",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "insurability",
+            "life-stage-example",
+            "note-3",
+            "table-357-row-0",
+            "table-357-row-1",
+            "table-357-row-2",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.25,
+          "missing_additional": [],
+          "missing_core": [
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "fixed-income-assets",
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal",
+            "table-357-row-0",
+            "life-stage-example"
+          ],
+          "source_characters": 4431,
+          "top5": [
+            "fixed-income-assets",
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "front-matter-themes",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "insurability",
+            "life-stage-example",
+            "note-1",
+            "note-3",
+            "table-357-row-0",
+            "table-357-row-1",
+            "table-357-row-2",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.25,
+          "missing_additional": [],
+          "missing_core": [
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal",
+            "table-357-row-0",
+            "life-stage-example",
+            "coverage-summary"
+          ],
+          "source_characters": 4856,
+          "top5": [
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal"
+          ]
+        }
+      },
+      "question": "我家孫子今年要上學，要投什麼保啊？"
+    },
+    {
+      "id": "q8",
+      "language": "original",
+      "latency_ms": 9.958,
+      "methods": {
+        "bm25": {
+          "bundle": [
+            "fixed-income-assets"
+          ],
+          "core_coverage": 0.0,
+          "missing_additional": [
+            "front-matter-themes",
+            "life-stage-example"
+          ],
+          "missing_core": [
+            "cash-value-risk",
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "fixed-income-assets"
+          ],
+          "source_characters": 402,
+          "top5": [
+            "fixed-income-assets"
+          ]
+        },
+        "hybrid": {
+          "bundle": [
+            "cash-value-risk",
+            "fixed-income-assets",
+            "front-matter-themes",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "insurability",
+            "life-stage-example",
+            "note-3",
+            "table-357-row-0",
+            "table-357-row-1",
+            "table-357-row-2",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.25,
+          "missing_additional": [],
+          "missing_core": [
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "fixed-income-assets",
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal",
+            "table-357-row-0",
+            "life-stage-example"
+          ],
+          "source_characters": 4431,
+          "top5": [
+            "fixed-income-assets",
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability"
+          ]
+        },
+        "vector": {
+          "bundle": [
+            "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
+            "front-matter-themes",
+            "generic-cash-withdrawal",
+            "generic-disclaimer",
+            "insurability",
+            "life-stage-example",
+            "note-1",
+            "note-3",
+            "table-357-row-0",
+            "table-357-row-1",
+            "table-357-row-2",
+            "term-and-lapse"
+          ],
+          "core_coverage": 0.25,
+          "missing_additional": [],
+          "missing_core": [
+            "note-6",
+            "note-7",
+            "withdrawal"
+          ],
+          "recall_at_5": 0.0,
+          "required_evidence_coverage": 1.0,
+          "selected": [
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal",
+            "table-357-row-0",
+            "life-stage-example",
+            "coverage-summary"
+          ],
+          "source_characters": 4856,
+          "top5": [
+            "table-357-row-1",
+            "front-matter-themes",
+            "table-357-row-2",
+            "insurability",
+            "generic-cash-withdrawal"
+          ]
+        }
+      },
+      "question": "我家孙子今年要上学，要投什么保啊？"
+    }
+  ],
+  "retrieval_cases_sha256": "f1e294f6f8cd5ffce8fdae5a26935b052ffb24e65d132b22934f8d65123cf7fd",
+  "schema_version": 1,
+  "summary": {
+    "bm25": {
+      "complete_core_cases": 16,
+      "core_coverage": 0.746429,
+      "recall_at_5": 0.619048,
+      "required_evidence_coverage": 1.0
+    },
+    "cases": 28,
+    "hybrid": {
+      "complete_core_cases": 16,
+      "core_coverage": 0.751786,
+      "recall_at_5": 0.607143,
+      "required_evidence_coverage": 1.0
+    },
+    "vector": {
+      "complete_core_cases": 16,
+      "core_coverage": 0.723214,
+      "recall_at_5": 0.556548,
+      "required_evidence_coverage": 1.0
+    }
+  }
+}

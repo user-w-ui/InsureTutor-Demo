@@ -13,6 +13,11 @@
 /data/corpus-rules.json text eol=lf
 /data/corpus.json text eol=lf
 /data/tokenizer/tokenizer.json text eol=lf
+/src/insuretutor/retrieval/** text eol=lf
+/src/insuretutor/agent_tools.py text eol=lf
+/data/retrieval/*.json text eol=lf
+/data/retrieval/*.npy binary
+/tests/retrieval_cases.json text eol=lf
 
 # Raster and archive formats: never diffed, never line-converted.
 *.pdf binary

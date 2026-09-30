@@ -21,7 +21,7 @@ Neither language is silently preferred when the brochure disagrees with itself.
 The offline cleaner writes separately to [`data/cleaned/`](data/cleaned/README.md),
 leaving `raw data/` unchanged. Start with the [readable preview](data/cleaned/preview.md),
 [quality report](data/cleaned/report.json), and [table/note map](docs/data-cleaning-map.md).
-The remaining application architecture below is a proposal, not an implemented runtime.
+Local retrieval is implemented; the chat API, generation and guardrails remain planned.
 
 From the repository root, using Python 3.11 or newer (no third-party dependencies
 are needed for cleaning or its tests):
@@ -29,7 +29,7 @@ are needed for cleaning or its tests):
 ```powershell
 $env:PYTHONPATH = "src"
 python -m insuretutor.ingest.clean
-python -m unittest discover -s tests -v
+python -m unittest discover -s tests -p "test_cleaning.py" -v
 ```
 
 The source-pinned [`data/cleaning-rules.json`](data/cleaning-rules.json) declares exact
@@ -62,12 +62,52 @@ the original `evidence_text`, physical PDF page and raw bbox.
 table/context associations, and the explicitly paired standalone disclaimers.
 Footnote links and source conflicts remain owned by the cleaner. The pinned E5
 [tokenizer](data/tokenizer/README.md) is included for offline length checks; model
-weights and embedding generation are deferred to Step 2.
+weights are prepared separately by the Step 2 command below.
 
 The two data entry points are in [`insuretutor.corpus`](src/insuretutor/corpus.py):
 `build_corpus() -> Corpus` and `assemble_evidence(corpus, unit_ids) -> EvidenceBundle`.
 Assembly restores full parents, follows required notes, adds headers/context and
 retains both conflict sources. Rebuilds are byte-identical, and tests use no model API.
+
+### Run local retrieval (implemented)
+
+```powershell
+python -m pip install -e ".[dev]"
+# This is the only retrieval command that downloads files (470 MB FP32 model).
+python -m insuretutor.retrieval prepare-model
+# Vectors are committed; rebuild explicitly only when corpus / encoding changes.
+python -m insuretutor.retrieval build-index
+python -m insuretutor.retrieval query "保證可保權益最多可行使幾次？" --output tmp/query.json
+python -m insuretutor.retrieval evaluate
+python -m pytest -q
+```
+
+After preparation, query, indexing and evaluation require no network or model API.
+The CLI's evaluation blocks outbound socket connections during model initialization
+and inference. A missing, damaged or mismatched artifact fails explicitly.
+Model files live in ignored `models/multilingual-e5-small/`; the committed
+[manifest and vectors](data/retrieval/README.md) pin corpus, ordered views, assets and encoding.
+Defaults: 2 CPU threads; top 12 units per channel; equal RRF with constant 60;
+up to 8 direct hits and 12,000 deduplicated source characters. Automatically completed
+notes use no direct-hit slots. Responses are complete evidence bundles with original
+text, physical PDF pages and bounding boxes; this CLI does not generate answers.
+
+### Read-only agent tool (adapter implemented; conversation loop next)
+
+```powershell
+python -m pip install -e ".[agent,dev]"
+```
+
+`make_search_evidence_tool(EvidenceSearchSession(retriever))` wraps the same
+`await retriever.retrieve(QueryContext(...))` as an SDK `function_tool`.
+The agent will choose focused searches, inspect results and search again before
+answering. Each call returns complete evidence; results are not manually ranked or
+merged across searches. The per-turn registry only enforces limits and records
+which unit IDs are citable: default 6 calls and 12,000 unique source characters.
+Schema and actual SDK tool execution are tested without a model API; the Runner
+loop, answer generation and safety validation are the next step.
+See [implementation notes](docs/implementation-notes.zh-CN.md) for measured recall,
+latency and remaining retrieval gaps.
 
 ---
 
@@ -92,16 +132,17 @@ citation-verified answering** — not the chat loop.
 
 A single Docker container serves a FastAPI backend and static chat UI. It loads a
 committed corpus and precomputed vectors for BM25 + NumPy hybrid retrieval.
-Application code resolves the query, retrieves clauses and required notes, then passes structured evidence to a
-tool-free OpenAI Agents SDK agent. The server validates the draft and constructs
+One OpenAI Agents SDK agent will query a read-only evidence tool, inspect results,
+and search again when needed. The server controls tool budgets, preserves required
+notes, records citable evidence and validates the draft. It constructs
 PDF citations before returning the answer. Without an LLM, it returns labelled
 source excerpts. Query embeddings run locally on CPU with multilingual-e5-small
 through FastEmbed; the model and tokenizer are bundled in the Docker image.
 
 See the [technical architecture](docs/architecture.zh-CN.md) for the complete design;
 [data and implementation details](docs/implementation-notes.zh-CN.md) are maintained
-separately. Cleaning, corpus construction and evidence assembly are implemented;
-retrieval and the conversation runtime remain planned.
+separately. Cleaning, corpus construction, CPU retrieval, evidence assembly and the SDK search tool adapter are
+implemented; the conversation runtime remains planned.
 
 ---
 
@@ -114,8 +155,9 @@ raw data/
     MANIFEST.md              Provenance: tool, version, params, checksums, date
 src/insuretutor/
   corpus.py                  Corpus models, offline builder, evidence assembly
+  agent_tools.py             Read-only SDK search tool and per-turn citation registry
   ingest/                    cleaning (build-time only)
-  retrieval/                 Lexical index + required-link completion
+  retrieval/                 Offline CPU E5, BM25 + NumPy, RRF, evidence completion
   guardrails/                Refusal & scope policy
   tutor.py                   Full request lifecycle (to add)
   generation.py              Tool-free Agents SDK adapter (to add)
@@ -126,6 +168,7 @@ data/
   corpus-rules.json          Reviewed language boundaries and context associations
   corpus.json                Runtime artifact (implemented)
   tokenizer/                 Pinned E5 tokenizer only, no embedding weights
+  retrieval/                 FP32 vectors, manifest and retrieval evaluation reports
 frontend/                    Single-page chat UI
 docs/                        Task spec, architecture, data provenance
 docker/                      Dockerfile + compose
@@ -151,9 +194,11 @@ See [`docs/data-provenance.md`](docs/data-provenance.md) for the full log.
 - [x] Source PDF analysed, parse path determined
 - [x] Official-API parse verified (380 blocks, 20 pages, 9 tables, 72 headings, 42 images)
 - [x] Nine-table / ten-note map and offline cleaner implemented
-- [ ] Bilingual glossary drafted
+- [x] Source-verified bilingual lexical heading mappings
 - [x] Cleaned fragments and reviewed metadata integrated into `corpus.json`
-- [ ] Retrieval + citation
+- [x] Local hybrid retrieval + complete evidence with citation anchors
+- [x] Read-only SDK search tool + per-turn budgets and citation registry
+- [ ] Agent query loop + answer generation + citation presentation
 - [ ] Guardrails
 - [ ] API + frontend
 - [ ] Docker

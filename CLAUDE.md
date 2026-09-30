@@ -48,7 +48,11 @@ dataset feeds the implemented runtime `data/corpus.json` builder in `src/insuret
 logical unit has Chinese and English search views; English views contain no Chinese.
 `data/corpus-rules.json` records only reviewed language boundaries and context/table
 associations, plus the explicit parallel disclaimer units. Required-note links remain
-in cleaning-rules.json. Tokenizer assets are local; this step loads no model weights.
+in cleaning-rules.json. Corpus building uses only the local tokenizer. Retrieval now loads
+pinned FP32 E5 weights from models/ and validates committed vectors before CPU inference.
+The read-only SDK tool adapter is in agent_tools.py; the agent loop will use this tool
+for iterative searches. Do not implement application-side question splitting or cross-query
+rank merging. Record returned evidence for citation validation; preserve required notes.
 `units.jsonl` is the next chunking input. Finite corrections in cleaning-rules.json
 restore bilingual columns, missing characters, and formulas; cite spans.evidence_text
 and check pdf_verified text against its physical PDF page. The seven reported text
@@ -129,7 +133,7 @@ The parts that shape the ingest code:
   notes sit on physical page 12 while the benefits they qualify are on pages 5-11, so
   **spatial distance carries no signal here**. Missing note numbers (note 6) are
   recovered in cleaning-rules.json.
-- **Traditional → Simplified is one-way and index-side only** (OpenCC `t2s`). Display
+- **Traditional → Simplified is one-way on queries and index text** (OpenCC `t2s`). Display
   always shows the original Traditional, because a citation exists so a human can check
   it against the source. Never `s2t` on output. Simplified aliases are never citable.
 - **Local hybrid retrieval.** Use rank-bm25 over deterministic tokens (Chinese
@@ -210,5 +214,6 @@ Other specifics worth knowing:
 Parse and cleaned artifacts are frozen. Cleaning, corpus construction and complete
 bilingual evidence assembly are implemented and tested. Corpus tests cover source
 coverage, footnote conditions, page anchors, source conflicts, tokenizer limits and
-offline byte-identical builds. Retrieval, generation, guardrails, API/frontend and
+offline byte-identical builds. Local retrieval and the SDK evidence tool adapter are implemented;
+agent execution, generation, guardrails, API/frontend and
 Docker remain. See [`README.md`](README.md).

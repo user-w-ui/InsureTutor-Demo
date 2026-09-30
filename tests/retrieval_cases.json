@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "description": "Equivalent queries for the seven positive evaluator scenarios. Primary targets measure raw Recall@5; core targets measure the facts needed after full evidence recovery. No evaluator text or target IDs enter the production index.",
+  "cases": [
+    {
+      "id": "q1",
+      "primary": [
+        "enhancement",
+        "insurability",
+        "table-352-row-8"
+      ],
+      "core": [
+        "enhancement",
+        "insurability",
+        "note-2",
+        "note-3"
+      ],
+      "additional": [
+        "table-352-row-8"
+      ],
+      "zh-Hans": "保单里有两个增加基本保障额的权益，哪个每年自动增加无需健康证明，哪个在结婚或生孩子时用？分别何时失效？保证可保权益每次最多增加多少，一生最多几次？",
+      "en": "The policy has two options to increase the Basic Sum Insured. Which increases it automatically each year without health evidence, and which applies on marriage or childbirth? When does each expire? For Guaranteed Insurability, what is the maximum increase each time and the lifetime number of exercises?"
+    },
+    {
+      "id": "q2",
+      "primary": [
+        "table-354-row-5"
+      ],
+      "core": [
+        "table-354-row-5"
+      ],
+      "additional": [],
+      "zh-Hans": "我要增加基本保障额。产品册规定每次增加或减少的最低金额是多少？请列出三种货币的准确数字、规定位置。如果中英文不同，哪个版本才对？",
+      "en": "I need to increase the sum insured. What is the minimum amount of each increase or decrease in all three currencies? Where is this provision in the brochure? If the Chinese and English differ, which version is correct?"
+    },
+    {
+      "id": "q3",
+      "primary": [
+        "additional-interest",
+        "base-interest",
+        "extra-bonus-frequency",
+        "bonus-rate-15-25",
+        "bonus-rate-30",
+        "table-352-row-6"
+      ],
+      "core": [
+        "additional-interest",
+        "base-interest",
+        "extra-bonus-frequency",
+        "bonus-rate-15-25",
+        "bonus-rate-30",
+        "bonus-rate-disclaimer",
+        "interest-every5-note",
+        "interest-year20-note",
+        "rate-date-note",
+        "table-352-row-6"
+      ],
+      "additional": [],
+      "zh-Hans": "顾问说第20个保单年度额外回报为2.75%，基本派息4%连同额外利息0.25%一起复利滚存，对吗？额外回报什么时候派、用什么比率？计划有没有保证利率？",
+      "en": "An adviser says the Extra Bonus in policy year 20 is 2.75%, and Base Crediting Interest of 4% compounds together with the 0.25% additional interest. Is that correct? When is the Extra Bonus paid and at which rates? Does the plan have a guaranteed interest rate?"
+    },
+    {
+      "id": "q4",
+      "primary": [
+        "table-97-row-3",
+        "note-5"
+      ],
+      "core": [
+        "table-97-row-3",
+        "note-4",
+        "note-5"
+      ],
+      "additional": [],
+      "zh-Hans": "保单选择渐进寿险保障，基本保障额1,000,000美元，身故时账户价值400,000美元，身故前11个月提取过100,000美元。应付身故保障是多少？",
+      "en": "Suppose a Policy is on the Incremental Benefit option. The Basic Sum Insured is US$1,000,000 and Account Value at death is US$400,000. The insured withdrew US$100,000 eleven months before death. What Death Benefit is payable?"
+    },
+    {
+      "id": "q5",
+      "primary": [
+        "note-6",
+        "table-356-row-1"
+      ],
+      "core": [
+        "note-6",
+        "table-356-row-1"
+      ],
+      "additional": [],
+      "zh-Hans": "保单生效3年，能用定期提款权益每月自动提款吗？每月最低金额、提款年期和手续费是什么？如果自行主动提款如何收费？",
+      "en": "My policy has been effective for 3 years. Can I use the automatic periodic withdrawal option monthly? What are the minimum monthly amount, withdrawal period and fees? How are manual withdrawals charged?"
+    },
+    {
+      "id": "q6",
+      "primary": [
+        "table-352-row-14",
+        "table-352-row-15",
+        "term-and-lapse",
+        "unemployment"
+      ],
+      "core": [
+        "note-8",
+        "table-352-row-14",
+        "table-352-row-15",
+        "term-and-lapse",
+        "unemployment"
+      ],
+      "additional": [],
+      "zh-Hans": "澳门签发的保单有哪些货币和缴费方式？暂停缴付保费会在什么情况下失效？失业保障是不是让我失业以后一直不用交保费？",
+      "en": "For a policy issued in Macau, which currencies and payment modes are available? If I stop paying premiums, when will the policy lapse? Does Unemployment Protection mean I can stop paying premiums forever while unemployed?"
+    },
+    {
+      "id": "q8",
+      "primary": [
+        "withdrawal"
+      ],
+      "core": [
+        "withdrawal",
+        "cash-value-risk",
+        "note-6",
+        "note-7"
+      ],
+      "additional": [
+        "front-matter-themes",
+        "life-stage-example"
+      ],
+      "zh-Hans": "我家孙子今年要上学，要投什么保啊？",
+      "en": "My grandson starts school this year. What insurance should I buy?"
+    }
+  ]
+}
