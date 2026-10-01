@@ -108,6 +108,22 @@ def test_chat_statuses_and_session_pass_through(corpus, status):
         assert response.headers["Cache-Control"] == "no-store"
 
 
+def test_uncited_paragraph_is_displayable_without_reference_groups(corpus):
+    result = ChatResult(
+        session_id="test-session",
+        response_language="en",
+        status="answered",
+        explanation="An uncited paragraph.",
+        claims=[Claim(text="An uncited paragraph.")],
+    )
+    with client_for(corpus, StubTutor(result)) as client:
+        response = client.post("/api/chat", json={"question": "Explain the plan."})
+        assert response.status_code == 200
+        body = response.json()
+        assert body["claims"][0]["evidence_ids"] == []
+        assert body["citations"] == body["reference_groups"] == []
+
+
 @pytest.mark.parametrize(
     "payload",
     [
@@ -163,9 +179,12 @@ def test_health_assets_and_pdf_range(corpus):
             response = client.get(f"/static/{asset}")
             assert response.status_code == 200
             assert response.headers["Cache-Control"] == "no-cache"
-            assert client.get(
-                f"/static/{asset}", headers={"If-None-Match": response.headers["ETag"]}
-            ).headers["Cache-Control"] == "no-cache"
+            assert (
+                client.get(
+                    f"/static/{asset}", headers={"If-None-Match": response.headers["ETag"]}
+                ).headers["Cache-Control"]
+                == "no-cache"
+            )
         response = client.get(health["pdf_url"], headers={"Range": "bytes=0-4"})
         assert response.status_code == 206 and response.content == b"%PDF-"
         assert (

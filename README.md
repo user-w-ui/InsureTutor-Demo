@@ -11,6 +11,9 @@ for the system diagram, module boundaries, request flow, retrieval, and safety d
 Data contracts, source discrepancies, and implementation reminders are in
 [implementation notes (中文)](docs/implementation-notes.zh-CN.md).
 
+Runtime validation checks JSON structure and submitted citation provenance. Answer
+quality, completeness and safety wording are handled by model instructions and evaluations.
+
 **Source document:** `FLEXI-ULife Prime Saver.pdf` — 20-page bilingual
 (Traditional Chinese / English) product brochure, YF Life 萬通保險.
 **Domain language:** Traditional Chinese + English, each retained as original evidence.

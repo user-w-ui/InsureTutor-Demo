@@ -15,9 +15,7 @@ from insuretutor.guardrails.answers import (
     AnswerRejected,
     EvidenceRegistry,
     message,
-    required_boundaries,
     validate_answer,
-    validate_partial_answer,
 )
 from insuretutor.retrieval import Retriever
 from insuretutor.sessions import HistoryTurn, SessionStore
@@ -63,33 +61,18 @@ class Tutor:
                             "response_language": language,
                             "history": [h.as_data() for h in conversation.history],
                             "initial_citable_unit_ids": sorted(search.citable_units),
-                            "initial_evidence": json.loads(initial.to_agent_json()),
+                            "initial_evidence": json.loads(search.agent_json(initial)),
                             "limits": {
                                 "remaining_searches": initial.remaining_searches,
                                 "remaining_source_characters": initial.remaining_source_characters,
                             },
                         }
-                        user_questions = [h.question for h in conversation.history] + [
-                            turn.question
-                        ]
-                        partial = False
-
                         def validate(draft):
-                            return validate_answer(
-                                draft, EvidenceRegistry(search), user_questions, language
-                            )
+                            return validate_answer(draft, EvidenceRegistry(search), language)
 
-                        try:
-                            draft = await self.generator.generate(
-                                data, search, calls, validate=validate
-                            )
-                        except AnswerRejected as exc:
-                            if exc.draft is None or str(exc) != "unsupported_quantity":
-                                raise
-                            draft = validate_partial_answer(
-                                exc.draft, EvidenceRegistry(search), user_questions, language
-                            )
-                            partial = True
+                        draft = await self.generator.generate(
+                            data, search, calls, validate=validate
+                        )
                         registry = EvidenceRegistry(search)
                         ids = list(
                             dict.fromkeys(uid for c in draft.claims for uid in c.evidence_ids)
@@ -119,8 +102,6 @@ class Tutor:
                                     language,
                                 )
                             notices = [message("conflict", language)] if conflict else []
-                            if partial:
-                                notices.insert(0, message("partial", language))
                             if any(c.calculation for c in draft.claims):
                                 notices.append(message("calculation", language))
                             result = ChatResult(
@@ -132,7 +113,6 @@ class Tutor:
                                 citations=citations,
                                 clarification_question=draft.clarification_question,
                                 notices=notices,
-                                reason="partial_validation" if partial else None,
                             )
             except TimeoutError:
                 result = self._fallback(search, conversation.id, language, "timeout")
@@ -156,10 +136,6 @@ class Tutor:
             )
             if reset:
                 result.notices.insert(0, message("reset", language))
-            if result.reason and result.reason != "partial_validation":
-                codes, topics = required_boundaries(turn.question)
-                result.notices.extend(message(code, language) for code in codes)
-                result.notices.extend(message(topic, language) for topic in topics)
             # Excerpts and failures are not validated conversational answers.
             if result.reason is None:
                 registry = EvidenceRegistry(search)

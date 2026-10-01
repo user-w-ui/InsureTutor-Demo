@@ -147,8 +147,9 @@ def test_sdk_schema_and_actual_invocation_without_network():
         result = json.loads(output)
         assert result["evidence"]["conflicts"]
         assert result["evidence"]["source_spans"][0]["pdf_page"] == 17
-        assert "bbox_raw" in result["evidence"]["source_spans"][0]
-        assert "text_origin" in result["evidence"]["source_spans"][0]
+        assert "bbox_raw" not in result["evidence"]["source_spans"][0]
+        assert session.bundles[-1].source_spans[0].bbox_raw
+        assert session.bundles[-1].source_spans[0].text_origin
         assert all("text" not in u for u in result["evidence"]["units"])
         assert "table-354-row-5" in session.citable_units
         assert "withdrawal" in session.citable_units
@@ -226,7 +227,7 @@ def test_initial_and_supplemental_results_keep_both_languages(question):
             assert {s["language"] for s in payload["source_spans"]} == {"en", "zh-Hant"}
             for unit in payload["units"]:
                 assert {r["language"] for r in unit["segments"]} == {"en", "zh-Hant"}
-                assert all(r["pair_id"] == unit["id"] for r in unit["segments"])
+                assert len(unit["segments"]) == 2
 
     asyncio.run(run())
 
@@ -240,13 +241,14 @@ def test_serialized_corpus_keeps_language_links_and_split_source_provenance():
     payload = json.loads(result.to_agent_json())["evidence"]
     sources = {s["id"]: s for s in payload["source_spans"]}
     originals = {s.id: s for s in bundle.source_spans}
+    records = {u.id: {r.language: r for r in u.segments} for u in bundle.units}
     assert len(sources) == len(payload["source_spans"]) == len(originals)
     assert {u["id"] for u in payload["units"]} == {u.id for u in corpus.units}
     assert all("text" not in u for u in payload["units"])
     for unit in payload["units"]:
-        peers = {r["id"]: r for r in unit["segments"]}
-        for record in peers.values():
-            assert peers[record["parallel_id"]]["parallel_id"] == record["id"]
+        assert {r["language"] for r in unit["segments"]} == {"en", "zh-Hant"}
+        for record in unit["segments"]:
+            assert record["text"] == records[unit["id"]][record["language"]].text
             assert all(
                 sources[sid]["language"] == record["language"]
                 for sid in record["source_span_ids"] + record["context_span_ids"]
@@ -260,13 +262,57 @@ def test_serialized_corpus_keeps_language_links_and_split_source_provenance():
         expected = originals[sid]
         assert span["evidence_text"] == expected.evidence_text
         assert span["pdf_page"] == expected.pdf_page
-        assert span["bbox_raw"] == expected.bbox_raw
-        assert span["origin_span_id"] == expected.origin_span_id
-        assert span["origin_ranges"] == expected.origin_ranges
+        assert "bbox_raw" not in span and "origin_ranges" not in span
+        assert expected.bbox_raw and expected.origin_span_id and expected.origin_ranges
     conflict = next(u for u in payload["units"] if u["id"] == "table-354-row-5")
     assert conflict["pairing_status"] == "reviewed_source_conflict"
     assert conflict["id"] in payload["conflicts"]
-    assert any(s.get("bbox_precision") == "whole_table" for s in sources.values())
+    assert any(getattr(s, "bbox_precision", None) == "whole_table" for s in originals.values())
+
+
+def test_model_payload_delta_preserves_all_references_and_required_sources():
+    session = EvidenceSearchSession(StubRetriever())
+
+    async def run():
+        decoded = []
+        decoded.append(
+            json.loads(session.agent_json(await session.initialize("withdraw")))["evidence"]
+        )
+        decoded.append(json.loads(session.agent_json(await session.search("conflict")))["evidence"])
+        decoded.append(json.loads(session.agent_json(await session.search("withdraw")))["evidence"])
+        assert not decoded[-1]["units"] and not decoded[-1]["source_spans"]
+        assert "withdrawal" in decoded[-1]["reused_unit_ids"]
+        known_units, known_sources = {}, {}
+        for payload in decoded:
+            assert not (known_units.keys() & {u["id"] for u in payload["units"]})
+            assert not (known_sources.keys() & {s["id"] for s in payload["source_spans"]})
+            assert set(payload["reused_unit_ids"]) <= known_units.keys()
+            assert set(payload["reused_source_span_ids"]) <= known_sources.keys()
+            known_units.update({u["id"]: u for u in payload["units"]})
+            known_sources.update({s["id"]: s for s in payload["source_spans"]})
+            for unit in payload["units"]:
+                assert set(unit["requires"]) <= known_units.keys()
+                for record in unit["segments"]:
+                    for sid in record["source_span_ids"] + record["context_span_ids"]:
+                        assert known_sources[sid]["language"] == record["language"]
+                for binding in payload["cell_bindings"][unit["id"]]:
+                    assert binding["cell"] in known_sources
+                    assert set(binding["column_headers"]) <= known_sources.keys()
+        assert set(known_units) == session.citable_units
+        for bundle in session.bundles:
+            for source in bundle.source_spans:
+                assert (
+                    known_sources[session.source_aliases[source.id]]["evidence_text"]
+                    == source.evidence_text
+                )
+        assert len(set(session.source_aliases.values())) == len(session.source_aliases)
+        assert all(alias.startswith("s") for alias in known_sources)
+        # A fresh turn must send full definitions, even with the same retriever.
+        new = EvidenceSearchSession(session.retriever)
+        first = json.loads(new.agent_json(await new.initialize("withdraw")))["evidence"]
+        assert first["units"] and first["source_spans"] and not first["reused_unit_ids"]
+
+    asyncio.run(run())
 
 
 def test_shared_origin_does_not_merge_languages_or_undercharge_source_budget():

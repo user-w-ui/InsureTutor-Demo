@@ -61,10 +61,10 @@ class Claim(StrictModel):
             ):
                 raise ValueError("User conditions contain only exact user inputs")
         elif self.kind == "application":
-            if not self.evidence_ids or not self.user_inputs or self.boundary or self.calculation:
-                raise ValueError("Condition application needs evidence and exact user conditions")
-        elif not self.evidence_ids or self.boundary is not None or self.user_inputs:
-            raise ValueError("Factual claims need evidence IDs")
+            if not self.user_inputs or self.boundary or self.calculation:
+                raise ValueError("Condition application needs user conditions")
+        elif self.boundary is not None or self.user_inputs:
+            raise ValueError("Factual claims cannot contain boundary or user-condition fields")
         if (self.kind == "calculation") != (self.calculation is not None):
             raise ValueError("Calculation metadata must match claim kind")
         return self
