@@ -150,7 +150,9 @@ def test_health_assets_and_pdf_range(corpus):
     with client_for(corpus, tutor) as client:
         health = client.get("/api/health").json()
         assert health["ready"] and health["mode"] == "excerpts" and not tutor.turns
-        assert client.get("/").status_code == 200
+        page = client.get("/")
+        assert page.status_code == 200
+        assert page.headers["Cache-Control"] == "no-cache"
         for asset in [
             "app.js",
             "styles.css",
@@ -158,7 +160,12 @@ def test_health_assets_and_pdf_range(corpus):
             "vendor/pdf.min.mjs",
             "vendor/pdf.worker.min.mjs",
         ]:
-            assert client.get(f"/static/{asset}").status_code == 200
+            response = client.get(f"/static/{asset}")
+            assert response.status_code == 200
+            assert response.headers["Cache-Control"] == "no-cache"
+            assert client.get(
+                f"/static/{asset}", headers={"If-None-Match": response.headers["ETag"]}
+            ).headers["Cache-Control"] == "no-cache"
         response = client.get(health["pdf_url"], headers={"Range": "bytes=0-4"})
         assert response.status_code == 206 and response.content == b"%PDF-"
         assert (

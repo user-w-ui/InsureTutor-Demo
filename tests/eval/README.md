@@ -9,31 +9,6 @@ Ten question/answer items that stress the InsureTutor grounded QA agent, built o
 | [`ANSWER_KEY.md`](ANSWER_KEY.md) | **Start here.** Human-readable questions, answers, citations, rubrics and traps. |
 | [`items.json`](items.json) | Machine-readable source of truth (schema `insuretutor.eval-set/1`). |
 | [`test_eval_set.py`](test_eval_set.py) | Contract tests over the *dataset* — not over the tutor. |
-| [`ui-preview/index.html`](ui-preview/index.html) | Static chat/PDF citation preview using four prewritten answers and corpus anchors; no LLM. |
-
-## 静态网页预览
-
-从仓库根目录运行：
-
-```powershell
-.\.venv\Scripts\python.exe tests/eval/ui-preview/serve.py
-```
-
-打开 <http://127.0.0.1:8765>。四个预设问答支持逐条引用、PDF 跳页、来源区域高亮、
-中英原文切换、缩放及可复制的引用链接。正文／脚注定位原始文本块，表格仅标注整表，
-不声称逐句／逐字定位。引用内容和坐标来自 `data/corpus.json`。
-
-页面、PDF.js 5.4.149 及 worker 均由本地服务提供；运行时无需联网、API 密钥或模型。
-服务只开放预览文件和原始 PDF，不开放工作区其他文件。这是第四步的外观样例，未接入 Tutor。
-
-评测答案或语料更新后，重新生成预览数据：
-
-```powershell
-.\.venv\Scripts\python.exe tests/eval/ui-preview/prepare.py
-```
-
-PDF.js 来源、版本和文件哈希在 [`vendor/manifest.json`](../../src/insuretutor/web/vendor/manifest.json)，
-随附 Apache-2.0 许可证。示例数据只用于 UI 演示，不进入运行时提示或索引。
 
 ```bash
 pytest tests/eval -v     # 19 tests, all green

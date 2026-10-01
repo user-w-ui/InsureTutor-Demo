@@ -93,6 +93,9 @@ def create_app(runtime_factory: Callable[[], Runtime] = load_runtime) -> FastAPI
         except Exception:  # noqa: BLE001 -- prevent payload-bearing exception logs
             response = failure(request, "internal_error", 500)
         response.headers["X-Request-ID"] = request.state.request_id
+        if request.url.path == "/" or request.url.path.startswith("/static/"):
+            # Revalidate frontend assets after rebuilding the container.
+            response.headers["Cache-Control"] = "no-cache"
         if request.url.path == "/api/chat":
             logger.info(
                 "request=%s elapsed_ms=%.0f http=%s status=%s reason=%s",

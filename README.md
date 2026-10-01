@@ -145,16 +145,6 @@ Interactive commands: `/new`, `/exit`. Language choices: `auto`, `en`, `zh-Hans`
 Evaluation fixtures are test-only; their answers and rubrics never enter model inputs.
 Citation coverage requires human semantic review; see [implementation notes](docs/implementation-notes.zh-CN.md).
 
-### Static chat / PDF preview
-
-```powershell
-.\.venv\Scripts\python.exe tests/eval/ui-preview/serve.py
-```
-
-Open <http://127.0.0.1:8765> to try four prewritten Q&As with clickable citations,
-PDF page navigation and source-region highlights. No LLM or network is needed.
-See the [preview instructions](tests/eval/README.md#静态网页预览).
-
 ---
 
 ## Why this is harder than "just a RAG"

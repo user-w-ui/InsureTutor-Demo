@@ -35,8 +35,25 @@ const words = {
   no_evidence: ['No supporting evidence was found for this turn.', '本轮未找到支持问题的证据。', '本輪未找到支持問題的證據。'],
   model_or_tool_failed: ['The model or search call failed; showing available original evidence.', '模型或补查调用失败，展示已取得的原文证据。', '模型或補查呼叫失敗，展示已取得的原文證據。'],
   timeout: ['The answer timed out; showing available original evidence.', '回答超时，展示已取得的原文证据。', '回答逾時，展示已取得的原文證據。'],
-  degraded: ['The generated draft was not accepted; showing original evidence.', '生成草稿未通过，展示原文证据。', '生成草稿未通過，展示原文證據。'],
+  invalid_json: ['Format validation failed (JSON syntax or fields); showing original evidence.', '格式层校验未通过（JSON 语法或字段），展示原文证据。', '格式層校驗未通過（JSON 語法或欄位），展示原文證據。'],
+  content_rejected: ['Content validation failed (evidence, quantities or answer boundaries); showing original evidence.', '内容层校验未通过（引用、数字或回答边界等），展示原文证据。', '內容層校驗未通過（引用、數字或回答邊界等），展示原文證據。'],
+  turn_limit: ['The agent reached its turn limit; showing available original evidence.', 'Agent 达到回合上限，展示已取得的原文证据。', 'Agent 達到回合上限，展示已取得的原文證據。'],
+  degraded: ['The answer fell back to original evidence; the failure layer is unknown.', '回答已降级为原文证据，未识别失败层级。', '回答已降級為原文證據，未識別失敗層級。'],
 };
+const contentRejectionReasons = new Set([
+  'unknown_or_missing_evidence', 'missing_source', 'invalid_source_id',
+  'invented_user_input', 'instruction_is_not_user_condition', 'unsupported_quantity',
+  'scope_violation', 'unrecorded_eligibility', 'conflict_authority_selected',
+  'formula_mismatch', 'missing_formula', 'missing_calculation_notes',
+  'not_death_benefit_formula', 'unsupported_calculation', 'missing_calculation_input',
+  'missing_withdrawal_timing', 'invented_calculation_input', 'calculation_input_omitted',
+  'missing_calculation_result', 'calculation_currency_mismatch',
+  'numeric_assumption_in_clarification', 'multiple_clarifications', 'response_language_mismatch',
+]);
+function reasonMessageKey(reason) {
+  if (contentRejectionReasons.has(reason)) return 'content_rejected';
+  return Object.hasOwn(words, reason) ? reason : 'degraded';
+}
 let language = initialLanguage(), sessionId = null, pending = false, ready = false, mode = null;
 let turnNumber = 0, active = null, pdfStatus = 'loadingPdf', pdfFailed = false;
 const turns = new Map();
@@ -101,7 +118,7 @@ function addRefs(parent, turn, ids) {
 function renderAnswer(turn, container) {
   const result = turn.result;
   const heading = element('div', '', 'answer-heading'); heading.append(element('strong', 'InsureTutor'), element('span', t(result.status))); container.append(heading);
-  if (result.reason) container.append(element('p', t(words[result.reason] ? result.reason : 'degraded'), 'mode-notice'));
+  if (result.reason) container.append(element('p', t(reasonMessageKey(result.reason)), 'mode-notice'));
   if (result.status === 'source_conflict') container.append(element('div', t('conflictNote'), 'conflict-notice'));
   if (result.claims.length) {
     result.claims.forEach((claim, index) => {
@@ -178,6 +195,7 @@ async function submit(event) {
   event.preventDefault(); if (pending || !ready) return;
   const question = $('question-input').value;
   if (!question.trim() || Array.from(question).length > 4000) { showError('invalid_input'); return; }
+  $('question-input').value = ''; updateCount();
   $('chat-error').hidden = true; document.querySelector('.welcome')?.remove();
   const questionRow = element('div', '', 'question-row'); const bubble = element('div', '', 'question-bubble expanded');
   bubble.append(element('p', question));
@@ -202,11 +220,11 @@ async function submit(event) {
     if ($('response-language').value === 'auto') { language = data.response_language; translate(); }
     clearInterval(timer); content.replaceChildren();
     const turn = { id: ++turnNumber, result: data }; turns.set(turn.id, turn); renderAnswer(turn, content);
-    $('question-input').value = ''; updateCount();
     if (data.reference_groups.length) selectGroup(turn, data.reference_groups[0], data.response_language === 'en' ? 'en' : 'zh-Hant');
     $('conversation').scrollTop = Math.max(0, answerRow.offsetTop - $('conversation').offsetTop - 14);
   } catch (error) {
     answerRow.remove(); questionRow.remove();
+    $('question-input').value = question; updateCount();
     showError(error.name === 'AbortError' ? 'clientTimeout' : words[error.message] ? error.message : 'network', error.requestId);
   } finally { clearInterval(timer); clearTimeout(timeout); setPending(false); $('question-input').focus(); }
 }

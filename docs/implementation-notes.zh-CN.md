@@ -422,7 +422,7 @@ Docker Desktop 引擎尚未运行，容器冒烟留待部署步骤。下一步�
 ## 第 4 步：HTTP、网页与容器（2026-10-01）
 
 - 正式资源在 `src/insuretutor/web/`，FastAPI 启动入口为 `python -m insuretutor.api`。
-  原静态样例保留为测试夹具；PDF.js 5.4.149 和 worker 共用正式目录的本地文件及许可证。
+  旧静态预览网页及专用脚本已移除；PDF.js 5.4.149、worker 及许可证保留在正式资源目录。
 - HTTP 在 `ChatResult` 上增加 `reference_groups`：按逻辑单元提供两种原文、标题、
   来源片段、上下文及必需单元 ID。仅从本轮已有引用与 corpus 显式关系恢复，不调用检索或模型。
   模型草稿、Tutor、检索算法及语料均未修改。缺少标题时用脚注编号或原文首行作为显示标签。
