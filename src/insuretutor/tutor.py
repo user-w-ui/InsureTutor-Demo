@@ -17,6 +17,7 @@ from insuretutor.guardrails.answers import (
     message,
     required_boundaries,
     validate_answer,
+    validate_partial_answer,
 )
 from insuretutor.retrieval import Retriever
 from insuretutor.sessions import HistoryTurn, SessionStore
@@ -68,14 +69,28 @@ class Tutor:
                                 "remaining_source_characters": initial.remaining_source_characters,
                             },
                         }
-                        draft = await self.generator.generate(data, search, calls)
+                        user_questions = [h.question for h in conversation.history] + [
+                            turn.question
+                        ]
+                        partial = False
+
+                        def validate(draft):
+                            return validate_answer(
+                                draft, EvidenceRegistry(search), user_questions, language
+                            )
+
+                        try:
+                            draft = await self.generator.generate(
+                                data, search, calls, validate=validate
+                            )
+                        except AnswerRejected as exc:
+                            if exc.draft is None or str(exc) != "unsupported_quantity":
+                                raise
+                            draft = validate_partial_answer(
+                                exc.draft, EvidenceRegistry(search), user_questions, language
+                            )
+                            partial = True
                         registry = EvidenceRegistry(search)
-                        draft = validate_answer(
-                            draft,
-                            registry,
-                            [h.question for h in conversation.history] + [turn.question],
-                            language,
-                        )
                         ids = list(
                             dict.fromkeys(uid for c in draft.claims for uid in c.evidence_ids)
                         )
@@ -104,6 +119,8 @@ class Tutor:
                                     language,
                                 )
                             notices = [message("conflict", language)] if conflict else []
+                            if partial:
+                                notices.insert(0, message("partial", language))
                             if any(c.calculation for c in draft.claims):
                                 notices.append(message("calculation", language))
                             result = ChatResult(
@@ -115,6 +132,7 @@ class Tutor:
                                 citations=citations,
                                 clarification_question=draft.clarification_question,
                                 notices=notices,
+                                reason="partial_validation" if partial else None,
                             )
             except TimeoutError:
                 result = self._fallback(search, conversation.id, language, "timeout")
@@ -138,7 +156,7 @@ class Tutor:
             )
             if reset:
                 result.notices.insert(0, message("reset", language))
-            if result.reason:
+            if result.reason and result.reason != "partial_validation":
                 codes, topics = required_boundaries(turn.question)
                 result.notices.extend(message(code, language) for code in codes)
                 result.notices.extend(message(topic, language) for topic in topics)

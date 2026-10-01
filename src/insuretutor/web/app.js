@@ -37,6 +37,7 @@ const words = {
   timeout: ['The answer timed out; showing available original evidence.', '回答超时，展示已取得的原文证据。', '回答逾時，展示已取得的原文證據。'],
   invalid_json: ['Format validation failed (JSON syntax or fields); showing original evidence.', '格式层校验未通过（JSON 语法或字段），展示原文证据。', '格式層校驗未通過（JSON 語法或欄位），展示原文證據。'],
   content_rejected: ['Content validation failed (evidence, quantities or answer boundaries); showing original evidence.', '内容层校验未通过（引用、数字或回答边界等），展示原文证据。', '內容層校驗未通過（引用、數字或回答邊界等），展示原文證據。'],
+  partial_validation: ['Partial answer: related unverifiable paragraphs were omitted.', '部分回答：未通过校验的段落及关联内容已省略。', '部分回答：未通過校驗的段落及關聯內容已省略。'],
   turn_limit: ['The agent reached its turn limit; showing available original evidence.', 'Agent 达到回合上限，展示已取得的原文证据。', 'Agent 達到回合上限，展示已取得的原文證據。'],
   degraded: ['The answer fell back to original evidence; the failure layer is unknown.', '回答已降级为原文证据，未识别失败层级。', '回答已降級為原文證據，未識別失敗層級。'],
 };

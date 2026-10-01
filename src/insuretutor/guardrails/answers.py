@@ -22,7 +22,7 @@ FORMULAS = {
 
 
 class AnswerRejected(ValueError):
-    pass
+    draft: DraftAnswer | None = None
 
 
 def normalized(text: str) -> str:
@@ -155,6 +155,10 @@ MESSAGES = {
     "excerpts": (
         "Source excerpt mode: no generated answer was accepted. The following is original brochure text, not a personalized answer.",
         "原文摘录模式：未采用生成答案。以下为宣传册原文，不是针对个人情况的回答。",
+    ),
+    "partial": (
+        "Some content could not be verified and has been omitted with related claims. Only the remaining source-checked paragraphs are shown; this is an incomplete answer.",
+        "部分内容未能通过校验，已连同关联段落省略。以下仅保留其余通过来源校验的段落，回答并不完整。",
     ),
 }
 
@@ -327,10 +331,34 @@ def required_boundaries(question: str) -> tuple[list[str], list[str]]:
     return codes, topics
 
 
+def selects_conflict_authority(text: str) -> bool:
+    """Recognize explicit denials without letting one denial excuse another assertion."""
+    text = normalized(text)
+    denial = (
+        r"(?:不选择|不能选择|不应选择|不能以|不应以|不以|无法认定)"
+        r"(?:英文|中文)(?:版本|原文)?(?:为准|为权威|为正确版本)|"
+        r"(?:英文|中文)(?:版本|原文)?(?:并非|不是|不能视为)(?:正确|权威)|"
+        r"(?:do not|cannot|can't|must not|should not) "
+        r"(?:choose|select|treat|regard|prefer) (?:the )?(?:english|chinese)"
+        r"(?: version| text)?(?: as)? (?:correct|authoritative)|"
+        r"(?:english|chinese)(?: version| text)? is (?:not|not necessarily) "
+        r"(?:correct|authoritative)"
+    )
+    text = re.sub(denial, "", text)
+    return bool(
+        re.search(
+            r"(?:英文|中文).{0,10}(?:正确|权威|为准)|"
+            r"(?:english|chinese).{0,20}(?:correct|authoritative)|"
+            r"prefer (?:the )?(?:english|chinese)",
+            text,
+        )
+    )
+
+
 def validate_answer(
     draft: DraftAnswer, registry: EvidenceRegistry, user_questions: list[str], language: str
 ):
-    """Return a sanitized draft. All failures discard the whole answer in Tutor."""
+    """Return a sanitized draft or reject it; Tutor controls correction/recovery."""
     draft = draft.model_copy(deep=True)
     all_user = "\n".join(user_questions)
     for claim in draft.claims:
@@ -354,10 +382,7 @@ def validate_answer(
         if any(
             registry.units[u].conflict or u in registry.conflicts
             for u in registry.closure(claim.evidence_ids)
-        ) and re.search(
-            r"(?:英文|中文).{0,10}(?:正确|权威|为准)|(?:english|chinese).{0,20}(?:correct|authoritative)|prefer (?:the )?(?:english|chinese)",
-            normalized(claim.text),
-        ):
+        ) and selects_conflict_authority(claim.text):
             raise AnswerRejected("conflict_authority_selected")
         allowed = quantities(source)
         if claim.kind == "application":
@@ -435,7 +460,10 @@ def validate_answer(
             claim.text = message("application", language) + " " + claim.text
     if draft.clarification_question:
         check_scope(draft.clarification_question, all_user)
-        if quantities(draft.clarification_question):
+        # Asking about a sourced threshold or an actual user figure is not an
+        # invented numerical premise. Unseen numbers/units still fail closed.
+        supported = quantities(all_user) | quantities(registry.evidence_text(list(registry.units)))
+        if not quantities(draft.clarification_question) <= supported:
             raise AnswerRejected("numeric_assumption_in_clarification")
         if len(re.findall(r"[?？]", draft.clarification_question)) > 1:
             raise AnswerRejected("multiple_clarifications")
@@ -488,3 +516,58 @@ def validate_answer(
         if draft.clarification_question:
             draft.clarification_question = convert(draft.clarification_question)
     return draft
+
+
+def validate_partial_answer(draft, registry, user_questions, language):
+    """Recover only separate evidence groups after one unsuccessful correction.
+
+    Provenance/quantity checks do not prove semantic independence or correctness.
+    Global boundary, source, input, calculation and language failures stay closed.
+    """
+    failed, footprints = set(), []
+    for i, claim in enumerate(draft.claims):
+        try:
+            validate_answer(
+                DraftAnswer(status="answered", claims=[claim]), registry, user_questions, language
+            )
+        except AnswerRejected as exc:
+            if str(exc) != "unsupported_quantity" or claim.kind != "fact":
+                raise
+            failed.add(i)
+        footprints.append(
+            {
+                sid
+                for uid in registry.closure(claim.evidence_ids)
+                for sid in registry.span_ids(uid)
+                if sid in registry.units[uid].source_span_ids
+                or normalized(registry.spans[sid].evidence_text).strip(" :：")
+                not in {"notes", "附注"}
+            }
+        )
+    if not failed:
+        raise AnswerRejected("unsupported_quantity")
+    # Drop the whole connected component, including another paragraph's shared
+    # sources, context, mandatory notes and paired conflict units.
+    while True:
+        affected = set().union(*(footprints[i] for i in failed))
+        linked = {i for i, spans in enumerate(footprints) if spans & affected}
+        if linked <= failed:
+            break
+        failed |= linked
+    remaining = [c for i, c in enumerate(draft.claims) if i not in failed]
+    if not any(c.kind in {"fact", "application", "calculation"} for c in remaining):
+        raise AnswerRejected("unsupported_quantity")
+    # Do not leave an explicit reference or conclusion pointing at omitted prose.
+    if any(
+        re.search(
+            r"上述|前述|前者|后者|上文|因此|所以|因而|"
+            r"\b(?:above|former|latter|therefore|consequently)\b",
+            normalized(c.text),
+        )
+        for c in remaining
+    ):
+        raise AnswerRejected("unsupported_quantity")
+    partial = DraftAnswer(
+        status="insufficient", claims=remaining, clarification_question=draft.clarification_question
+    )
+    return validate_answer(partial, registry, user_questions, language)
