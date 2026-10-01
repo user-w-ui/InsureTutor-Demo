@@ -6,7 +6,7 @@ from unittest.mock import patch
 
 import pytest
 
-from insuretutor.agent_tools import EvidenceSearchSession, make_search_evidence_tool
+from insuretutor.agent_tools import EvidenceSearchSession, SearchResult, make_search_evidence_tool
 from insuretutor.corpus import assemble_evidence
 from insuretutor.retrieval.embedding import QueryInputError
 from insuretutor.retrieval.index import load_corpus
@@ -201,5 +201,88 @@ def test_initial_backend_failure_does_not_enable_agent_tool():
             make_search_evidence_tool(session)
         with pytest.raises(RuntimeError, match="already attempted"):
             await session.initialize("withdraw")
+
+    asyncio.run(run())
+
+
+@pytest.mark.parametrize(
+    "question",
+    ["What are the conditions?", "條件是甚麼？", "條件是甚麼？ What are the conditions?"],
+)
+def test_initial_and_supplemental_results_keep_both_languages(question):
+    session = EvidenceSearchSession(StubRetriever(), response_language="en")
+
+    async def run():
+        initial = await session.initialize(question)
+        supplement = await session.search("currency")
+        for result in [initial, supplement]:
+            payload = json.loads(result.to_agent_json())["evidence"]
+            assert {s["language"] for s in payload["source_spans"]} == {"en", "zh-Hant"}
+            for unit in payload["units"]:
+                assert {r["language"] for r in unit["segments"]} == {"en", "zh-Hant"}
+                assert all(r["pair_id"] == unit["id"] for r in unit["segments"])
+
+    asyncio.run(run())
+
+
+def test_serialized_corpus_keeps_language_links_and_split_source_provenance():
+    corpus = load_corpus()
+    bundle = assemble_evidence(corpus, [u.id for u in corpus.units])
+    result = SearchResult(
+        status="evidence", evidence=bundle, remaining_searches=5, remaining_source_characters=0
+    )
+    payload = json.loads(result.to_agent_json())["evidence"]
+    sources = {s["id"]: s for s in payload["source_spans"]}
+    originals = {s.id: s for s in bundle.source_spans}
+    assert len(sources) == len(payload["source_spans"]) == len(originals)
+    assert {u["id"] for u in payload["units"]} == {u.id for u in corpus.units}
+    assert all("text" not in u for u in payload["units"])
+    for unit in payload["units"]:
+        peers = {r["id"]: r for r in unit["segments"]}
+        for record in peers.values():
+            assert peers[record["parallel_id"]]["parallel_id"] == record["id"]
+            assert all(
+                sources[sid]["language"] == record["language"]
+                for sid in record["source_span_ids"] + record["context_span_ids"]
+            )
+        for sid in payload["context_by_unit"][unit["id"]]:
+            assert sid in sources
+        for binding in payload["cell_bindings"][unit["id"]]:
+            assert binding["cell"] in sources
+            assert all(sid in sources for sid in binding["column_headers"])
+    for sid, span in sources.items():
+        expected = originals[sid]
+        assert span["evidence_text"] == expected.evidence_text
+        assert span["pdf_page"] == expected.pdf_page
+        assert span["bbox_raw"] == expected.bbox_raw
+        assert span["origin_span_id"] == expected.origin_span_id
+        assert span["origin_ranges"] == expected.origin_ranges
+    conflict = next(u for u in payload["units"] if u["id"] == "table-354-row-5")
+    assert conflict["pairing_status"] == "reviewed_source_conflict"
+    assert conflict["id"] in payload["conflicts"]
+    assert any(s.get("bbox_precision") == "whole_table" for s in sources.values())
+
+
+def test_shared_origin_does_not_merge_languages_or_undercharge_source_budget():
+    backend = StubRetriever()
+    bundle = assemble_evidence(backend.corpus, ["table-354-row-5"])
+    cost = sum(len(s.evidence_text) for s in bundle.source_spans)
+    session = EvidenceSearchSession(backend, character_budget=cost)
+
+    async def run():
+        first = await session.initialize("conflict")
+        origins = {}
+        for span in first.evidence.source_spans:
+            origins.setdefault(span.origin_span_id, []).append(span)
+        paired = [spans for spans in origins.values() if len(spans) == 2]
+        assert paired
+        for spans in paired:
+            assert {s.language for s in spans} == {"en", "zh-Hant"}
+            assert len({s.id for s in spans}) == 2
+            assert all(s.id in session.source_characters for s in spans)
+        assert sum(session.source_characters.values()) == cost
+        assert first.remaining_source_characters == 0
+        assert (await session.search("conflict")).remaining_source_characters == 0
+        assert backend.queries == ["conflict"]
 
     asyncio.run(run())
