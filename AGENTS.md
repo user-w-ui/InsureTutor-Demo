@@ -1,6 +1,6 @@
 # AGENTS.md
 
-InsureTutor：基于双语保险宣传册的求职 demo。
+InsureTutor：基于双语保险宣传册的RAG问答机器人 demo。
 
 ## 项目资料
 
