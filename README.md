@@ -26,12 +26,30 @@ uv sync --locked --extra agent --extra dev
 
 Dependencies are declared in `pyproject.toml` and pinned in `uv.lock`.
 
+## Run the web demo with Docker
+
+Copy `.env.example` to `.env` and fill in the LLM settings, then run:
+
+```powershell
+docker compose up --build -d
+```
+
+Open <http://127.0.0.1:8000>. The container serves chat, the API and the original PDF;
+no host model or source mounts are required. The first build downloads and verifies
+the pinned E5 model; later builds reuse that layer. Query embeddings stay local.
+Without LLM configuration, the page explicitly shows original-excerpt mode.
+Keep reasoning at `medium` and the token limit at `32768` for the tested provider.
+
+To stop: `docker compose down`. For local development after preparing the model:
+`uv run --locked --extra agent python -m insuretutor.api`.
+Refresh or **New chat** starts a new conversation; restarting the container resets server sessions.
+
 ## Cleaned data and runtime corpus (implemented)
 
 The offline cleaner writes separately to [`data/cleaned/`](data/cleaned/README.md),
 leaving `raw data/` unchanged. Start with the [readable preview](data/cleaned/preview.md),
 [quality report](data/cleaned/report.json), and [table/note map](docs/data-cleaning-map.md).
-Local retrieval and the guarded chat CLI are implemented; HTTP, UI and Docker remain planned.
+Local retrieval, the guarded chat CLI, web API/UI and Docker are implemented.
 
 From the repository root, using Python 3.11 or newer (no third-party dependencies
 are needed for cleaning or its tests):
@@ -127,6 +145,16 @@ Interactive commands: `/new`, `/exit`. Language choices: `auto`, `en`, `zh-Hans`
 Evaluation fixtures are test-only; their answers and rubrics never enter model inputs.
 Citation coverage requires human semantic review; see [implementation notes](docs/implementation-notes.zh-CN.md).
 
+### Static chat / PDF preview
+
+```powershell
+.\.venv\Scripts\python.exe tests/eval/ui-preview/serve.py
+```
+
+Open <http://127.0.0.1:8765> to try four prewritten Q&As with clickable citations,
+PDF page navigation and source-region highlights. No LLM or network is needed.
+See the [preview instructions](tests/eval/README.md#静态网页预览).
+
 ---
 
 ## Why this is harder than "just a RAG"
@@ -160,7 +188,8 @@ through FastEmbed; the model and tokenizer are bundled in the Docker image.
 
 See the [technical architecture](docs/architecture.zh-CN.md) for the complete design;
 [data and implementation details](docs/implementation-notes.zh-CN.md) are maintained
-separately. The conversation core and CLI are implemented; HTTP, UI and Docker are next.
+separately. The conversation core, CLI, HTTP API, static chat UI and Docker are implemented.
+Final handoff checks and full evaluation are the next step.
 
 ---
 
@@ -222,8 +251,9 @@ See [`docs/data-provenance.md`](docs/data-provenance.md) for the full log.
 - [x] Read-only SDK search tool + per-turn budgets and citation registry
 - [x] Tutor + Agent query loop + answer validation + server citations (offline and configured API verified; quality limits in implementation notes)
 - [x] Bounded sessions, follow-ups and atomic excerpt fallback
-- [ ] API + frontend
-- [ ] Docker
+- [x] FastAPI + three-language chat UI + source block/table PDF highlights
+- [x] Docker image built and representative live requests verified inside the container
+- [ ] Final handoff checks and full evaluation
 
 ## Credentials
 

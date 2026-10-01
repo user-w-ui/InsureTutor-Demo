@@ -1,6 +1,6 @@
 # InsureTutor 技术架构
 
-状态：2026-10-01，语料、本地检索、Tutor 对话内核与 CLI 已实现并通过离线及配置 API 验证；问答覆盖限制见[实现备忘](implementation-notes.zh-CN.md)。API、UI 与 Docker 待实现。
+状态：2026-10-01，语料、本地检索、Tutor、CLI、FastAPI、聊天网页与 Docker 已实现；问答覆盖与本轮验证见[实现备忘](implementation-notes.zh-CN.md)。最终交付检查与全量评测待下一步完成。
 需求见 [任务说明](task-spec.md)；数据契约、原文差异、实现细节与验证待办见
 [实现备忘](implementation-notes.zh-CN.md)。
 
@@ -180,14 +180,18 @@ tokenizer 测长，确保标题、前缀与正文一起满足长度限制，避�
 
 | 接口 | 输入 / 输出 |
 | --- | --- |
-| `POST /api/chat` | 问题、可选会话 ID、`auto / en / zh-Hans / zh-Hant`；返回状态、claims、服务端引用 |
-| `GET /api/health` | 语料就绪状态、作答模式 |
+| `POST /api/chat` | 现有 `ChatTurn`；返回 `ChatResult` 与用于网页的双语 `reference_groups` |
+| `GET /api/health` | 检索就绪状态、配置的作答模式和白名单 PDF 地址；不探测模型 API |
 | `GET /sources/{source_id}.pdf` | 白名单源 PDF；引用链接使用 `#page=N` 的物理页锚点 |
 
-UI 展示聊天、语言选择、请求等待状态、原文摘录和页码链接；冲突与摘录模式明确标识。
-回答遵循请求语言，引用保留来源语言。
+原生静态 UI 与 API 同源，保留左侧对话、右侧 PDF 阅读。界面随回答语言切换，
+校验完成后一次返回答案；等待期间仅显示计时。刷新或新对话清空浏览器内存会话。
+每条主张可打开对应逻辑单元及必需条件；引用按回答语言默认展示，可切换中英原文，
+冲突保留双方。PDF 高亮只使用既有文本块／整表 bbox，没有有效坐标则只跳物理页。
+HTTP 引用适配从已返回引用及必需关系生成，不新增检索或模型调用；旧轮引用仍可查看。
 
 Docker 包含锁定依赖、代码、静态 UI、语料、向量、embedding 模型与 tokenizer、源 PDF；
 启动校验语料格式、哈希、关系完整性与向量配置。
 运行时不解析 PDF、不下载模型。一个 worker，重启清空会话；密钥通过环境变量传入。
-日志记录请求 ID、阶段耗时、证据 ID 与降级原因。
+Compose 默认映射到本机 `127.0.0.1:8000`，使用非 root 用户，无源码／模型挂载。
+日志记录请求 ID、请求耗时、状态与降级原因，不记录问题或证据正文。

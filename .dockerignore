@@ -1,0 +1,20 @@
+# Allow only application inputs; secrets and fixtures never enter build context.
+**
+!Dockerfile
+!pyproject.toml
+!uv.lock
+!src/
+!src/insuretutor/
+!src/insuretutor/**
+src/**/__pycache__/
+src/**/*.pyc
+!data/
+!data/corpus.json
+!data/retrieval/
+!data/retrieval/manifest.json
+!data/retrieval/vectors.npy
+!data/tokenizer/
+!data/tokenizer/tokenizer.json
+!raw data/
+!raw data/source/
+!raw data/source/FLEXI-ULife Prime Saver.pdf
