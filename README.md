@@ -16,6 +16,16 @@ Data contracts, source discrepancies, and implementation reminders are in
 **Domain language:** Traditional Chinese + English, each retained as original evidence.
 Neither language is silently preferred when the brochure disagrees with itself.
 
+## Install dependencies
+
+Use **uv** and Python **3.12**. From the repository root:
+
+```powershell
+uv sync --locked --extra agent --extra dev
+```
+
+Dependencies are declared in `pyproject.toml` and pinned in `uv.lock`.
+
 ## Cleaned data and runtime corpus (implemented)
 
 The offline cleaner writes separately to [`data/cleaned/`](data/cleaned/README.md),
@@ -46,10 +56,8 @@ corrections; it does not certify the entire brochure or translate it into Simpli
 ### Build the runtime corpus
 
 ```powershell
-python -m pip install -e ".[dev]"
-$env:PYTHONPATH = "src"
-python -m insuretutor.corpus
-python -m pytest -q
+uv run --locked --extra agent --extra dev python -m insuretutor.corpus
+uv run --locked --extra agent --extra dev python -m pytest -q
 ```
 
 [`data/corpus.json`](data/corpus.json) preserves all 137 logical units and 458 source
@@ -72,14 +80,13 @@ retains both conflict sources. Rebuilds are byte-identical, and tests use no mod
 ### Run local retrieval (implemented)
 
 ```powershell
-python -m pip install -e ".[dev]"
 # This is the only retrieval command that downloads files (470 MB FP32 model).
-python -m insuretutor.retrieval prepare-model
+uv run --locked --extra agent --extra dev python -m insuretutor.retrieval prepare-model
 # Vectors are committed; rebuild explicitly only when corpus / encoding changes.
-python -m insuretutor.retrieval build-index
-python -m insuretutor.retrieval query "保證可保權益最多可行使幾次？" --output tmp/query.json
-python -m insuretutor.retrieval evaluate
-python -m pytest -q
+uv run --locked --extra agent --extra dev python -m insuretutor.retrieval build-index
+uv run --locked --extra agent --extra dev python -m insuretutor.retrieval query "保證可保權益最多可行使幾次？" --output tmp/query.json
+uv run --locked --extra agent --extra dev python -m insuretutor.retrieval evaluate
+uv run --locked --extra agent --extra dev python -m pytest -q
 ```
 
 After preparation, query, indexing and evaluation require no network or model API.
@@ -93,10 +100,6 @@ notes use no direct-hit slots. Responses are complete evidence bundles with orig
 text, physical PDF pages and bounding boxes; this CLI does not generate answers.
 
 ### Read-only agent tool (adapter implemented; conversation loop next)
-
-```powershell
-python -m pip install -e ".[agent,dev]"
-```
 
 Create a per-turn `EvidenceSearchSession`, then call `await session.initialize(question)`
 once with the full original question before starting the agent. Include the result's
