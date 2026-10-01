@@ -1,0 +1,20 @@
+{
+  "package": "pdfjs-dist",
+  "version": "5.4.149",
+  "source": "https://github.com/mozilla/pdf.js/releases/tag/v5.4.149",
+  "license": "Apache-2.0",
+  "files": {
+    "pdf.min.mjs": {
+      "sha256": "a935133d4b2166e8e3cf28e288b1b889d0743285e1c4e6ab3c77f04704eb56f3",
+      "bytes": 394119
+    },
+    "pdf.worker.min.mjs": {
+      "sha256": "c964e291707ad492e6e90ff7f4f352b75e05ea2734c3dd3a80b94983b1b7ce3d",
+      "bytes": 1039207
+    },
+    "LICENSE": {
+      "sha256": "0d542e0c8804e39aa7f37eb00da5a762149dc682d7829451287e11b938e94594",
+      "bytes": 10174
+    }
+  }
+}

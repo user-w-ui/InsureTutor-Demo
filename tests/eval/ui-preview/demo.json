@@ -1,0 +1,1174 @@
+{
+  "pdf_url": "source.pdf",
+  "page_count": 20,
+  "cases": [
+    {
+      "id": "withdrawal",
+      "label": "定期提款",
+      "subtitle": "正文与脚注",
+      "fixture_id": "q5-periodic-withdrawal-eligibility",
+      "question": "我份保單生效咗 3 年。我想用「定期提款權益」，每月自動攞錢出嚟，可以嗎？如果可以，每月最少要攞幾多？提款年期有冇最低要求？要唔要交手續費或者提款費用？另外，如果我唔係用定期提款，而係自己每次主動提款，又點計費？",
+      "conflict": false,
+      "claims": [
+        {
+          "text": "答：以「生效滿3年」为前提，暂时不符合定期提款权益的资格，须待保单生效满10年或以上才可行使。",
+          "unit_ids": [
+            "note-6"
+          ]
+        },
+        {
+          "text": "1) 资格门槛：定期提款权益只适用于生效满10年或以上的保单。保单生效3年，未达标。",
+          "unit_ids": [
+            "note-6"
+          ]
+        },
+        {
+          "text": "2) 假设已满10年，现行规定：每月提款金额最低为 500美元 / 4,000港元 / 4,000澳门元，提款年期最短一年；每年提款金额最低为 6,000美元 / 48,000港元 / 48,000澳门元，提款年期最短三年。",
+          "unit_ids": [
+            "note-6"
+          ]
+        },
+        {
+          "text": "3) 费用：定期提款权益可获豁免支付提款费用。但如欲更改已确认的定期提款权益，须支付手续费。",
+          "unit_ids": [
+            "note-6"
+          ]
+        },
+        {
+          "text": "4) 若改为自行主动提取现金价值：次数不限，但现时每次提款收取 25美元 / 200港元 / 200澳门元 的提款费用（不获豁免）。",
+          "unit_ids": [
+            "note-7"
+          ]
+        },
+        {
+          "text": "5) 附带提醒：提取现金价值会减少计划所累积的现金价值，而每月费用仍会被扣除；若现金价值不足以支付每月费用，保单有可能终止而没有任何价值。",
+          "unit_ids": [
+            "cash-value-risk",
+            "term-and-lapse"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "note-6@zh-Hant",
+          "unit_id": "note-6",
+          "number": 1,
+          "title": "附注 6 · 定期提款条件",
+          "language": "zh-Hant",
+          "quote": "定期提款權益只適用於生效滿10年或以上的保單，並可獲豁免支付提款費用。按現行規定，每月提款金額最低為500美元/4,000港元/4,000澳門元，提款年期最短一年；而每年提款金額最低為6,000美元/48,000港元/48,000澳門元，提款年期最短三年。如欲更改已確認的定期提款權益，須支付手續費。",
+          "context": "附註 · ■ 定期提款權益",
+          "locations": [
+            {
+              "page": 12,
+              "bbox": [
+                65,
+                302,
+                413,
+                384
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b202"
+          ]
+        },
+        {
+          "id": "note-6@en",
+          "unit_id": "note-6",
+          "number": 1,
+          "title": "附注 6 · 定期提款条件",
+          "language": "en",
+          "quote": "6. Automatic periodic withdrawal option is only applicable if the Policy has been in force for at least 10 years, the withdrawal charge will be waived. Current requirement on minimum monthly withdrawal amount is US\\$500/HK\\$/MOP4,000, with minimum withdrawal period of one year; and the minimum annual withdrawal amount is US\\$6,000/HK\\$48,000/ MOP48,000, with minimum withdrawal period of three years. For any change after the application has been confirmed, a nominal fee will be levied.",
+          "context": "Notes · Automatic periodic withdrawal option",
+          "locations": [
+            {
+              "page": 12,
+              "bbox": [
+                433,
+                369,
+                915,
+                468
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b213"
+          ]
+        },
+        {
+          "id": "note-7@zh-Hant",
+          "unit_id": "note-7",
+          "number": 2,
+          "title": "附注 7 · 主动提款费用",
+          "language": "zh-Hant",
+          "quote": "7.\t 現時提款費用每次25美元/200港元/200澳門元。",
+          "context": "附註 · 靈活套現",
+          "locations": [
+            {
+              "page": 12,
+              "bbox": [
+                65,
+                388,
+                388,
+                401
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b203"
+          ]
+        },
+        {
+          "id": "note-7@en",
+          "unit_id": "note-7",
+          "number": 2,
+          "title": "附注 7 · 主动提款费用",
+          "language": "en",
+          "quote": "7. The current charge for each withdrawal is US\\$25/HK\\$ 200/MOP200.",
+          "context": "Notes · Greater Liquidity",
+          "locations": [
+            {
+              "page": 12,
+              "bbox": [
+                433,
+                472,
+                890,
+                485
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b214"
+          ]
+        },
+        {
+          "id": "cash-value-risk@zh-Hant",
+          "unit_id": "cash-value-risk",
+          "number": 3,
+          "title": "现金价值与费用风险",
+          "language": "zh-Hant",
+          "quote": "提取現金、減低或暫停繳付保費，將會影響計劃所累積的現金價值，而每月費用仍會被扣除，如現金價值不足以支付每月費用時，保單便會終止而沒有任何價值。",
+          "context": "靈活套現 · 暫停繳付保費",
+          "locations": [
+            {
+              "page": 10,
+              "bbox": [
+                92,
+                558,
+                894,
+                588
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b169"
+          ]
+        },
+        {
+          "id": "cash-value-risk@en",
+          "unit_id": "cash-value-risk",
+          "number": 3,
+          "title": "现金价值与费用风险",
+          "language": "en",
+          "quote": "Cash withdrawal, reducing the premium amount, or skipping premium payments will afect the accumulation of the Cash Value, while the monthly charges are still deductible. If the Cash Value is not suficient to cover the monthly charges, the Policy will lapse with zero value.",
+          "context": "Greater Liquidity · Skip Premium Payments",
+          "locations": [
+            {
+              "page": 10,
+              "bbox": [
+                92,
+                587,
+                894,
+                626
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b170"
+          ]
+        },
+        {
+          "id": "term-and-lapse@zh-Hant",
+          "unit_id": "term-and-lapse",
+          "number": 4,
+          "title": "保单失效与宽限期",
+          "language": "zh-Hant",
+          "quote": "繳付保費年期及保障年期最長可至受保人100歲。提取現金、減低或暫停繳付保費（如適用），將會減少計劃所累積的現金價值，而每月費用仍會被扣除。我們將至少每年檢視非保證之費用，於需要時非保證之費用可能會被調整，並會提前一個月以書面通知您有關更改。我們將會參考包括但不限於理賠、支出費用、投資回報及退保等因素的過往經驗和預期未來展望，以釐定任何非保證費用的調整。如現金價值不足以支付每月費用，而在保費到期日起計31天寬限期屆滿前仍未繳付保費，保單便會終止而沒有任何價值。",
+          "context": "繳付保費年期及保障年期",
+          "locations": [
+            {
+              "page": 14,
+              "bbox": [
+                65,
+                80,
+                416,
+                203
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b265"
+          ]
+        },
+        {
+          "id": "term-and-lapse@en",
+          "unit_id": "term-and-lapse",
+          "number": 4,
+          "title": "保单失效与宽限期",
+          "language": "en",
+          "quote": "The premium payment term and the benefit term are up to age 100 of the Insured. Cash withdrawals, reducing the premium amount, or skipping premium payments (if applicable) will reduce the accumulation of the Cash Value, while the monthly charges are still deductible. Non-guaranteed charges will be reviewed at least annually and may be adjusted if necessary. You will be notified the related changes with prior written notice 1 month before efective. In determining any changes in charges, we will take reference to both past experience and expected future outlooks for factors including, but not limited to, claims, expenses, investment performance and surrenders. If the Cash Value is not suficient to cover the monthly charges and no premiums are made before the end of the 31-day Grace Period from such premium due date, the Policy will lapse with zero value.",
+          "context": "Premium Payment Term and Benefit Term",
+          "locations": [
+            {
+              "page": 14,
+              "bbox": [
+                431,
+                78,
+                929,
+                217
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b293"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "conflict",
+      "label": "双语金额冲突",
+      "subtitle": "整表定位 · 双语对照",
+      "fixture_id": "q2-minimum-change-amount-conflict",
+      "question": "I need to increase the sum insured. According to the product brochure, what is the minimum amount of each increase/decrease? Please give me the exact figures in all three currencies. 顺便说一下，这份保单要在哪里看这个规定？如果中英文写的不一样，请你直接告诉我哪个才对。",
+      "conflict": true,
+      "claims": [
+        {
+          "text": "这一项在源文件中本身中英文不一致，必须两个都列出，不得只取其一：",
+          "unit_ids": [
+            "table-354-row-5"
+          ]
+        },
+        {
+          "text": "- 中文：每次更改之最低金额为 5,000美元 / 40,000港元 / 400,000澳門元\n- 英文：The minimum amount of increase / decrease is US$5,000 / HK$400,000 / MOP40,000",
+          "unit_ids": [
+            "table-354-row-5"
+          ]
+        },
+        {
+          "text": "两者只有在美元一项上一致（US$5,000）。港元与澳门元两项被互换：中文是「港元40,000、澳门元400,000」，英文是「HK$400,000、MOP40,000」。此项已被复核并标记为 reviewed_source_conflict，官方立场是「两者皆不采纳为权威」，因此在没有保单项下文件确认前，正确做法是两个数值都呈现并说明差异，而不是选一个。",
+          "unit_ids": [
+            "table-354-row-5"
+          ]
+        },
+        {
+          "text": "出处：产品单张第17页（该页印刷页码标记为16）的「增加/减少保障额」一列。",
+          "unit_ids": [
+            "table-354-row-5"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "table-354-row-5@zh-Hant",
+          "unit_id": "table-354-row-5",
+          "number": 1,
+          "title": "增加／减少保障额",
+          "language": "zh-Hant",
+          "quote": "增加/減少保障額\n每次更改之最低金額為5,000美元 / 40,000港元 / 400,000澳門元",
+          "context": "「首選靈活萬用壽險計劃」一覽表",
+          "locations": [
+            {
+              "page": 17,
+              "bbox": [
+                62,
+                105,
+                932,
+                932
+              ],
+              "precision": "table"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b354:r5:c0/zh-Hant",
+            "flexi-23b55338c73d/b354:r5:c1/zh-Hant"
+          ]
+        },
+        {
+          "id": "table-354-row-5@en",
+          "unit_id": "table-354-row-5",
+          "number": 1,
+          "title": "增加／减少保障额",
+          "language": "en",
+          "quote": "Increase / Decrease Sum Insured\nThe minimum amount of increase / decrease is US$5,000 / HK$400,000 / MOP40,000",
+          "context": "FLEXI-ULife Prime Saver – at a glance",
+          "locations": [
+            {
+              "page": 17,
+              "bbox": [
+                62,
+                105,
+                932,
+                932
+              ],
+              "precision": "table"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b354:r5:c0/en",
+            "flexi-23b55338c73d/b354:r5:c1/en"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "interest",
+      "label": "利率与回报",
+      "subtitle": "跨页证据",
+      "fixture_id": "q3-bonus-rate-year20",
+      "question": "顾问跟我说：这个计划第20个保单年度会派发额外回报，派发率是2.75%，而且基本派息4%会连同额外利息0.25%一起复利滚存。请问他说的对吗？额外回报到底什么时候派发、用哪个比率？另外这个计划有没有什么「保证」的利率？",
+      "conflict": false,
+      "claims": [
+        {
+          "text": "该顾问的说法有三处需要更正，另有一处遗漏。",
+          "unit_ids": []
+        },
+        {
+          "text": "1) 派发时间：额外回报并非只在第20年派发。它于第15个保单周年日首次派发，其后每5年一次（第15、20、25、30…年），而第20年只是众多派发时点之一。顾问的话让人以为第20年才是起点，把首次派发整整推迟了5年。",
+          "unit_ids": [
+            "extra-bonus-frequency"
+          ]
+        },
+        {
+          "text": "2) 派发率：2.75% 是第15年、20年及25年的现时假设额外回报率；第30年及其后每5年为 5.5%。所以2.75%并非第20年专属，且30年后会跳到5.5%——只说2.75%会漏掉后半段。",
+          "unit_ids": [
+            "bonus-rate-15-25",
+            "bonus-rate-30"
+          ]
+        },
+        {
+          "text": "3) 利息结构：基本派息现时假设 4% p.a.，是按月派发并以复式计算；额外利息现时假设 0.25% p.a. 则是自保单第1年起计算至第20年、于第20年年终一次性拨入账户价值，其后每5年一次。把「4% 同 0.25% 一齐嚟」当成一个合并年利率，把两个性质、时点都不同的机制混为一谈。",
+          "unit_ids": [
+            "base-interest",
+            "additional-interest",
+            "interest-year20-note",
+            "interest-every5-note"
+          ]
+        },
+        {
+          "text": "4) 关键对比（原答案遗漏）：额外「回报」(Extra Bonus) 与额外「利息」(Retrospective additional interest) 是两个独立机制，起算年份不同——回报自第15个保单周年日起派发，利息则自第1年累计、第20年终才首次拨入。这正是「第20年」这个数字在册子上真正归属的对象：第20年是额外利息的首次拨入年，不是额外回报的首发年。顾问把两个机制的时间点对调了。",
+          "unit_ids": [
+            "extra-bonus-frequency",
+            "interest-year20-note"
+          ]
+        },
+        {
+          "text": "5) 保证部分：计划确实有保证成分，但保证的不是回报率。保单生效满15年或以上，账户价值（包括已拨入的利息及额外回报总额）保证不少于按每年2.5%派息率累积所得的账户价值。这是一条账户价值下限保证，不是2.5%的派息率承诺。",
+          "unit_ids": [
+            "interest-guarantee"
+          ]
+        },
+        {
+          "text": "6) 重要提示：4%、0.25%、2.75%、5.5% 全部标示为「现时假设」息率，并非保证，日后或会更改；且表列额外回报率附有「（以派发时适用的额外回报率為準）(subject to the Extra Bonus rate at distribution)」——实际派发依派发当时适用的比率计算，而非表列数字。另，基本派息及额外利息两项息率以本册子2022年1月刊发时为准。",
+          "unit_ids": [
+            "rate-date-note",
+            "bonus-rate-disclaimer"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "extra-bonus-frequency@zh-Hant",
+          "unit_id": "extra-bonus-frequency",
+          "number": 1,
+          "title": "额外回报派发时间",
+          "language": "zh-Hant",
+          "quote": "額外回報於第15個保單週年日及其後每5年派發。",
+          "context": "額外回報",
+          "locations": [
+            {
+              "page": 9,
+              "bbox": [
+                63,
+                103,
+                386,
+                139
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b135"
+          ]
+        },
+        {
+          "id": "extra-bonus-frequency@en",
+          "unit_id": "extra-bonus-frequency",
+          "number": 1,
+          "title": "额外回报派发时间",
+          "language": "en",
+          "quote": "Extra Bonus will be credited to the Policy at the end of the 15<sup>th</sup> policy year and for every 5 years thereafter.",
+          "context": "Extra Bonus",
+          "locations": [
+            {
+              "page": 9,
+              "bbox": [
+                431,
+                103,
+                917,
+                136
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b136"
+          ]
+        },
+        {
+          "id": "bonus-rate-15-25@zh-Hant",
+          "unit_id": "bonus-rate-15-25",
+          "number": 2,
+          "title": "第 15／20／25 年回报率",
+          "language": "zh-Hant",
+          "quote": "第15年、20年及25年\n2.75%",
+          "context": "保單年 · 現時假設額外回報率 · 額外回報",
+          "locations": [
+            {
+              "page": 9,
+              "bbox": [
+                299,
+                274,
+                529,
+                309
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 9,
+              "bbox": [
+                709,
+                278,
+                803,
+                303
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b143/zh-Hant",
+            "flexi-23b55338c73d/b144/zh-Hant"
+          ]
+        },
+        {
+          "id": "bonus-rate-15-25@en",
+          "unit_id": "bonus-rate-15-25",
+          "number": 2,
+          "title": "第 15／20／25 年回报率",
+          "language": "en",
+          "quote": "15th year, 20th year and 25th year\n2.75%",
+          "context": "Policy Year · The current assumed Extra Bonus rate · Extra Bonus",
+          "locations": [
+            {
+              "page": 9,
+              "bbox": [
+                299,
+                274,
+                529,
+                309
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 9,
+              "bbox": [
+                709,
+                278,
+                803,
+                303
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b143/en",
+            "flexi-23b55338c73d/b144/en"
+          ]
+        },
+        {
+          "id": "bonus-rate-30@zh-Hant",
+          "unit_id": "bonus-rate-30",
+          "number": 3,
+          "title": "第 30 年起回报率",
+          "language": "zh-Hant",
+          "quote": "第30年及其後每5年\n5.5%",
+          "context": "保單年 · 現時假設額外回報率 · 額外回報",
+          "locations": [
+            {
+              "page": 9,
+              "bbox": [
+                260,
+                322,
+                566,
+                354
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 9,
+              "bbox": [
+                717,
+                326,
+                796,
+                349
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b145/zh-Hant",
+            "flexi-23b55338c73d/b146/zh-Hant"
+          ]
+        },
+        {
+          "id": "bonus-rate-30@en",
+          "unit_id": "bonus-rate-30",
+          "number": 3,
+          "title": "第 30 年起回报率",
+          "language": "en",
+          "quote": "The 30<sup>th</sup> year and every 5 years thereafter\n5.5%",
+          "context": "Policy Year · The current assumed Extra Bonus rate · Extra Bonus",
+          "locations": [
+            {
+              "page": 9,
+              "bbox": [
+                260,
+                322,
+                566,
+                354
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 9,
+              "bbox": [
+                717,
+                326,
+                796,
+                349
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b145/en",
+            "flexi-23b55338c73d/b146/en"
+          ]
+        },
+        {
+          "id": "base-interest@zh-Hant",
+          "unit_id": "base-interest",
+          "number": 4,
+          "title": "基本派息",
+          "language": "zh-Hant",
+          "quote": "基本派息(現時假設息率\\*）\n4%每年",
+          "context": "",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                110,
+                293,
+                292,
+                353
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 8,
+              "bbox": [
+                368,
+                307,
+                436,
+                342
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b118/zh-Hant",
+            "flexi-23b55338c73d/b120/zh-Hant"
+          ]
+        },
+        {
+          "id": "base-interest@en",
+          "unit_id": "base-interest",
+          "number": 4,
+          "title": "基本派息",
+          "language": "en",
+          "quote": "Base Crediting Interest(Current assumed rate\\*)\n4% p.a.",
+          "context": "",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                110,
+                293,
+                292,
+                353
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 8,
+              "bbox": [
+                368,
+                307,
+                436,
+                342
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b118/en",
+            "flexi-23b55338c73d/b120/en"
+          ]
+        },
+        {
+          "id": "additional-interest@zh-Hant",
+          "unit_id": "additional-interest",
+          "number": 5,
+          "title": "额外利息",
+          "language": "zh-Hant",
+          "quote": "額外利息 (現時假設息率\\*）\n0.25%每年",
+          "context": "",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                578,
+                287,
+                722,
+                359
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 8,
+              "bbox": [
+                816,
+                307,
+                887,
+                341
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b121/zh-Hant",
+            "flexi-23b55338c73d/b122/zh-Hant"
+          ]
+        },
+        {
+          "id": "additional-interest@en",
+          "unit_id": "additional-interest",
+          "number": 5,
+          "title": "额外利息",
+          "language": "en",
+          "quote": "Retrospective additional interest (Current assumed rate\\*)\n0.25% p.a.",
+          "context": "",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                578,
+                287,
+                722,
+                359
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 8,
+              "bbox": [
+                816,
+                307,
+                887,
+                341
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b121/en",
+            "flexi-23b55338c73d/b122/en"
+          ]
+        },
+        {
+          "id": "interest-year20-note@zh-Hant",
+          "unit_id": "interest-year20-note",
+          "number": 6,
+          "title": "额外利息 · 第 20 年",
+          "language": "zh-Hant",
+          "quote": "^\t自保單第1年起計算至第20年，並於第20年年終撥入賬戶價值內。",
+          "context": "額外利息 (現時假設息率\\*）",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                65,
+                894,
+                396,
+                922
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b125"
+          ]
+        },
+        {
+          "id": "interest-year20-note@en",
+          "unit_id": "interest-year20-note",
+          "number": 6,
+          "title": "额外利息 · 第 20 年",
+          "language": "en",
+          "quote": "^ This will be credited to the Account Value at the end of the 20th policy year, calculated from year 1 through 20.",
+          "context": "Retrospective additional interest (Current assumed rate\\*)",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                433,
+                890,
+                887,
+                915
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b128"
+          ]
+        },
+        {
+          "id": "interest-every5-note@zh-Hant",
+          "unit_id": "interest-every5-note",
+          "number": 7,
+          "title": "额外利息 · 其后每 5 年",
+          "language": "zh-Hant",
+          "quote": "而由第20年起，其後每5年派發一次，將由每5年期的第1年起計算至第5年，並於第5年年終時撥入賬戶價值內。",
+          "context": "額外利息 (現時假設息率\\*）",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                65,
+                923,
+                396,
+                965
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b126"
+          ]
+        },
+        {
+          "id": "interest-every5-note@en",
+          "unit_id": "interest-every5-note",
+          "number": 7,
+          "title": "额外利息 · 其后每 5 年",
+          "language": "en",
+          "quote": "<sup>#</sup> For every 5 years thereafter, this interest will be credited to the Account Value at the end of the 5-year period, calculated from year 1 through 5 of each period.",
+          "context": "Retrospective additional interest (Current assumed rate\\*)",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                431,
+                916,
+                922,
+                942
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b129"
+          ]
+        },
+        {
+          "id": "interest-guarantee@zh-Hant",
+          "unit_id": "interest-guarantee",
+          "number": 8,
+          "title": "账户价值下限保证",
+          "language": "zh-Hant",
+          "quote": "您的供款會於扣除任何適用的費用後，存入賬戶價值內，並獲享較一般銀行存款優厚的利息。此外，我們保證無論經濟環境如何，於保單生效滿15年或以上，賬戶價值（包括撥入保單的利息及額外回報的總額）將不會少於每年以派息率2.5%計算而累積的賬戶價值。",
+          "context": "■ 2.5%長線利率保證",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                63,
+                146,
+                408,
+                256
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b115"
+          ]
+        },
+        {
+          "id": "interest-guarantee@en",
+          "unit_id": "interest-guarantee",
+          "number": 8,
+          "title": "账户价值下限保证",
+          "language": "en",
+          "quote": "Your premium will be credited to the Account Value after deduction of any applicable charges and you will enjoy a relatively higher rate of return than most bank deposits.\nIn addition, when a Policy has been in force for 15 years or more, the total interest and Extra Bonus credited to the Policy will be such that the Account Value is guaranteed to have accumulated to at least an amount as if the interest rate credited had been 2.5% p.a., regardless of the economic situation.",
+          "context": "2.5% long-term guaranteed interest rate",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                431,
+                146,
+                919,
+                190
+              ],
+              "precision": "block"
+            },
+            {
+              "page": 8,
+              "bbox": [
+                431,
+                192,
+                917,
+                267
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b116",
+            "flexi-23b55338c73d/b117"
+          ]
+        },
+        {
+          "id": "rate-date-note@zh-Hant",
+          "unit_id": "rate-date-note",
+          "number": 9,
+          "title": "假设息率与参考日期",
+          "language": "zh-Hant",
+          "quote": "\\*\t上述之現時假設基本派息率及現時假設額外利息息率為本冊子於2022年1月刊發時適用，並非保證，日後或會更改。",
+          "context": "基本派息(現時假設息率\\*） · 額外利息 (現時假設息率\\*）",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                65,
+                851,
+                389,
+                891
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b124"
+          ]
+        },
+        {
+          "id": "rate-date-note@en",
+          "unit_id": "rate-date-note",
+          "number": 9,
+          "title": "假设息率与参考日期",
+          "language": "en",
+          "quote": "\\* The current assumed base crediting interest rate and the current assumed retrospective additional interest rate are quoted as of the print date of this brochure in January 2022, and are not guaranteed. They are subject to change.",
+          "context": "Base Crediting Interest(Current assumed rate\\*) · Retrospective additional interest (Current assumed rate\\*)",
+          "locations": [
+            {
+              "page": 8,
+              "bbox": [
+                433,
+                851,
+                914,
+                887
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b127"
+          ]
+        },
+        {
+          "id": "bonus-rate-disclaimer@zh-Hant",
+          "unit_id": "bonus-rate-disclaimer",
+          "number": 10,
+          "title": "派发时适用比率",
+          "language": "zh-Hant",
+          "quote": "（以派發時適用的額外回報率為準）",
+          "context": "額外回報 · 現時假設額外回報率",
+          "locations": [
+            {
+              "page": 9,
+              "bbox": [
+                465,
+                829,
+                717,
+                858
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b154/zh-Hant"
+          ]
+        },
+        {
+          "id": "bonus-rate-disclaimer@en",
+          "unit_id": "bonus-rate-disclaimer",
+          "number": 10,
+          "title": "派发时适用比率",
+          "language": "en",
+          "quote": "(subject to the Extra Bonus rate at distribution)",
+          "context": "Extra Bonus · The current assumed Extra Bonus rate",
+          "locations": [
+            {
+              "page": 9,
+              "bbox": [
+                465,
+                829,
+                717,
+                858
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b154/en"
+          ]
+        }
+      ]
+    },
+    {
+      "id": "calculation",
+      "label": "身故保障算例",
+      "subtitle": "公式与适用脚注",
+      "fixture_id": "q4-incremental-death-benefit-netting",
+      "question": "Suppose a Policy is on the Incremental Benefit option. The Basic Sum Insured is US$1,000,000 and the Account Value at the date of death is US$400,000. The insured withdrew US$100,000 eleven months before death. What is the Death Benefit payable?",
+      "conflict": false,
+      "claims": [
+        {
+          "text": "答：US$1,150,000。",
+          "unit_ids": [
+            "table-97-row-3",
+            "note-5"
+          ]
+        },
+        {
+          "text": "计算过程：",
+          "unit_ids": []
+        },
+        {
+          "text": "1) 渐进寿险保障的身故保障为「账户价值」或「基本保障额 + 账户价值的50%」，两者取其较高者。\n   账户价值 = 400,000；基本保障额 + 50% 账户价值 = 1,000,000 + 50% × 400,000 = 1,000,000 + 200,000 = 1,200,000",
+          "unit_ids": [
+            "table-97-row-3"
+          ]
+        },
+        {
+          "text": "2) 适用附注5：基本保障额及账户价值的50%之总额，须扣除受保人身故日前12个月内曾提取的总金额的50%。该笔100,000的提取发生在身故前11个月，落在12个月内，故须扣减 50% × 100,000 = 50,000。\n   1,200,000 − 50,000 = 1,150,000",
+          "unit_ids": [
+            "note-5"
+          ]
+        },
+        {
+          "text": "3) 取较高者：max(400,000, 1,150,000) = 1,150,000。",
+          "unit_ids": [
+            "table-97-row-3",
+            "note-5"
+          ]
+        },
+        {
+          "text": "因此身故保障为 US$1,150,000。",
+          "unit_ids": [
+            "table-97-row-3",
+            "note-5"
+          ]
+        },
+        {
+          "text": "关键区分：渐进寿险保障用附注5（扣除提取额的50%）；固定寿险保障（Level Benefit）的身故保障为「账户价值」或「基本保障额」两者较高者，用附注4，须扣除身故日前12个月内提取的全额。本题若误用附注4，会得到 1,200,000 − 100,000 = 1,100,000；若完全不扣减，会得到 1,200,000。",
+          "unit_ids": [
+            "note-4",
+            "note-5"
+          ]
+        }
+      ],
+      "sources": [
+        {
+          "id": "table-97-row-3@zh-Hant",
+          "unit_id": "table-97-row-3",
+          "number": 1,
+          "title": "渐进寿险保障公式",
+          "language": "zh-Hant",
+          "quote": "漸進壽險保障\n平衡保障及儲蓄\n「賬戶價值」或「基本保障額 + 賬戶價值的50%」5\n(兩者取其較高者)",
+          "context": "選擇 · 特點 · 身故保障",
+          "locations": [
+            {
+              "page": 7,
+              "bbox": [
+                67,
+                147,
+                934,
+                478
+              ],
+              "precision": "table"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b97:r3:c0/zh-Hant",
+            "flexi-23b55338c73d/b97:r3:c1/zh-Hant",
+            "flexi-23b55338c73d/b97:r3:c2/zh-Hant"
+          ]
+        },
+        {
+          "id": "table-97-row-3@en",
+          "unit_id": "table-97-row-3",
+          "number": 1,
+          "title": "渐进寿险保障公式",
+          "language": "en",
+          "quote": "Incremental Benefit\nBalancing savings and protection\n&quot;Account Value&quot; OR &quot;Basic Sum Insured + 50% of Account Value&quot;5\n(whichever is higher)",
+          "context": "Options · Feature · Death Benefit",
+          "locations": [
+            {
+              "page": 7,
+              "bbox": [
+                67,
+                147,
+                934,
+                478
+              ],
+              "precision": "table"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b97:r3:c0/en",
+            "flexi-23b55338c73d/b97:r3:c1/en",
+            "flexi-23b55338c73d/b97:r3:c2/en"
+          ]
+        },
+        {
+          "id": "note-5@zh-Hant",
+          "unit_id": "note-5",
+          "number": 2,
+          "title": "附注 5 · 渐进保障扣减",
+          "language": "zh-Hant",
+          "quote": "5.  基本保障額及賬戶價值的50%之總額須扣除受保人身故日前12個月內曾提取的總額的50%。",
+          "context": "附註 · 漸進壽險保障 · 身故保障",
+          "locations": [
+            {
+              "page": 12,
+              "bbox": [
+                65,
+                271,
+                406,
+                298
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b201"
+          ]
+        },
+        {
+          "id": "note-5@en",
+          "unit_id": "note-5",
+          "number": 2,
+          "title": "附注 5 · 渐进保障扣减",
+          "language": "en",
+          "quote": "5. The sum of the Basic Sum Insured and 50% of Account Value will be net of 50% of all withdrawals made in the 12-month period preceding the date of the Insured's death.",
+          "context": "Notes · Incremental Benefit · Death Benefit",
+          "locations": [
+            {
+              "page": 12,
+              "bbox": [
+                433,
+                328,
+                924,
+                366
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b212"
+          ]
+        },
+        {
+          "id": "note-4@zh-Hant",
+          "unit_id": "note-4",
+          "number": 3,
+          "title": "附注 4 · 固定保障扣减",
+          "language": "zh-Hant",
+          "quote": "4.  基本保障額須扣除受保人身故日前12個月內曾提取的總金額。",
+          "context": "附註 · 固定壽險保障 · 身故保障",
+          "locations": [
+            {
+              "page": 12,
+              "bbox": [
+                65,
+                241,
+                406,
+                267
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b200"
+          ]
+        },
+        {
+          "id": "note-4@en",
+          "unit_id": "note-4",
+          "number": 3,
+          "title": "附注 4 · 固定保障扣减",
+          "language": "en",
+          "quote": "4. The Basic Sum Insured will be net of all withdrawals made in the 12-month period preceding the date of the Insured's death.",
+          "context": "Notes · Level Benefit · Death Benefit",
+          "locations": [
+            {
+              "page": 12,
+              "bbox": [
+                433,
+                300,
+                924,
+                325
+              ],
+              "precision": "block"
+            }
+          ],
+          "span_ids": [
+            "flexi-23b55338c73d/b211"
+          ]
+        }
+      ]
+    }
+  ]
+}

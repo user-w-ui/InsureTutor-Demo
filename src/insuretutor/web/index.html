@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>InsureTutor</title>
+  <link rel="stylesheet" href="/static/styles.css">
+</head>
+<body>
+  <header class="app-header">
+    <a class="brand" href="#" aria-label="InsureTutor">
+      <span class="brand-mark"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 5c-3-2-7-2-9-1v15c3-1 6-1 9 1 3-2 6-2 9-1V4c-2-1-6-1-9 1Zm0 0v15" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"/></svg></span>
+      <span class="brand-name">InsureTutor<span class="brand-subtitle" data-i18n="subtitle">读懂保障，核对原文</span></span>
+    </a>
+    <div class="header-right"><span class="preview-badge" id="service-status" role="status">正在连接…</span><span class="header-note">FLEXI-ULife Prime Saver</span></div>
+  </header>
+
+  <main class="workspace">
+    <section class="chat-panel" aria-label="问答">
+      <div class="chat-toolbar">
+        <div><span class="eyebrow">BROCHURE CONVERSATION</span><h1 data-i18n="heading">从问题，回到依据。</h1></div>
+        <button id="new-chat" class="case-button" data-i18n="newChat">新对话</button>
+      </div>
+      <div class="case-switcher" role="group" aria-label="Suggested questions" id="suggestions"></div>
+      <div class="conversation" id="conversation" aria-label="Conversation"><div class="welcome"><span class="welcome-icon">i</span><h2 data-i18n="welcome">关于这份宣传册，你想了解什么？</h2><p data-i18n="welcomeText">了解保障、提款条件与费用，点击回答引用核对原文。</p></div></div>
+      <form id="composer" class="composer">
+        <label for="question-input" class="sr-only" data-i18n="question">你的问题</label>
+        <textarea id="question-input" rows="2" maxlength="4000" placeholder="问一个关于宣传册的问题…" required></textarea>
+        <div class="composer-actions"><label class="language-label"><span data-i18n="language">语言</span> <select id="response-language" aria-label="Response language"><option value="auto">自动 / Auto</option><option value="en">English</option><option value="zh-Hans">简体中文</option><option value="zh-Hant">繁體中文</option></select></label><span id="character-count">0 / 4000</span><button id="send" type="submit" data-i18n="send" disabled>发送 ↗</button></div>
+      </form>
+      <div id="chat-error" class="chat-error" role="alert" hidden></div>
+      <div class="chat-fineprint" data-i18n="fineprint">仅解释本册内容；具体条款以保单文件为准。</div>
+    </section>
+
+    <section class="reference-panel" aria-label="PDF 原文参考">
+      <header class="reference-heading"><div class="document-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none"><path d="M6 3h8l4 4v14H6V3Z" stroke="currentColor" stroke-width="1.5"/><path d="M14 3v5h4M9 12h6M9 16h6" stroke="currentColor" stroke-width="1.5"/></svg></div><div><h2 data-i18n="reference">原文参考</h2><p>FLEXI-ULife Prime Saver.pdf <span id="document-pages">· 20 页</span></p></div><a id="open-pdf" target="_blank" rel="noopener" class="open-pdf" data-i18n="openPdf">打开原件 ↗</a></header>
+      <div class="pdf-toolbar">
+        <div class="page-control"><button id="prev-page" class="icon-button" aria-label="Previous page">‹</button><label class="page-label"><span data-i18n="page">页</span> <input id="page-input" type="number" min="1" max="20" value="1" aria-label="PDF physical page"> <span id="page-total">/ 20</span></label><button id="next-page" class="icon-button" aria-label="Next page">›</button></div>
+        <div class="zoom-control"><button id="zoom-out" class="icon-button" aria-label="Zoom out">−</button><button id="fit-page" data-i18n="fit">适合宽度</button><button id="zoom-in" class="icon-button" aria-label="Zoom in">＋</button></div>
+      </div>
+      <div class="viewer-status" id="viewer-status" role="status" aria-live="polite">正在加载本地 PDF…</div>
+      <div class="pdf-scroll" id="pdf-scroll"><div class="pdf-page" id="pdf-page"><canvas id="pdf-canvas" aria-label="原始 PDF 页面"></canvas><div id="highlights" class="highlights" aria-hidden="true"></div></div></div>
+      <aside class="citation-detail" id="citation-detail" aria-label="Current citation" hidden>
+        <div class="citation-meta"><span class="citation-number" id="citation-number">1</span><strong id="citation-title">附注 6 · 定期提款条件</strong><span class="precision-label" id="precision-label">原始文本块</span></div>
+        <div class="citation-controls"><span id="citation-page">PDF 第 12 页</span><span class="dot-separator">·</span><div class="language-toggle" role="group" aria-label="引用原文语言"><button id="source-zh" data-language="zh-Hant">中文原文</button><button id="source-en" data-language="en">English</button></div><span id="location-switches"></span></div>
+        <p class="citation-context" id="citation-context"></p>
+        <blockquote id="citation-quote"></blockquote>
+        <p class="precision-note" id="precision-note">高亮为原始文本块范围，非逐字标注。</p>
+        <div id="required-references" class="reference-links"></div>
+      </aside>
+    </section>
+  </main>
+  <noscript>请启用 JavaScript，以查看 PDF 并使用引用跳转。</noscript>
+  <script type="module" src="/static/app.js"></script>
+</body>
+</html>
