@@ -161,6 +161,136 @@ def expand_required(units: list[dict], selected: list[str]) -> list[dict]:
     return result
 
 
+def separate_languages(result: dict, rules: dict) -> dict:
+    """Materialize reviewed language boundaries; never retain mixed text records."""
+    originals = {s["id"]: s for s in result["spans"]}
+    split, by_id = {}, {}
+    for sid, source in originals.items():
+        text = source["evidence_text"]
+        boundary = rules["language_boundaries"].get(sid)
+        if boundary:
+            if digest(text.encode()) != boundary["evidence_sha256"]:
+                raise ValueError(f"Stale language boundary: {sid}")
+            parts = boundary["segments"]
+        elif source["language"] == "mixed":
+            raise ValueError(f"Missing language boundary: {sid}")
+        else:
+            parts = [{"start": 0, "end": len(text),
+                      "language": "shared" if source["language"] == "und" else source["language"]}]
+        covered = {i for p in parts for i in range(p["start"], p["end"])}
+        if any(p["start"] < 0 or p["end"] > len(text) for p in parts) or any(
+            i not in covered and not c.isspace() for i, c in enumerate(text)
+        ):
+            raise ValueError(f"Incomplete language boundary: {sid}")
+        split[sid] = {}
+        for lang in ("zh-Hant", "en"):
+            selected = [p for p in parts if p["language"] in (lang, "shared")]
+            if not selected:
+                continue
+            value, previous = "", None
+            for p in selected:
+                if previous is not None and previous["end"] != p["start"]:
+                    value += " "
+                value += text[p["start"]:p["end"]]
+                previous = p
+            value = value.strip()
+            if not value:
+                continue
+            if lang == "en" and CJK.search(value):
+                raise ValueError(f"Chinese text in English source: {sid}")
+            new_id = sid if source["language"] == lang and not boundary else f"{sid}/{lang}"
+            span = {k: v for k, v in source.items()
+                    if k not in {"raw_text", "parent_source_key", "raw_char_range"}}
+            # Marker removal remains pinned to the source, including bare table references.
+            basis = html.unescape(re.sub(r"\\([$*#])", r"\1", value))
+            markers = [m for m in rules["literal_markers"].get(source["source_key"], [])
+                       if m["anchor"] in basis]
+            markup = {int(m.group(1) or m.group(2)) for m in re.finditer(
+                r"<sup>(\d+)</sup>|\$\^\{(\d+)\}\$", value)} & set(source["note_refs"])
+            clean, _, flags = normalize(value, markers, markup)
+            span.update(id=new_id, language=lang, evidence_text=value, clean_text=clean,
+                        origin_span_id=sid, origin_evidence_sha256=digest(text.encode()),
+                        origin_ranges=[[p["start"], p["end"]] for p in selected],
+                        literal_markers=markers,
+                        quote_policy="evidence_text; trace origin_ranges to the physical PDF page",
+                        quality_flags=sorted(set(source["quality_flags"] + flags)))
+            if "parent_source_key" in source:
+                span["origin_parent_source_key"] = source["parent_source_key"]
+                span["origin_parent_raw_char_range"] = source["raw_char_range"]
+            split[sid][lang] = new_id
+            by_id[new_id] = span
+
+    unit_map = {u["id"]: u for u in result["units"]}
+    for unit in result["units"]:
+        bodies = unit["source_span_ids"][:]
+        for peer in rules["parallel_units"].get(unit["id"], []):
+            bodies += unit_map[peer]["source_span_ids"]
+        # Save original IDs before replacing any unit's source references.
+        unit["_original_body"] = unique(bodies)
+    for unit in result["units"]:
+        bindings = unit.get("cell_bindings", []) + rules["language_cell_bindings"].get(unit["id"], [])
+        bound = {b["cell"]: b["column_headers"] for b in bindings}
+        context = unique(unit["context_span_ids"] + rules["language_context"].get(unit["id"], [])
+                         + [h for b in bindings for h in b["column_headers"]])
+        records, new_bindings = [], []
+        for lang, other in (("zh-Hant", "en"), ("en", "zh-Hant")):
+            body_ids = []
+            for sid in unit["_original_body"]:
+                if lang not in split[sid]:
+                    continue
+                if originals[sid]["language"] == "und" and sid in bound and not any(
+                    lang in split[h] for h in bound[sid]
+                ):
+                    continue
+                body_ids.append(split[sid][lang])
+            context_ids = unique(split[sid][lang] for sid in context if lang in split[sid])
+            if not body_ids:
+                raise ValueError(f"Missing bilingual body: {unit['id']}/{lang}")
+            headings = {}
+            for b in bindings:
+                cell = split[b["cell"]].get(lang)
+                headers = [split[h][lang] for h in b["column_headers"] if lang in split[h]]
+                if cell in body_ids:
+                    new_bindings.append({"cell": cell, "column_headers": headers})
+                    headings[cell] = " / ".join(by_id[h]["clean_text"] for h in headers)
+            rendered = []
+            for sid in unique(context_ids + body_ids):
+                value = by_id[sid]["clean_text"]
+                header = headings.get(sid)
+                rendered.append(f"{header}: {value}" if header else value)
+            title = next((by_id[sid].get("title", "") for sid in body_ids
+                          if by_id[sid].get("title")), "")
+            records.append({"id": f"{unit['id']}/{lang}", "pair_id": unit["id"],
+                            "parallel_id": f"{unit['id']}/{other}", "language": lang,
+                            "title": title, "text": "\n".join(unique(rendered)),
+                            "source_span_ids": body_ids, "context_span_ids": context_ids})
+        unit.pop("text")
+        unit.pop("_original_body")
+        unit["segments"] = records
+        unit["source_span_ids"] = unique(sid for r in records for sid in r["source_span_ids"])
+        unit["context_span_ids"] = unique(sid for r in records for sid in r["context_span_ids"])
+        unit["languages"] = ["zh-Hant", "en"]
+        unit["cell_bindings"] = new_bindings
+    result["spans"] = list(by_id.values())
+    result["blocks"] = [{**{k: v for k, v in block.items() if k not in originals[block["id"]]},
+                         **by_id[new_id]}
+                        for block in result["blocks"] for new_id in split[block["id"]].values()]
+    for table in result["tables"]:
+        for cell in table["cells"]:
+            cell["span_ids"] = list(split[cell.pop("span_id")].values())
+        table["caption_span_ids"] = [sid for key in table["caption_keys"]
+                                     for sid in split[f"{result['manifest']['source_id']}/{key}"].values()]
+    result["report"].update(source_spans=len(by_id), retained_text_blocks=len(result["blocks"]),
+                            bilingual_units=len(result["units"]), language_records=2 * len(result["units"]),
+                            source_languages=dict(Counter(s["language"] for s in by_id.values())),
+                            mixed_source_spans=0)
+    result["manifest"]["schema_version"] = 2
+    result["manifest"]["normalization_policy"] = (
+        "All text records are monolingual. Unit segments pair zh-Hant/en explicitly; "
+        "origin_ranges trace each source to frozen extraction or PDF-verified correction.")
+    return result
+
+
 def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
     if digest(raw_bytes) != rules["raw_sha256"] or digest(pdf_bytes) != rules["pdf_sha256"]:
         raise ValueError("Source hash changed; review cleaning-rules.json before rebuilding")
@@ -458,8 +588,9 @@ def build(raw_bytes: bytes, rules: dict, pdf_bytes: bytes) -> dict:
         "normalization_policy": "evidence_text is the citation excerpt; text_origin distinguishes MinerU extraction from PDF-verified transcription. Corrected excerpts are verified against the PDF, not a MinerU substring.",
         "table_positions": "zero-based row and expanded column; bbox is whole table",
     }
-    return {"manifest": manifest, "blocks": blocks, "spans": list(spans.values()),
-            "tables": tables, "units": units, "assets": assets, "ledger": ledger, "report": report}
+    return separate_languages({"manifest": manifest, "blocks": blocks, "spans": list(spans.values()),
+                               "tables": tables, "units": units, "assets": assets,
+                               "ledger": ledger, "report": report}, rules)
 
 
 def write_outputs(result: dict, output: Path, rules_bytes: bytes):
@@ -470,14 +601,12 @@ def write_outputs(result: dict, output: Path, rules_bytes: bytes):
             json.dumps(row, ensure_ascii=False, sort_keys=True) + "\n" for row in result[name])
     for name in ("tables", "assets", "report"):
         files[name + ".json"] = json.dumps(result[name], ensure_ascii=False, indent=2, sort_keys=True) + "\n"
-    lines = ["# 清洗结果预览", "", "干净片段，供后续切块。引用使用 spans.jsonl 的 evidence_text；PDF 校对文本按物理页核对，不要求是 MinerU 原块的连续子串。", ""]
+    lines = ["# 清洗结果预览", "", "每个逻辑单元固定保存两条中英记录，以 pair_id 对应。来源片段均为单一语言；引用使用 spans.jsonl 的 evidence_text。PDF 校对文本按物理页核对。", ""]
     for unit in result["units"]:
         lines += [f"## {unit['id']}", "", f"PDF 页：{unit['pages']}；类型：{unit['kind']}；可索引：{unit['indexable']}", ""]
-        if unit.get("segments"):
-            for segment in unit["segments"]:
-                lines += [f"### {segment['language']} · {segment['title']}", "", segment["text"], ""]
-        else:
-            lines += [unit["text"], ""]
+        for segment in unit["segments"]:
+            lines += [f"### {segment['language']}" + (f" · {segment['title']}" if segment["title"] else ""),
+                      "", segment["text"], ""]
         lines += ["必须补齐：" + (", ".join(unit["requires"]) or "无"), ""]
         if unit.get("conflict_detail"):
             lines += ["原文冲突：" + unit["conflict_detail"], ""]
@@ -490,10 +619,10 @@ def write_outputs(result: dict, output: Path, rules_bytes: bytes):
 由 `python -m insuretutor.ingest.clean` 离线生成；不要手改生成文件。
 规则位于 `data/cleaning-rules.json`，原始文件保持不变。
 
-- `blocks.jsonl`：保留的文本块、规范化文本、原文、页码和质量标记。
-- `spans.jsonl`：来源片段及 PDF 校对文本；引用使用 evidence_text，text_origin 区分两者。
+- `blocks.jsonl`：按语言拆开的文本块、页码及质量标记。
+- `spans.jsonl`：单一语言来源片段；language 只允许 zh-Hant/en，引用使用 evidence_text。
 - `tables.json`：9 张表的原 HTML、单元格、展开后的合并格网格、原有题注。
-- `units.jsonl`：{report['retrieval_units']} 个干净片段，其中 {report['indexable_units']} 个可用于后续切块和检索。
+- `units.jsonl`：{report['retrieval_units']} 个逻辑单元，每个固定两个独立语言记录，共 {report['language_records']} 条。
 - `ledger.jsonl`：所有 380 块的处理去向；排除仅影响派生产物。
 - `assets.json`：图像/图表保留记录，不假定图片都是装饰。
 - `report.json`：计数、缺字、未配对内容、原文冲突、审核范围。
@@ -504,14 +633,17 @@ def write_outputs(result: dict, output: Path, rules_bytes: bytes):
 后续使用 `indexable=true` 的片段，按 evidence_group 去重。
 命中后必须递归补齐 requires；可调用 `expand_required(units, selected_ids)`。
 依赖片段不与主条款争抢 top-k，不可截断必需条件。
-质量标记和 conflict_detail 必须传给回答层，不能只取 text。
-同主题双语关联；已校对分栏提供 segments，分别保存语言、标题和正文。
+质量标记和 conflict_detail 必须传给回答层。
+每个单元均提供 segments：id、pair_id、parallel_id、language、title、text、source_span_ids、context_span_ids。
+两条记录的 pair_id 等于单元 ID，parallel_id 互指；正文、标题及来源均按语言分开。
+父单元不再保存混排 text，来源片段不再使用 mixed/und。表格数字归入对应语言及表头。
 原有 {report['resolved_issue_count']} 项问题已按原 PDF 修复，未解决项 {report['unresolved_issue_count']}。
 额外回报、算例和现金价值公式已恢复。修订有来源块、物理页码及理由。
-修订引句核对 PDF；raw_text 是原始解析记录，不能用它的子串匹配否定已核对的修订。
+origin_span_id、origin_ranges、原文哈希与 source_key 追溯冻结解析或 PDF 校对文本；原始混排只在 raw data 保存。
 未提供简体自动转换；后续可在检索侧使用项目已有 OpenCC 依赖生成别名。
 
-原始文件冻结，生成文件覆盖当前版本，不保存历史版本。第 17 页原文金额冲突仍保留。
+构建语料：python -m insuretutor.corpus；后续 RAG 使用 data/corpus.json。
+原始文件冻结，生成文件覆盖当前版本。第 17 页原文金额冲突仍保留在各自语言记录中。
 """
     for name, text in files.items():
         (output / name).write_bytes(text.encode("utf-8"))

@@ -15,6 +15,7 @@ from insuretutor.corpus import (
     ROOT,
     Corpus,
     LogicalUnit,
+    LanguageRecord,
     SourceSegment,
     SourceSpan,
     _views,
@@ -45,7 +46,8 @@ class CorpusTests(unittest.TestCase):
 
     def test_all_original_units_spans_and_relations_are_preserved(self):
         self.assertEqual(len(self.units), 137)
-        self.assertEqual(len(self.spans), 458)
+        self.assertEqual(len(self.spans), 660)
+        self.assertEqual({s.language for s in self.spans.values()}, {"zh-Hant", "en"})
         for row in read_rows("units.jsonl"):
             actual = self.units[row["id"]].model_dump()
             self.assertEqual(row, {key: actual[key] for key in row})
@@ -106,7 +108,8 @@ class CorpusTests(unittest.TestCase):
         for lang, prefix in [("en", "b252"), ("zh-Hans", "b231")]:
             view = self.views("asset-allocation-row-1", lang)[0]
             amounts = [s for s in view.source_segments
-                       if s.role == "body" and s.language == "shared"]
+                       if s.role == "body" and not re.search(r"[A-Za-z\u3400-\u9fff]",
+                                                            self.spans[s.span_id].evidence_text)]
             self.assertEqual(len(amounts), 1)
             self.assertIn(prefix, amounts[0].span_id)
             bundle = assemble_evidence(self.corpus, ["asset-allocation-row-1"])
@@ -144,14 +147,15 @@ class CorpusTests(unittest.TestCase):
         self.assertIn("HK$400,000 / MOP40,000", en.search_text)
         body_zh = next(s for s in zh.source_segments if s.role == "body")
         body_en = next(s for s in en.source_segments if s.role == "body")
-        self.assertEqual(body_zh.span_id, body_en.span_id)
-        self.assertEqual(body_zh.end, body_en.start)
+        self.assertNotEqual(body_zh.span_id, body_en.span_id)
+        self.assertEqual(self.spans[body_zh.span_id].origin_span_id,
+                         self.spans[body_en.span_id].origin_span_id)
         bundle = assemble_evidence(self.corpus, [uid])
         self.assertIn(uid, bundle.conflicts)
         original = next(s for s in bundle.source_spans if s.id == body_zh.span_id)
         self.assertEqual(original.pdf_page, 17)
         self.assertIn("40,000港元", original.evidence_text[body_zh.start:body_zh.end])
-        self.assertIn("HK$400,000", original.evidence_text[body_en.start:body_en.end])
+        self.assertIn("HK$400,000", self.spans[body_en.span_id].evidence_text[body_en.start:body_en.end])
 
     def test_long_view_restores_the_complete_parent(self):
         children = self.views("terminal-exclusions", "en")
@@ -182,7 +186,7 @@ class CorpusTests(unittest.TestCase):
                 self.assertTrue(any(sources[sid].pdf_page == citation["pdf_page"]
                                     for sid in unit.source_span_ids + unit.context_span_ids))
                 for word in citation["quote"].split():
-                    self.assertIn(word, unit.text)
+                    self.assertTrue(any(word in r.text for r in unit.segments))
 
     def test_offline_rebuild_is_byte_identical_and_inputs_remain_frozen(self):
         manifest_path = ROOT / "data/cleaned/manifest.json"
@@ -205,6 +209,14 @@ class CorpusTests(unittest.TestCase):
         with self.assertRaises(ValidationError):
             Corpus.model_validate(bad)
         bad = copy.deepcopy(original)
+        bad["source_spans"][0]["language"] = "mixed"
+        with self.assertRaises(ValidationError):
+            Corpus.model_validate(bad)
+        bad = copy.deepcopy(original)
+        bad["units"][0]["segments"].pop()
+        with self.assertRaises(ValidationError):
+            Corpus.model_validate(bad)
+        bad = copy.deepcopy(original)
         bad["retrieval_views"] = [v for v in bad["retrieval_views"]
                                   if v["id"] != "terminal-exclusions/en/002"]
         with self.assertRaises(ValidationError):
@@ -216,18 +228,17 @@ class CorpusTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             assemble_evidence(self.corpus, ["missing-unit"])
 
-    def test_stale_boundary_rules_are_rejected(self):
-        rules = json.loads((ROOT / "data/corpus-rules.json").read_text(encoding="utf-8"))
-        rules["spans"][next(iter(rules["spans"]))]["evidence_sha256"] = "stale"
+    def test_stale_cleaned_manifest_is_rejected(self):
+        manifest_path = ROOT / "data/cleaned/manifest.json"
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        manifest["artifacts"]["spans.jsonl"] = "stale"
         read_text = Path.read_text
 
-        def changed_rules(path, *args, **kwargs):
-            if path == ROOT / "data/corpus-rules.json":
-                return json.dumps(rules)
-            return read_text(path, *args, **kwargs)
+        def changed_manifest(path, *args, **kwargs):
+            return json.dumps(manifest) if path == manifest_path else read_text(path, *args, **kwargs)
 
-        with patch.object(Path, "read_text", new=changed_rules):
-            with self.assertRaisesRegex(ValueError, "Stale language boundary"):
+        with patch.object(Path, "read_text", new=changed_manifest):
+            with self.assertRaisesRegex(ValueError, "Cleaned input changed"):
                 build_corpus()
 
     def test_oversized_single_condition_is_split_without_overlap_or_truncation(self):
@@ -235,7 +246,11 @@ class CorpusTests(unittest.TestCase):
                 + "minimum duration of three years and a nominal fee")
         span = SourceSpan(id="test/body", source_key="body", evidence_text=text, language="en",
                           pdf_page=12, bbox_raw=[0, 0, 100, 100], text_origin="mineru", quality_flags=[])
-        unit = LogicalUnit(id="test", kind="numbered_note", text=text, evidence_group="test",
+        unit = LogicalUnit(id="test", kind="numbered_note", segments=[
+            LanguageRecord(id="test/en", pair_id="test", parallel_id="test/zh-Hant", language="en",
+                           title="", text=text, source_span_ids=[span.id], context_span_ids=[]),
+            LanguageRecord(id="test/zh-Hant", pair_id="test", parallel_id="test/en", language="zh-Hant",
+                           title="", text="條件", source_span_ids=[], context_span_ids=[])], evidence_group="test",
                            source_span_ids=[span.id], context_span_ids=[], requires=[], pages=[12],
                            indexable=True, pairing_status="same_topic_not_equivalence", quality_flags=[])
         ref = SourceSegment(span_id=span.id, start=0, end=len(text), language="en")

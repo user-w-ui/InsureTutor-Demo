@@ -139,7 +139,8 @@ class EvalSetTests(unittest.TestCase):
         for item in self.items:
             for citation in item["citations"]:
                 quote = citation["quote"]
-                unit_text = self.units[citation["unit_id"]]["text"]
+                unit_text = next(r["text"] for r in self.units[citation["unit_id"]]["segments"]
+                                 if r["language"] == citation["language"])
                 with self.subTest(item=item["id"], unit=citation["unit_id"]):
                     for fragment in re.split(r"\s+", quote.strip()):
                         if not fragment:
@@ -222,7 +223,8 @@ class EvalSetTests(unittest.TestCase):
                     if quote:
                         for fragment in re.split(r"\s+", quote.strip()):
                             if fragment:
-                                self.assertIn(fragment, unit["text"])
+                               self.assertIn(fragment, next(r["text"] for r in unit["segments"]
+                                            if r["language"] == entry["language"]))
 
     def test_every_numeric_item_states_the_expected_number(self):
         for item in self.items:

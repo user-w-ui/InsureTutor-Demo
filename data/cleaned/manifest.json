@@ -1,17 +1,17 @@
 {
   "artifacts": {
-    "README.md": "a9ede51322908afc8f0ab8e0b4aa584d5b3e0446e3364f3a82d1d811cedd7cc6",
+    "README.md": "31379fcefd3c1ecec523340ce516d50b6d4f8e6b63d1dc4593a792a8dca2057c",
     "assets.json": "0a71fb401ffad13ef88a5a6c28a591897faf63373de28960e90913a4e1bc79e2",
-    "blocks.jsonl": "9512ebab4ed068522431568304132fec8b61820e5534b0cd10c2e597448d73fe",
+    "blocks.jsonl": "f4fb2e154526ebbe5e3f3be1d54857d8b5f427ed203a0523f8370c166c61cabd",
     "ledger.jsonl": "40b6c23189d2349399a720bde0d72d8c64b22433451f9338319a7519cc6623c3",
-    "preview.md": "2094d7bfde5710aae7b9dfd1a04c6e10aaff9e1886d31c56138ce8fb42c10fd4",
-    "report.json": "eb559ffce8e67bd09a8ba3141baa524e72fe4c4ce75230a1128827bfc51b154a",
-    "spans.jsonl": "d79e326d500be3eccadfccb66c787e33f1dd8dbf203b6abe46b4e0a5e3f08cf2",
-    "tables.json": "7be127e4fd49f22b14e91687798982233ff958cc59562b620657f711832f0dd6",
-    "units.jsonl": "8b627785d3e4cd0b32ed828472cacc1bac2d30df45619af31397f6a1b41f82aa"
+    "preview.md": "df3423300ca2d52f3c7c09a4b561de3a46133105d55dda465e2882508aeec04b",
+    "report.json": "e06c7dce15ea9e67ce4956f829db68a30efb28ca4bb2427bd4b16b8b54899bd5",
+    "spans.jsonl": "980d2f54c2c87d22efa42d910db2ea0db02425c5b7af1fa52f14a0422f6b6f04",
+    "tables.json": "3487af109e7211ba594203e7544836386a889c7c6991d10af21a3e81e87efc12",
+    "units.jsonl": "64fdda6f247cb704575d936257e904f758259c609bea28aaffc066107ab8c962"
   },
   "citation_policy": "pdf_page is physical, one-based; bbox_raw is not PDF points",
-  "cleaner_sha256": "6ad34db272e1febe65f726974317b78fb1e0f32fa2126b8422d0d0cecde06a94",
+  "cleaner_sha256": "e48b155a8201dce47e586e908d032d6d8d485a63946676d2b432313b90f255b7",
   "metadata": {
     "version_code": {
       "block_index": 378,
@@ -19,7 +19,7 @@
       "raw_text": "PSP-137-V3-0925B"
     }
   },
-  "normalization_policy": "evidence_text is the citation excerpt; text_origin distinguishes MinerU extraction from PDF-verified transcription. Corrected excerpts are verified against the PDF, not a MinerU substring.",
+  "normalization_policy": "All text records are monolingual. Unit segments pair zh-Hant/en explicitly; origin_ranges trace each source to frozen extraction or PDF-verified correction.",
   "printed_page_labels_raw": [
     {
       "label": "1",
@@ -102,8 +102,8 @@
       "verified": false
     }
   ],
-  "rules_sha256": "733508efa374e8b5f0f2033ce8548c51f2e961776a0efcb1edeb667b6a0ca668",
-  "schema_version": 1,
+  "rules_sha256": "1386a32452ef4bf1b4b574c08f784d93d33754aba45ddead81225592b4f96f36",
+  "schema_version": 2,
   "source_id": "flexi-23b55338c73d",
   "source_json": "raw data/mineru-official/content/FLEXI-ULife Prime Saver.json",
   "source_json_sha256": "23b55338c73de0e8052e2eb83225434e10f3956f24667f4d19fb2add4f1dbbf3",

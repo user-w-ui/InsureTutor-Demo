@@ -19,6 +19,10 @@ from insuretutor.ingest.clean import (
 )
 
 
+def unit_text(unit):
+    return "\n".join(record["text"] for record in unit["segments"])
+
+
 class CleaningTests(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
@@ -29,7 +33,8 @@ class CleaningTests(unittest.TestCase):
         cls.raw = json.loads(cls.raw_bytes)
         cls.result = build(cls.raw_bytes, cls.rules, cls.pdf_bytes)
         cls.units = {u["id"]: u for u in cls.result["units"]}
-        cls.spans = {s["source_key"]: s for s in cls.result["spans"]}
+        cls.spans = {s["source_key"]: s for s in sorted(
+            cls.result["spans"], key=lambda row: row["language"] == "zh-Hant")}
 
     def test_all_input_blocks_accounted_for_and_layout_noise_not_indexed(self):
         ledger = self.result["ledger"]
@@ -41,12 +46,12 @@ class CleaningTests(unittest.TestCase):
         for unit in self.units.values():
             for sid in unit["source_span_ids"] + unit["context_span_ids"]:
                 self.assertNotIn(by_id[sid]["block_index"], excluded)
-        text = "\n".join(u["text"] for u in self.units.values())
+        text = "\n".join(unit_text(u) for u in self.units.values())
         self.assertNotIn("MANACLTENT", text)
         self.assertNotIn("PSP-137-V3-0925B", text)
 
     def test_disclaimer_rescued_and_version_saved_as_metadata(self):
-        self.assertIn("does not contain the full terms", self.units["disclaimer-en"]["text"])
+        self.assertIn("does not contain the full terms", unit_text(self.units["disclaimer-en"]))
         self.assertEqual(self.units["disclaimer-en"]["pages"], [19])
         self.assertEqual(self.result["manifest"]["metadata"]["version_code"]["raw_text"],
                          "PSP-137-V3-0925B")
@@ -65,13 +70,13 @@ class CleaningTests(unittest.TestCase):
         self.assertEqual(normalize(text), (text, [], []))
         self.assertEqual(self.units["table-97-row-1"]["note_refs"], [4])
         self.assertEqual(self.units["table-97-row-3"]["note_refs"], [5])
-        self.assertNotIn('Insured"4', self.units["table-97-row-1"]["text"])
-        self.assertIn("25%", self.units["note-3"]["text"])
-        self.assertIn("51st", self.units["note-3"]["text"])
-        self.assertIn("50%", self.units["table-97-row-3"]["text"])
+        self.assertNotIn('Insured"4', unit_text(self.units["table-97-row-1"]))
+        self.assertIn("25%", unit_text(self.units["note-3"]))
+        self.assertIn("51st", unit_text(self.units["note-3"]))
+        self.assertIn("50%", unit_text(self.units["table-97-row-3"]))
 
     def test_reference_removal_preserves_english_word_boundary(self):
-        text = self.units["table-356-row-1"]["text"]
+        text = unit_text(self.units["table-356-row-1"])
         self.assertIn("withdrawal charge of US$25", text)
         self.assertNotIn("chargeof", text)
 
@@ -80,9 +85,9 @@ class CleaningTests(unittest.TestCase):
             note = self.units[f"note-{number}"]
             self.assertEqual(len(note["source_span_ids"]), 2)
             self.assertEqual(note["pages"], [12])
-        self.assertEqual(self.spans["b202"]["raw_text"], self.raw[202]["text"])
-        self.assertFalse(self.spans["b202"]["raw_text"].startswith("6."))
-        self.assertIn("生效滿10年", self.units["note-6"]["text"])
+        self.assertEqual(self.spans["b202"]["evidence_text"], self.raw[202]["text"])
+        self.assertFalse(self.spans["b202"]["evidence_text"].startswith("6."))
+        self.assertIn("生效滿10年", unit_text(self.units["note-6"]))
 
     def test_required_evidence_closure(self):
         bundle = expand_required(self.result["units"], ["withdrawal"])
@@ -98,16 +103,16 @@ class CleaningTests(unittest.TestCase):
     def test_fee_rows_keep_non_guaranteed_fee_note(self):
         for key in ("table-354-row-6", "table-354-row-7", "table-354-row-8", "table-356-row-0"):
             self.assertIn("note-10", self.units[key]["requires"])
-        self.assertIn("10%", self.units["table-354-row-6"]["text"])
-        self.assertIn("14", self.units["table-356-row-0"]["text"])
+        self.assertIn("10%", unit_text(self.units["table-354-row-6"]))
+        self.assertIn("14", unit_text(self.units["table-356-row-0"]))
 
     def test_merged_cells_keep_age_headers_and_amounts(self):
         unit = self.units["table-354-row-1"]
-        self.assertIn("< Age 45 歲: 香港保單", unit["text"])
-        self.assertIn("≥ Age 45 歲: US$15,000", unit["text"])
-        self.assertIn("FP80/100/130", unit["text"])
+        self.assertIn("< 45 歲: 香港保單", unit_text(unit))
+        self.assertIn("≥ 45 歲: US$15,000", unit_text(unit))
+        self.assertIn("FP80/100/130", unit_text(unit))
         other = self.units["table-354-row-3"]
-        self.assertIn("< Age 45 歲 / ≥ Age 45 歲: US$5,000", other["text"])
+        self.assertIn("< 45 歲 / ≥ 45 歲: US$5,000", unit_text(other))
         table = next(t for t in self.result["tables"] if t["block_index"] == 354)
         self.assertEqual(table["grid"][1][0], table["grid"][3][0])
 
@@ -119,8 +124,8 @@ class CleaningTests(unittest.TestCase):
             parser.expanded("test")
 
     def test_stuck_values_split_by_exact_source_substrings(self):
-        early = self.units["table-352-row-5-early"]["text"]
-        later = self.units["table-352-row-5-later"]["text"]
+        early = unit_text(self.units["table-352-row-5-early"])
+        later = unit_text(self.units["table-352-row-5-later"])
         self.assertIn("2.75%", early)
         self.assertIn("15/20/25", early)
         self.assertNotIn("5.5%", early)
@@ -128,24 +133,29 @@ class CleaningTests(unittest.TestCase):
         self.assertIn("30th", later)
         self.assertNotIn("2.75%", later)
         for span in self.spans.values():
-            if "parent_source_key" in span:
-                parent = self.spans[span["parent_source_key"]]["raw_text"]
-                start, end = span["raw_char_range"]
-                self.assertEqual(parent[start:end], span["raw_text"])
+            if "origin_parent_source_key" in span:
+                table = next(t for t in self.result["tables"] if t["block_index"] == span["block_index"])
+                parent = next(c["raw_html"] for c in table["cells"]
+                              if c["key"] == span["origin_parent_source_key"])
+                start, end = span["origin_parent_raw_char_range"]
+                origin = parent[start:end]
+                self.assertEqual(digest(origin.encode()), span["origin_evidence_sha256"])
+                self.assertEqual(normalize(" ".join(origin[a:b] for a, b in span["origin_ranges"]))[0],
+                                 normalize(span["evidence_text"])[0])
 
     def test_conflict_survives_without_choosing_a_currency_amount(self):
         unit = self.units["table-354-row-5"]
         self.assertTrue(unit["conflict"])
         self.assertEqual(unit["pages"], [17])
-        self.assertIn("40,000港元 / 400,000澳門元", unit["text"])
-        self.assertIn("HK$400,000 / MOP40,000", unit["text"])
+        self.assertIn("40,000港元 / 400,000澳門元", unit_text(unit))
+        self.assertIn("HK$400,000 / MOP40,000", unit_text(unit))
         self.assertEqual(unit["pairing_status"], "reviewed_source_conflict")
 
     def test_damaged_text_repaired_only_with_recorded_pdf_corrections(self):
         self.assertEqual(self.result["report"]["control_character_occurrences"], 4)
         for key, count in (("b115", 1), ("b200", 1), ("b201", 2)):
             span = self.spans[key]
-            self.assertIn("\x1a", span["raw_text"])
+            self.assertIn("\x1a", self.raw[span["block_index"]]["text"])
             self.assertNotIn("\x1a", span["clean_text"])
             self.assertEqual(span["clean_text"].count("總"), count)
             self.assertNotIn("damaged_text", span["quality_flags"])
@@ -172,6 +182,15 @@ class CleaningTests(unittest.TestCase):
     def test_parallel_text_grouped_and_pdf_formulas_restored(self):
         unit = self.units["insurability"]
         self.assertEqual(unit["source_keys"], ["b89", "b90"])
+        for parent in self.units.values():
+            self.assertNotIn("text", parent)
+            self.assertEqual([r["language"] for r in parent["segments"]], ["zh-Hant", "en"])
+            for record in parent["segments"]:
+                self.assertEqual(record["pair_id"], parent["id"])
+                self.assertTrue(record["text"].strip())
+                if record["language"] == "en":
+                    self.assertNotRegex(record["text"], r"[\u3400-\u9fff]")
+        self.assertEqual({s["language"] for s in self.result["spans"]}, {"zh-Hant", "en"})
         self.assertEqual(unit["evidence_group"], self.units["table-352-row-8"]["evidence_group"])
         self.assertIn("asset-allocation-row-1", self.units)
         self.assertNotIn("table-231-row-1", self.units)
@@ -184,7 +203,7 @@ class CleaningTests(unittest.TestCase):
             self.assertTrue(formula["indexable"])
             self.assertEqual(formula["pages"], [page])
             self.assertEqual(formula["review_status"], "pdf_verified")
-            self.assertIn(text, formula["text"])
+            self.assertIn(text, unit_text(formula))
         for key, title in (("generic-coverage", "Flexible Coverage"),
                            ("generic-premium-rate", "Preferential Premium Rates"),
                            ("generic-payment-flexibility", "Premium Flexibility"),
@@ -193,9 +212,9 @@ class CleaningTests(unittest.TestCase):
             self.assertEqual(en["title"], title)
             self.assertNotRegex(zh["text"], "[A-Za-z]")
             self.assertEqual(self.units[key]["pages"], [4])
-        self.assertIn("省卻額外保單費用", self.units["generic-coverage"]["text"])
-        self.assertIn("無須支付貸款利息", self.units["generic-payment-flexibility"]["text"])
-        self.assertIn("$708,800 × 2.75% = $19,492", self.units["bonus-example"]["text"])
+        self.assertIn("省卻額外保單費用", unit_text(self.units["generic-coverage"]))
+        self.assertIn("無須支付貸款利息", unit_text(self.units["generic-payment-flexibility"]))
+        self.assertIn("$708,800 × 2.75% = $19,492", unit_text(self.units["bonus-example"]))
         self.assertTrue({"example-disclaimer", "bonus-rate-disclaimer"}
                         <= set(self.units["bonus-example"]["requires"]))
 
@@ -205,6 +224,10 @@ class CleaningTests(unittest.TestCase):
         rules = copy.deepcopy(self.rules)
         rules["literal_markers"]["b83"][0]["anchor"] = "NOT IN SOURCE1"
         with self.assertRaisesRegex(ValueError, "anchor"):
+            build(self.raw_bytes, rules, self.pdf_bytes)
+        rules = copy.deepcopy(self.rules)
+        next(iter(rules["language_boundaries"].values()))["evidence_sha256"] = "stale"
+        with self.assertRaisesRegex(ValueError, "Stale language boundary"):
             build(self.raw_bytes, rules, self.pdf_bytes)
 
     def test_reproducible_outputs_and_original_files_unchanged(self):

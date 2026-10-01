@@ -45,9 +45,11 @@ python -m unittest discover -s tests -p "test_cleaning.py" -v
 The source-pinned [`data/cleaning-rules.json`](data/cleaning-rules.json) declares exact
 reference markers, bilingual topic groups, table structure, required evidence, and
 the confirmed source conflict, and finite PDF-verified text corrections with source
-blocks and physical pages. `units.jsonl` contains clean fragments for the next chunking
-step; `spans.jsonl` provides `evidence_text` and its `text_origin` for citation checks.
-Corrected bilingual views separate language, title, and body. The seven known text
+blocks and physical pages. `units.jsonl` contains 137 logical pairs, each with two
+independent `segments` records: `zh-Hant` and `en`, sharing a `pair_id` and pointing
+to each other with `parallel_id`. Parents contain no mixed `text` field.
+`spans.jsonl` stores physically separated language sources and their origin ranges;
+`mixed` and `und` are not valid output languages. The seven known text
 issues and both formulas are resolved; the page 17 source conflict remains explicit.
 Use only indexable units and follow their `requires` links before answering.
 The cleaner retains original extraction text for provenance and marks PDF-verified
@@ -60,15 +62,18 @@ uv run --locked --extra agent --extra dev python -m insuretutor.corpus
 uv run --locked --extra agent --extra dev python -m pytest -q
 ```
 
-[`data/corpus.json`](data/corpus.json) preserves all 137 logical units and 458 source
-spans, with 275 retrieval children: 137 Chinese and 138 English. Every unit has both
-language views; the longer English exclusion list needs two children. English views
-contain no Chinese. Chinese search text uses OpenCC Simplified forms; citations keep
-the original `evidence_text`, physical PDF page and raw bbox.
+Use [`data/corpus.json`](data/corpus.json) as the RAG input. Schema 2 contains 137
+logical pairs, 274 separate language records and 660 monolingual source spans.
+Both source and full-unit texts are separated; every language record has the same
+fields and explicit pairing. The 275 retrieval children map back to these pairs;
+the longer English exclusion list needs two children. Chinese search text uses
+OpenCC Simplified forms; citations keep source-language `evidence_text`, physical
+PDF page, raw bbox and original character ranges.
 
-[`corpus-rules.json`](data/corpus-rules.json) records reviewed language boundaries,
-table/context associations, and the explicitly paired standalone disclaimers.
-Footnote links and source conflicts remain owned by the cleaner. The pinned E5
+Reviewed language boundaries, table/context associations, footnote links and source
+conflicts belong to [`cleaning-rules.json`](data/cleaning-rules.json).
+[`corpus-rules.json`](data/corpus-rules.json) keeps the standalone disclaimer link.
+The pinned E5
 [tokenizer](data/tokenizer/README.md) is included for offline length checks; model
 weights are prepared separately by the Step 2 command below.
 
@@ -172,7 +177,7 @@ src/insuretutor/
 data/
   cleaning-rules.json        Source-pinned corrections, structure & evidence links
   cleaned/                   Generated clean fragments and provenance (implemented)
-  corpus-rules.json          Reviewed language boundaries and context associations
+  corpus-rules.json          Corpus schema and standalone disclaimer link
   corpus.json                Runtime artifact (implemented)
   tokenizer/                 Pinned E5 tokenizer only, no embedding weights
   retrieval/                 FP32 vectors, manifest and retrieval evaluation reports

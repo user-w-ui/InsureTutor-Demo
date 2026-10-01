@@ -178,7 +178,7 @@ def test_long_child_and_conflict_recover_full_parent_and_sources(corpus):
     )
     conflict = retriever.evidence_for([RankedUnit("table-354-row-5", 1)])
     assert "table-354-row-5" in conflict.conflicts
-    assert {s.language for s in conflict.source_spans} >= {"mixed"}
+    assert {s.language for s in conflict.source_spans} == {"zh-Hant", "en"}
     raw = "\n".join(s.evidence_text for s in conflict.source_spans)
     assert "40,000" in raw and "400,000" in raw
     assert conflict.cell_bindings["table-354-row-5"]

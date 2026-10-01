@@ -25,21 +25,16 @@ class SearchResult(BaseModel):
         payload = self.model_dump(exclude={"evidence"})
         if self.evidence is not None:
             bundle = self.evidence
-            # Original source text once per span; omit duplicated unit text and
-            # the cleaner's intermediate extraction/HTML fields.
+            # Source text once per monolingual span, with explicit language pairing.
             payload["evidence"] = {
                 "selected_unit_ids": bundle.selected_unit_ids,
                 "units": [
-                    u.model_dump(
-                        include={
-                            "id",
-                            "kind",
-                            "requires",
-                            "source_span_ids",
-                            "conflict",
-                            "quality_flags",
-                        }
-                    )
+                    {
+                        **u.model_dump(include={"id", "kind", "requires", "source_span_ids",
+                                                "conflict", "quality_flags"}),
+                        "segments": [r.model_dump(include={"id", "pair_id", "parallel_id",
+                            "language", "source_span_ids", "context_span_ids"}) for r in u.segments],
+                    }
                     for u in bundle.units
                 ],
                 "source_spans": [

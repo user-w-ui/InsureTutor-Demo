@@ -111,10 +111,14 @@ NUMBER = r"\d+(?:\.\d+)?"
 
 
 def verified_terms(corpus: Corpus) -> list[tuple[str, str, str]]:
-    spans = {s.source_key: normalize_search(s.evidence_text).lower() for s in corpus.source_spans}
+    spans = {}
+    for source in corpus.source_spans:
+        # Both language records retain the same original heading key.
+        spans.setdefault(source.source_key, set()).add(
+            normalize_search(source.evidence_text).lower())
     terms = []
     for key, chinese, english in TERM_PAIRS:
-        if chinese not in spans.get(key, "") or english not in spans.get(key, ""):
+        if not all(any(term in text for text in spans.get(key, ())) for term in (chinese, english)):
             raise ValueError(f"Lexical bilingual heading no longer matches source {key}")
         terms.append((f"term:{key}", chinese, english))
     return terms

@@ -9,6 +9,7 @@
     "block_index": 97,
     "caption": null,
     "caption_keys": [],
+    "caption_span_ids": [],
     "caption_status": "absent",
     "cells": [
       {
@@ -18,7 +19,10 @@
         "raw_html": "選擇\nOptions",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r0:c0/zh-Hant",
+          "flexi-23b55338c73d/b97:r0:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -27,7 +31,10 @@
         "raw_html": "特點\nFeature",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r0:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r0:c1/zh-Hant",
+          "flexi-23b55338c73d/b97:r0:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -36,7 +43,10 @@
         "raw_html": "身故保障\nDeath Benefit",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r0:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r0:c2/zh-Hant",
+          "flexi-23b55338c73d/b97:r0:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -45,7 +55,10 @@
         "raw_html": "固定壽險保障\nLevel Benefit",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r1:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r1:c0/zh-Hant",
+          "flexi-23b55338c73d/b97:r1:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -54,7 +67,10 @@
         "raw_html": "儲蓄成份較高\nWith more savings",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b97:r1:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -63,7 +79,10 @@
         "raw_html": "「賬戶價值」或「基本保障額」4\n(兩者取其較高者)\n&quot;Account Value&quot; OR &quot;Basic Sum Insured&quot;4\n(whichever is higher)",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r1:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r1:c2/zh-Hant",
+          "flexi-23b55338c73d/b97:r1:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -72,7 +91,10 @@
         "raw_html": "遞增壽險保障/\n特級遞增壽險保障\nIncreasing Benefit/\nIncreasing Benefit Plus",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r2:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r2:c0/zh-Hant",
+          "flexi-23b55338c73d/b97:r2:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -81,7 +103,10 @@
         "raw_html": "兩者的保障成份較高。遞增壽險保障的短線資金增長較快，而特級遞增壽險保障的長線資金增長則較佳。\nWith more protection for both. Increasing Benefit provides a faster capital growth in the short term, while Increasing Benefit Plus provides better capital growth in the long term.",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r2:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r2:c1/zh-Hant",
+          "flexi-23b55338c73d/b97:r2:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -90,7 +115,10 @@
         "raw_html": "「賬戶價值」+「基本保障額」\n&quot;Account Value&quot; + &quot;Basic Sum Insured&quot;",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r2:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r2:c2/zh-Hant",
+          "flexi-23b55338c73d/b97:r2:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -99,7 +127,10 @@
         "raw_html": "漸進壽險保障\nIncremental Benefit",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r3:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r3:c0/zh-Hant",
+          "flexi-23b55338c73d/b97:r3:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -108,7 +139,10 @@
         "raw_html": "平衡保障及儲蓄\nBalancing savings and protection",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r3:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r3:c1/zh-Hant",
+          "flexi-23b55338c73d/b97:r3:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -117,7 +151,10 @@
         "raw_html": "「賬戶價值」或「基本保障額 + 賬戶價值的50%」5\n(兩者取其較高者)\n&quot;Account Value&quot; OR &quot;Basic Sum Insured + 50% of Account Value&quot;5\n(whichever is higher)",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b97:r3:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b97:r3:c2/zh-Hant",
+          "flexi-23b55338c73d/b97:r3:c2/en"
+        ]
       }
     ],
     "grid": [
@@ -157,6 +194,7 @@
     "block_index": 114,
     "caption": null,
     "caption_keys": [],
+    "caption_span_ids": [],
     "caption_status": "absent",
     "cells": [
       {
@@ -166,7 +204,10 @@
         "raw_html": "保單年Policy Year",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r0:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r0:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -175,7 +216,10 @@
         "raw_html": "現時假設基本派息率*Current assumed base crediting interest rate*每月撥入賬戶價值,並以複式計算Credited monthly to the Account Value at a compound rate",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r0:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r0:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r0:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -184,7 +228,10 @@
         "raw_html": "現時假設額外利息率*Current assumed retrospective additional interest rate*於第20年及其後每5年派發Credited to the Account Value at the end of the 20thpolicy year and for every 5 years thereafter",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r0:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r0:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r0:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -193,7 +240,10 @@
         "raw_html": "1",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r1:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r1:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r1:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -202,7 +252,10 @@
         "raw_html": "4%",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r1:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -211,7 +264,10 @@
         "raw_html": "0.25%",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r1:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r1:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r1:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -220,7 +276,10 @@
         "raw_html": "2",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r2:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r2:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r2:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -229,7 +288,10 @@
         "raw_html": "4%",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r2:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r2:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r2:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -238,7 +300,10 @@
         "raw_html": "0.25%",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r2:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r2:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r2:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -247,7 +312,10 @@
         "raw_html": "3",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r3:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r3:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r3:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -256,7 +324,10 @@
         "raw_html": "4%",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r3:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r3:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r3:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -265,7 +336,10 @@
         "raw_html": "0.25%",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r3:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r3:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r3:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -274,7 +348,10 @@
         "raw_html": "·",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r4:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r4:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r4:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -283,7 +360,10 @@
         "raw_html": "·",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r4:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r4:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r4:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -292,7 +372,10 @@
         "raw_html": "·",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r4:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r4:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r4:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -301,7 +384,10 @@
         "raw_html": "·",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r5:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r5:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r5:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -310,7 +396,10 @@
         "raw_html": "·",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r5:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r5:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r5:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -319,7 +408,10 @@
         "raw_html": "·",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r5:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r5:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r5:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -328,7 +420,10 @@
         "raw_html": "·",
         "row": 6,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r6:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r6:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r6:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -337,7 +432,10 @@
         "raw_html": "·",
         "row": 6,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r6:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r6:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r6:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -346,7 +444,10 @@
         "raw_html": "·",
         "row": 6,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r6:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r6:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r6:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -355,7 +456,10 @@
         "raw_html": "19",
         "row": 7,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r7:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r7:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r7:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -364,7 +468,10 @@
         "raw_html": "4%",
         "row": 7,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r7:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r7:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r7:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -373,7 +480,10 @@
         "raw_html": "0.25%",
         "row": 7,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r7:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r7:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r7:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -382,7 +492,10 @@
         "raw_html": "20",
         "row": 8,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r8:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r8:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r8:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -391,7 +504,10 @@
         "raw_html": "4%",
         "row": 8,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r8:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r8:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r8:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -400,7 +516,10 @@
         "raw_html": "0.25%",
         "row": 8,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r8:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r8:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r8:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -409,7 +528,10 @@
         "raw_html": "21",
         "row": 9,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r9:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r9:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r9:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -418,7 +540,10 @@
         "raw_html": "4%",
         "row": 9,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r9:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r9:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r9:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -427,7 +552,10 @@
         "raw_html": "0.25%",
         "row": 9,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r9:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r9:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r9:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -436,7 +564,10 @@
         "raw_html": "·",
         "row": 10,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r10:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r10:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r10:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -445,7 +576,10 @@
         "raw_html": "·",
         "row": 10,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r10:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r10:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r10:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -454,7 +588,10 @@
         "raw_html": "·",
         "row": 10,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r10:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r10:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r10:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -463,7 +600,10 @@
         "raw_html": "·",
         "row": 11,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r11:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r11:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r11:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -472,7 +612,10 @@
         "raw_html": "·",
         "row": 11,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r11:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r11:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r11:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -481,7 +624,10 @@
         "raw_html": "·",
         "row": 11,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r11:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r11:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r11:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -490,7 +636,10 @@
         "raw_html": "25",
         "row": 12,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r12:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r12:c0/zh-Hant",
+          "flexi-23b55338c73d/b114:r12:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -499,7 +648,10 @@
         "raw_html": "4%",
         "row": 12,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r12:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r12:c1/zh-Hant",
+          "flexi-23b55338c73d/b114:r12:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -508,7 +660,10 @@
         "raw_html": "0.25%",
         "row": 12,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b114:r12:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b114:r12:c2/zh-Hant",
+          "flexi-23b55338c73d/b114:r12:c2/en"
+        ]
       }
     ],
     "grid": [
@@ -593,6 +748,7 @@
     "block_index": 150,
     "caption": null,
     "caption_keys": [],
+    "caption_span_ids": [],
     "caption_status": "absent",
     "cells": [
       {
@@ -602,7 +758,10 @@
         "raw_html": "保單年Policy Year",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r0:c0/zh-Hant",
+          "flexi-23b55338c73d/b150:r0:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -611,7 +770,10 @@
         "raw_html": "平均每月賬戶價值Average Monthly Account Value",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r0:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r0:c1/zh-Hant",
+          "flexi-23b55338c73d/b150:r0:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -620,7 +782,10 @@
         "raw_html": "11",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r1:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r1:c0/zh-Hant",
+          "flexi-23b55338c73d/b150:r1:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -629,7 +794,10 @@
         "raw_html": "$566,000",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b150:r1:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -638,7 +806,10 @@
         "raw_html": "12",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r2:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r2:c0/zh-Hant",
+          "flexi-23b55338c73d/b150:r2:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -647,7 +818,10 @@
         "raw_html": "$633,000",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r2:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r2:c1/zh-Hant",
+          "flexi-23b55338c73d/b150:r2:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -656,7 +830,10 @@
         "raw_html": "13",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r3:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r3:c0/zh-Hant",
+          "flexi-23b55338c73d/b150:r3:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -665,7 +842,10 @@
         "raw_html": "$702,000",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r3:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r3:c1/zh-Hant",
+          "flexi-23b55338c73d/b150:r3:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -674,7 +854,10 @@
         "raw_html": "14",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r4:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r4:c0/zh-Hant",
+          "flexi-23b55338c73d/b150:r4:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -683,7 +866,10 @@
         "raw_html": "$774,000",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r4:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r4:c1/zh-Hant",
+          "flexi-23b55338c73d/b150:r4:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -692,7 +878,10 @@
         "raw_html": "15",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r5:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r5:c0/zh-Hant",
+          "flexi-23b55338c73d/b150:r5:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -701,7 +890,10 @@
         "raw_html": "$869,000",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b150:r5:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b150:r5:c1/zh-Hant",
+          "flexi-23b55338c73d/b150:r5:c1/en"
+        ]
       }
     ],
     "grid": [
@@ -745,6 +937,7 @@
     "block_index": 231,
     "caption": null,
     "caption_keys": [],
+    "caption_span_ids": [],
     "caption_status": "absent",
     "cells": [
       {
@@ -754,7 +947,9 @@
         "raw_html": "資產類別",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b231:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b231:r0:c0"
+        ]
       },
       {
         "col": 1,
@@ -763,7 +958,9 @@
         "raw_html": "目標資產組合 (%)",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b231:r0:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b231:r0:c1"
+        ]
       },
       {
         "col": 0,
@@ -772,7 +969,9 @@
         "raw_html": "債券及其他固定收益資產",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b231:r1:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b231:r1:c0"
+        ]
       },
       {
         "col": 1,
@@ -781,7 +980,10 @@
         "raw_html": "80% - 100%",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b231:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b231:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b231:r1:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -790,7 +992,9 @@
         "raw_html": "股票類資產",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b231:r2:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b231:r2:c0"
+        ]
       },
       {
         "col": 1,
@@ -799,7 +1003,10 @@
         "raw_html": "0% - 20%",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b231:r2:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b231:r2:c1/zh-Hant",
+          "flexi-23b55338c73d/b231:r2:c1/en"
+        ]
       }
     ],
     "grid": [
@@ -831,6 +1038,7 @@
     "block_index": 252,
     "caption": null,
     "caption_keys": [],
+    "caption_span_ids": [],
     "caption_status": "absent",
     "cells": [
       {
@@ -840,7 +1048,9 @@
         "raw_html": "Asset Class",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b252:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b252:r0:c0"
+        ]
       },
       {
         "col": 1,
@@ -849,7 +1059,9 @@
         "raw_html": "Target Asset Mix (%)",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b252:r0:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b252:r0:c1"
+        ]
       },
       {
         "col": 0,
@@ -858,7 +1070,9 @@
         "raw_html": "Bonds and other fixed-income instruments",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b252:r1:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b252:r1:c0"
+        ]
       },
       {
         "col": 1,
@@ -867,7 +1081,10 @@
         "raw_html": "80% - 100%",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b252:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b252:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b252:r1:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -876,7 +1093,9 @@
         "raw_html": "Equity-like assets",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b252:r2:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b252:r2:c0"
+        ]
       },
       {
         "col": 1,
@@ -885,7 +1104,10 @@
         "raw_html": "0% - 20%",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b252:r2:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b252:r2:c1/zh-Hant",
+          "flexi-23b55338c73d/b252:r2:c1/en"
+        ]
       }
     ],
     "grid": [
@@ -917,6 +1139,7 @@
     "block_index": 352,
     "caption": null,
     "caption_keys": [],
+    "caption_span_ids": [],
     "caption_status": "absent",
     "cells": [
       {
@@ -926,7 +1149,10 @@
         "raw_html": "利益項目 Benefits",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r0:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r0:c0/en"
+        ]
       },
       {
         "col": 0,
@@ -935,7 +1161,10 @@
         "raw_html": "基本派息率*Base crediting interest rate*",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r1:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r1:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r1:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -944,7 +1173,10 @@
         "raw_html": "現時假設基本派息率為每年4.0%。基本派息會每月派發,並撥入賬戶價值,以複式計算Current assumed base crediting interest rate is 4.0% p.a. The base crediting interest will be credited monthly to the Account Value at a compound rate",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r1:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -953,7 +1185,10 @@
         "raw_html": "額外利息*Retrospective additional interest*",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r2:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r2:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r2:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -962,7 +1197,10 @@
         "raw_html": "於保單第20個保單週年日及其後每5年派發,現時假設額外利息率為每年0.25%Credited to the Account Value at the end of the  $20^{th}$  policy year and for every 5 years thereafter. The current assumed retrospective additional interest rate is 0.25% p.a.",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r2:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r2:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r2:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -971,7 +1209,10 @@
         "raw_html": "額外回報Extra Bonus",
         "row": 3,
         "rowspan": 3,
-        "span_id": "flexi-23b55338c73d/b352:r3:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r3:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r3:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -980,7 +1221,10 @@
         "raw_html": "於保單第15個保單週年日及其後每5年派發Credited to the Policy at the end of the  $15^{th}$  policy year and for every 5 years thereafter",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r3:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r3:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r3:c1/en"
+        ]
       },
       {
         "col": 1,
@@ -989,7 +1233,10 @@
         "raw_html": "現時假設額外回報率The current assumed Extra Bonus rate",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r4:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r4:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r4:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -998,7 +1245,10 @@
         "raw_html": "保單年Policy Year",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r4:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r4:c2/zh-Hant",
+          "flexi-23b55338c73d/b352:r4:c2/en"
+        ]
       },
       {
         "col": 1,
@@ -1007,7 +1257,10 @@
         "raw_html": "2.75%5.5%",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r5:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r5:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r5:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -1016,7 +1269,10 @@
         "raw_html": "15/20/2530及其後每5年The  $30^{th}$  year and every 5 years thereafter",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r5:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r5:c2/zh-Hant",
+          "flexi-23b55338c73d/b352:r5:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -1025,7 +1281,10 @@
         "raw_html": "利息保證Guaranteed interest",
         "row": 6,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r6:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r6:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r6:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1034,7 +1293,10 @@
         "raw_html": "賬戶價值(包括已撥入保單的利息及額外回報的總額)保證不會少於每年以派息率2.5%計算而累積的賬戶價值(適用於已生效滿15年或以上的保單)Account Value (including the total interest and Extra Bonus credited to the Policy) is guaranteed to have accumulated to at least an amount as if the interest rate credited had been 2.5% p.a. (Applicable to a Policy that has been in force for 15 years or more)",
         "row": 6,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r6:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r6:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r6:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1043,7 +1305,10 @@
         "raw_html": "身故保障選擇Death Benefit Options",
         "row": 7,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r7:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r7:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r7:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1052,7 +1317,10 @@
         "raw_html": "固定壽險保障/遞增壽險保障/特級遞增壽險保障/漸進壽險保障Level Benefit / Increasing Benefit / Increasing Benefit Plus / Incremental Benefit",
         "row": 7,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r7:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r7:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r7:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1061,7 +1329,10 @@
         "raw_html": "保證可保權益3Guaranteed Insurability Option3",
         "row": 8,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r8:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r8:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r8:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1070,7 +1341,10 @@
         "raw_html": "每次增加之基本保障額為行使權益前基本保障額的25%或50,000美元/400,000港元/400,000澳門元(以較低者為準);最多可行使權益兩次For each exercise, the increase in Basic Sum Insured shall not exceed 25% of the Basic Sum Insured before exercising this option or US$50,000/HK$400,000/MOP400,000 (whichever is lower). This option can be exercised up to two times",
         "row": 8,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r8:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r8:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r8:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1079,7 +1353,10 @@
         "raw_html": "失業保障8Unemployment Benefit8",
         "row": 9,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r9:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r9:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r9:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1088,7 +1365,10 @@
         "raw_html": "可享有長達365日的特惠寬限期A Special Grace Period of up to 365 days",
         "row": 9,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r9:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r9:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r9:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1097,7 +1377,10 @@
         "raw_html": "末期病症保障9Terminal Illness Benefit9",
         "row": 10,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r10:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r10:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r10:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1106,7 +1389,10 @@
         "raw_html": "基本計劃及附加保障(如適用)的身故保障The Death Benefit of the Basic Plan and supplementary benefit(s)",
         "row": 10,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r10:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r10:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r10:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1115,7 +1401,10 @@
         "raw_html": "附加保障Supplementary Benefits",
         "row": 11,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r11:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r11:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r11:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1124,7 +1413,10 @@
         "raw_html": "豁免保費計劃、嚴重疾病保障、意外保障等Waiver of Premium Benefit, Critical Illness Benefit, Accident Benefit, etc.",
         "row": 11,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r11:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r11:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r11:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1133,7 +1425,10 @@
         "raw_html": "保單資料 Policy Information",
         "row": 12,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r12:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r12:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r12:c0/en"
+        ]
       },
       {
         "col": 0,
@@ -1142,7 +1437,10 @@
         "raw_html": "保單類別Plan Type",
         "row": 13,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r13:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r13:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r13:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1151,7 +1449,10 @@
         "raw_html": "基本計劃Basic Plan",
         "row": 13,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r13:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r13:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r13:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1160,7 +1461,10 @@
         "raw_html": "保單貨幣單位Currency",
         "row": 14,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r14:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r14:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r14:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1169,7 +1473,10 @@
         "raw_html": "香港保單:美元/港元澳門保單:美元/澳門元/港元Policy issued in Hong Kong: US$ / HK$Policy issued in Macau: US$ / MOP / HK$",
         "row": 14,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r14:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r14:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r14:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1178,7 +1485,10 @@
         "raw_html": "繳費方式Payment Mode",
         "row": 15,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r15:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r15:c0/zh-Hant",
+          "flexi-23b55338c73d/b352:r15:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1187,7 +1497,10 @@
         "raw_html": "每年/每半年/每季/每月繳付Annual / Semi-annual / Quarterly / Monthly Payment",
         "row": 15,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b352:r15:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b352:r15:c1/zh-Hant",
+          "flexi-23b55338c73d/b352:r15:c1/en"
+        ]
       }
     ],
     "grid": [
@@ -1287,6 +1600,7 @@
     "block_index": 354,
     "caption": null,
     "caption_keys": [],
+    "caption_span_ids": [],
     "caption_status": "absent",
     "cells": [
       {
@@ -1296,7 +1610,10 @@
         "raw_html": "最低保障額Minimum Sum Insured",
         "row": 0,
         "rowspan": 4,
-        "span_id": "flexi-23b55338c73d/b354:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r0:c0/zh-Hant",
+          "flexi-23b55338c73d/b354:r0:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1305,7 +1622,7 @@
         "raw_html": "",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r0:c1"
+        "span_ids": []
       },
       {
         "col": 2,
@@ -1314,7 +1631,10 @@
         "raw_html": "&lt; Age 45 歲",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r0:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r0:c2/zh-Hant",
+          "flexi-23b55338c73d/b354:r0:c2/en"
+        ]
       },
       {
         "col": 3,
@@ -1323,7 +1643,10 @@
         "raw_html": "≥ Age 45 歲",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r0:c3"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r0:c3/zh-Hant",
+          "flexi-23b55338c73d/b354:r0:c3/en"
+        ]
       },
       {
         "col": 1,
@@ -1332,7 +1655,10 @@
         "raw_html": "FP80/100/130",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b354:r1:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -1341,7 +1667,10 @@
         "raw_html": "香港保單Hong Kong PoliciesUS$30,000美元 /HK$240,000港元澳門保單Macau PoliciesUS$25,000美元 /MOP / HK$200,000澳門元 / 港元",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r1:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r1:c2/zh-Hant",
+          "flexi-23b55338c73d/b354:r1:c2/en"
+        ]
       },
       {
         "col": 3,
@@ -1350,7 +1679,10 @@
         "raw_html": "US$15,000美元 /HK$ / MOP120,000港元 / 澳門元",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r1:c3"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r1:c3/zh-Hant",
+          "flexi-23b55338c73d/b354:r1:c3/en"
+        ]
       },
       {
         "col": 1,
@@ -1359,7 +1691,10 @@
         "raw_html": "FP180/280",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r2:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r2:c1/zh-Hant",
+          "flexi-23b55338c73d/b354:r2:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -1368,7 +1703,10 @@
         "raw_html": "US$15,000美元 /HK$ / MOP120,000港元 / 澳門元",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r2:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r2:c2/zh-Hant",
+          "flexi-23b55338c73d/b354:r2:c2/en"
+        ]
       },
       {
         "col": 3,
@@ -1377,7 +1715,10 @@
         "raw_html": "US$8,000美元 /HK$ / MOP64,000港元 / 澳門元",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r2:c3"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r2:c3/zh-Hant",
+          "flexi-23b55338c73d/b354:r2:c3/en"
+        ]
       },
       {
         "col": 1,
@@ -1386,7 +1727,10 @@
         "raw_html": "其他 Others",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r3:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r3:c1/zh-Hant",
+          "flexi-23b55338c73d/b354:r3:c1/en"
+        ]
       },
       {
         "col": 2,
@@ -1395,7 +1739,10 @@
         "raw_html": "US$5,000美元 / HK$ / MOP40,000港元 / 澳門元",
         "row": 3,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r3:c2"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r3:c2/zh-Hant",
+          "flexi-23b55338c73d/b354:r3:c2/en"
+        ]
       },
       {
         "col": 0,
@@ -1404,7 +1751,10 @@
         "raw_html": "最高保障額Maximum Sum Insured",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r4:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r4:c0/zh-Hant",
+          "flexi-23b55338c73d/b354:r4:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1413,7 +1763,10 @@
         "raw_html": "個別考慮Individual consideration",
         "row": 4,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r4:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r4:c1/zh-Hant",
+          "flexi-23b55338c73d/b354:r4:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1422,7 +1775,10 @@
         "raw_html": "增加/減少保障額Increase / Decrease Sum Insured",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r5:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r5:c0/zh-Hant",
+          "flexi-23b55338c73d/b354:r5:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1431,7 +1787,10 @@
         "raw_html": "每次更改之最低金額為5,000美元 / 40,000港元 / 400,000澳門元The minimum amount of increase / decrease is US$5,000 / HK$400,000 / MOP40,000",
         "row": 5,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r5:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r5:c1/zh-Hant",
+          "flexi-23b55338c73d/b354:r5:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1440,7 +1799,10 @@
         "raw_html": "保費行政費用 $^{10}$ Premium Expense Charge $^{10}$ ",
         "row": 6,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r6:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r6:c0/zh-Hant",
+          "flexi-23b55338c73d/b354:r6:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1449,7 +1811,10 @@
         "raw_html": "按每次繳交的定期或非定期保費收取:在保單生效第一至第三年,費用為該段期間繳付的保費的10%,在保單生效第四至第九年內,為繳付保費的7%,而期後則為5%Charged based on each scheduled or unscheduled premium payment:This charge is 10% of premium payments made in policy years 1 to 3 inclusive, 7% of premium payments made in policy years 4 to 9 inclusive and 5% of premium payments made thereafter",
         "row": 6,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r6:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r6:c1/zh-Hant",
+          "flexi-23b55338c73d/b354:r6:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1458,7 +1823,10 @@
         "raw_html": "保險成本 $^{10}$ Cost of Insurance $^{10}$ ",
         "row": 7,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r7:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r7:c0/zh-Hant",
+          "flexi-23b55338c73d/b354:r7:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1467,7 +1835,10 @@
         "raw_html": "按淨承擔風險總值乘保險成本費率計算,每月收取。淨承擔風險總值的定義如下:固定壽險保障:淨承擔風險總值 = 基本保障額 - 賬戶價值漸進壽險保障:淨承擔風險總值 = 基本保障額 - 賬戶價值的50%遞增壽險保障 / 特級遞增壽險保障:淨承擔風險總值 = 基本保障額在任何情況下,淨承擔風險總值不會少於零。保險成本費率按受保人的性別、投保年齡(只適用於特級遞增壽險保障選擇)、實際年齡、吸煙習慣、風險級別、壽險保障選擇而釐定Charged monthly, determined by multiplying the Net Amount At Risk by the Cost of Insurance Rate.Net Amount At Risk is defined as follows:For Level Benefit: Net Amount At Risk = Basic Sum Insured - Account ValueFor Incremental Benefit: Net Amount At Risk = Basic Sum Insured - 50% of Account ValueFor Increasing Benefit / Increasing Benefit Plus: Net Amount At Risk = Basic Sum Insured Under all circumstances, the Net Amount At Risk will not be less than zero.Cost of Insurance Rate depends on the gender, issue age (for Increasing Benefit Plus option only), attained age, smoking habit and risk class of the Insured and Life Protection Option chosen",
         "row": 7,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r7:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r7:c1/zh-Hant",
+          "flexi-23b55338c73d/b354:r7:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1476,7 +1847,10 @@
         "raw_html": "一般行政費用 $^{10}$ Administrative Charge $^{10}$ ",
         "row": 8,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r8:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r8:c0/zh-Hant",
+          "flexi-23b55338c73d/b354:r8:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1485,7 +1859,10 @@
         "raw_html": "按基本計劃的每層保障額及一般行政費用率計算,每月收取,再加每月4美元 / 32港元 / 32澳門元一般行政費用率根據受保人的性別、投保年齡、吸煙習慣、風險級別及已生效的年期而釐定Charged monthly, determined based on each layer of Basic Sum Insured and the Administrative Charge Rate, plus US$4 / HK$32 / MOP32 per month.The Administrative Charge Rate depends on the gender, issue age, smoking habit, risk class of the Insured and years in effect",
         "row": 8,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b354:r8:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b354:r8:c1/zh-Hant",
+          "flexi-23b55338c73d/b354:r8:c1/en"
+        ]
       }
     ],
     "grid": [
@@ -1563,6 +1940,10 @@
     "caption_keys": [
       "b356:caption:0"
     ],
+    "caption_span_ids": [
+      "flexi-23b55338c73d/b356:caption:0/zh-Hant",
+      "flexi-23b55338c73d/b356:caption:0/en"
+    ],
     "caption_status": "native",
     "cells": [
       {
@@ -1572,7 +1953,10 @@
         "raw_html": "退保費用10Surrender Charge10",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b356:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b356:r0:c0/zh-Hant",
+          "flexi-23b55338c73d/b356:r0:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1581,7 +1965,10 @@
         "raw_html": "按基本計劃的每層保障額及退保費用率計算。適用於保單日期/每次增加基本保障額的生效日期起計首14年,於下列情況收取退保費用: - 保單失效或退保- 減少基本計劃的保障額退保費用率根據受保人的性別、投保年齡、吸煙習慣、風險級別及已生效的年期而釐定Determined based on each layer of Basic Sum Insured and the Surrender Charge Rate and applicable in the first 14 years from Policy Date / effective date of each increase in Basic Sum Insured upon: - Policy lapse or surrender- Decrease in Basic Sum InsuredSurrender Charge Rate depends on gender, issue age, smoking habit, risk class of the Insured and years in effect",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b356:r0:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b356:r0:c1/zh-Hant",
+          "flexi-23b55338c73d/b356:r0:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1590,7 +1977,10 @@
         "raw_html": "提取現金價值Cash Value Withdrawal",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b356:r1:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b356:r1:c0/zh-Hant",
+          "flexi-23b55338c73d/b356:r1:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1599,7 +1989,10 @@
         "raw_html": "次數不限,現時每次收取25美元/200港元/200澳門元提款費用10;定期提款權益則可獲豁免Unlimited frequency. Currently, each cash withdrawal is subject to a withdrawal charge10of US$25/HK$200/MOP200. Withdrawal charge is waived for automatic periodic withdrawal option",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b356:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b356:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b356:r1:c1/en"
+        ]
       }
     ],
     "grid": [
@@ -1631,6 +2024,10 @@
     "caption_keys": [
       "b357:caption:0"
     ],
+    "caption_span_ids": [
+      "flexi-23b55338c73d/b357:caption:0/zh-Hant",
+      "flexi-23b55338c73d/b357:caption:0/en"
+    ],
     "caption_status": "native",
     "cells": [
       {
@@ -1640,7 +2037,10 @@
         "raw_html": "投保年齡(以上次生日年齡計算)Issue Age (At Last Birthday)",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b357:r0:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b357:r0:c0/zh-Hant",
+          "flexi-23b55338c73d/b357:r0:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1649,7 +2049,10 @@
         "raw_html": "0-75歲(如選擇特級遞增壽險保障,投保年齡則為0-55歲)Age 0-75 (For Increasing Benefit Plus, Issue Age is 0-55)",
         "row": 0,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b357:r0:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b357:r0:c1/zh-Hant",
+          "flexi-23b55338c73d/b357:r0:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1658,7 +2061,10 @@
         "raw_html": "保障年期Benefit Term",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b357:r1:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b357:r1:c0/zh-Hant",
+          "flexi-23b55338c73d/b357:r1:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1667,7 +2073,10 @@
         "raw_html": "至100歲To Age 100",
         "row": 1,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b357:r1:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b357:r1:c1/zh-Hant",
+          "flexi-23b55338c73d/b357:r1:c1/en"
+        ]
       },
       {
         "col": 0,
@@ -1676,7 +2085,10 @@
         "raw_html": "繳付保費年期Premium Payment Term",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b357:r2:c0"
+        "span_ids": [
+          "flexi-23b55338c73d/b357:r2:c0/zh-Hant",
+          "flexi-23b55338c73d/b357:r2:c0/en"
+        ]
       },
       {
         "col": 1,
@@ -1685,7 +2097,10 @@
         "raw_html": "至100歲To Age 100",
         "row": 2,
         "rowspan": 1,
-        "span_id": "flexi-23b55338c73d/b357:r2:c1"
+        "span_ids": [
+          "flexi-23b55338c73d/b357:r2:c1/zh-Hant",
+          "flexi-23b55338c73d/b357:r2:c1/en"
+        ]
       }
     ],
     "grid": [

@@ -29,28 +29,48 @@ OPENCC_VERSION = "0.1.7"
 TARGET_TOKENS = 256
 MAX_TOKENS = 512
 PREFIX = "passage: "
-Language = Literal["zh-Hant", "en", "shared"]
+Language = Literal["zh-Hant", "en"]
 
 
 class SourceSpan(BaseModel):
-    """Retain every cleaner field, including raw text, bbox precision and origin."""
+    """One source language with physical-page and original-range provenance."""
 
     model_config = ConfigDict(extra="allow")
     id: str
     source_key: str
     evidence_text: str
-    language: str
+    language: Language
     pdf_page: int = Field(ge=1)
     bbox_raw: list[int | float]
     text_origin: str
     quality_flags: list[str]
+
+    @model_validator(mode="after")
+    def source_language(self) -> SourceSpan:
+        if self.language == "en" and re.search(r"[\u3400-\u9fff]", self.evidence_text):
+            raise ValueError(f"Chinese text in English source: {self.id}")
+        return self
+
+
+class LanguageRecord(BaseModel):
+    """One separately stored language version; its peer shares the same pair_id."""
+
+    model_config = ConfigDict(extra="forbid")
+    id: str
+    pair_id: str
+    parallel_id: str
+    language: Language
+    title: str
+    text: str = Field(min_length=1)
+    source_span_ids: list[str]
+    context_span_ids: list[str]
 
 
 class LogicalUnit(BaseModel):
     model_config = ConfigDict(extra="allow")
     id: str
     kind: str
-    text: str
+    segments: list[LanguageRecord]
     evidence_group: str
     source_span_ids: list[str]
     context_span_ids: list[str]
@@ -60,6 +80,21 @@ class LogicalUnit(BaseModel):
     conflict: bool = False
     pairing_status: str
     quality_flags: list[str]
+
+    @model_validator(mode="after")
+    def language_pair(self) -> LogicalUnit:
+        if len(self.segments) != 2 or {s.language for s in self.segments} != {"zh-Hant", "en"}:
+            raise ValueError(f"Incomplete language pair: {self.id}")
+        for record in self.segments:
+            peer = next(s for s in self.segments if s.language != record.language)
+            if (record.id != f"{self.id}/{record.language}" or record.pair_id != self.id
+                    or record.parallel_id != peer.id):
+                raise ValueError(f"Invalid language pair: {self.id}")
+            if record.language == "en" and re.search(r"[\u3400-\u9fff]", record.text):
+                raise ValueError(f"Chinese text in English record: {record.id}")
+        if "text" in self.model_extra:
+            raise ValueError("Logical parents cannot contain a mixed text field")
+        return self
 
 
 class SourceSegment(BaseModel):
@@ -97,7 +132,7 @@ class RetrievalView(BaseModel):
 
 class Corpus(BaseModel):
     model_config = ConfigDict(extra="forbid")
-    schema_version: Literal[1] = 1
+    schema_version: Literal[2] = 2
     provenance: dict[str, Any]
     source_spans: list[SourceSpan]
     units: list[LogicalUnit]
@@ -136,6 +171,12 @@ class Corpus(BaseModel):
                 ids += binding.column_headers
             if set(ids) - spans.keys():
                 raise ValueError(f"Dangling source/context: {unit.id}")
+            if {s for r in unit.segments for s in r.source_span_ids} != set(unit.source_span_ids):
+                raise ValueError(f"Language sources do not match parent: {unit.id}")
+            for record in unit.segments:
+                for sid in record.source_span_ids + record.context_span_ids:
+                    if sid not in spans or spans[sid].language != record.language:
+                        raise ValueError(f"Wrong language source: {record.id}/{sid}")
             referenced.update(ids)
         if set(self.language_segments) != referenced:
             raise ValueError("Missing or unexpected language segmentation")
@@ -170,7 +211,7 @@ class Corpus(BaseModel):
                 if ref.span_id not in permitted or ref.end > len(spans[ref.span_id].evidence_text):
                     raise ValueError(f"View source outside parent: {view.id}")
                 expected_language = "zh-Hant" if view.language == "zh-Hans" else "en"
-                if ref.language not in (expected_language, "shared"):
+                if ref.language != expected_language:
                     raise ValueError(f"Wrong language in view: {view.id}")
                 if not any(ref.start >= p.start and ref.end <= p.end
                            and ref.language == p.language
@@ -192,20 +233,13 @@ class Corpus(BaseModel):
             expected_sources = unit.source_span_ids + self.context_by_unit[uid]
             for peer in self.parallel_units.get(uid, []):
                 expected_sources += units[peer].source_span_ids
-            bound = {b.cell: b.column_headers for b in self.cell_bindings[uid] if b.column_headers}
             for sid in dict.fromkeys(expected_sources):
                 for part in self.language_segments[sid]:
-                    languages = {"zh-Hans", "en"} if part.language == "shared" else {
-                        "zh-Hans" if part.language == "zh-Hant" else "en"}
-                    if part.language == "shared" and sid in bound:
-                        languages &= {"zh-Hans" if language == "zh-Hant" else "en"
-                            for h in bound[sid] for language in ("zh-Hant", "en")
-                            if _matching(self.language_segments[h], language)}
-                    for language in languages:
-                        seen = coverage.get((uid, language, sid), set())
-                        if any(i not in seen and not spans[sid].evidence_text[i].isspace()
-                               for i in range(part.start, part.end)):
-                            raise ValueError(f"View omitted source content: {uid}/{language}/{sid}")
+                    language = "zh-Hans" if part.language == "zh-Hant" else "en"
+                    seen = coverage.get((uid, language, sid), set())
+                    if any(i not in seen and not spans[sid].evidence_text[i].isspace()
+                           for i in range(part.start, part.end)):
+                        raise ValueError(f"View omitted source content: {uid}/{language}/{sid}")
         return self
 
 
@@ -244,18 +278,11 @@ def load_tokenizer(path: Path = ROOT / "data/tokenizer/tokenizer.json") -> Token
     return tokenizer
 
 
-def _language_parts(span: SourceSpan, rules: dict) -> list[SourceSegment]:
-    if span.id in rules:
-        rule = rules[span.id]
-        if hashlib.sha256(span.evidence_text.encode()).hexdigest() != rule["evidence_sha256"]:
-            raise ValueError(f"Stale language boundary: {span.id}")
-        return [SourceSegment(span_id=span.id, **part) for part in rule["segments"]]
+def _source_parts(span: SourceSpan) -> list[SourceSegment]:
     if not span.evidence_text:
         return []
-    if span.language == "mixed":
-        raise ValueError(f"Mixed source requires a reviewed boundary: {span.id}")
-    language = "shared" if span.language == "und" else span.language
-    return [SourceSegment(span_id=span.id, start=0, end=len(span.evidence_text), language=language)]
+    return [SourceSegment(span_id=span.id, start=0, end=len(span.evidence_text),
+                          language=span.language)]
 
 
 def _slice(ref: SourceSegment, spans: dict[str, SourceSpan]) -> str:
@@ -263,45 +290,31 @@ def _slice(ref: SourceSegment, spans: dict[str, SourceSpan]) -> str:
 
 
 def _matching(parts: list[SourceSegment], language: str) -> list[SourceSegment]:
-    return [p for p in parts if p.language in (language, "shared")]
+    return [p for p in parts if p.language == language]
 
 
 def _body_parts(unit: LogicalUnit, segments: dict, spans: dict) -> list[SourceSegment]:
-    verified = getattr(unit, "segments", [])
-    if not verified:
-        parts = [part for sid in unit.source_span_ids for part in segments[sid]]
-        if unit.kind == "table_row" and len(unit.source_span_ids) > 1:
-            # Keep row labels (including bilingual asset classes) on every child.
-            parts = [p.model_copy(update={"role": "title"})
-                     if getattr(spans[p.span_id], "table_col", None) == 0 else p for p in parts]
-        return parts
-    # Prefer the cleaner's PDF-verified title/body separation; never rewrite it.
-    if {s["span_id"] for s in verified} != set(unit.source_span_ids):
-        raise ValueError(f"Incomplete verified segments: {unit.id}")
     result = []
-    for entry in verified:
-        sid, title, body = entry["span_id"], entry["title"], entry["text"]
+    for sid in unit.source_span_ids:
         text = spans[sid].evidence_text
-        if text != title + ("\n" + body if body else ""):
-            raise ValueError(f"Verified segment no longer matches evidence: {sid}")
-        if body:
+        title = getattr(spans[sid], "title", "")
+        if title and text.startswith(title + "\n"):
             result.append(SourceSegment(span_id=sid, start=0, end=len(title) + 1,
-                                        language=entry["language"], role="title"))
+                                        language=spans[sid].language, role="title"))
             result.append(SourceSegment(span_id=sid, start=len(title) + 1, end=len(text),
-                                        language=entry["language"]))
+                                        language=spans[sid].language))
         else:
-            result.extend(segments[sid])
+            role = "title" if unit.kind == "table_row" and getattr(
+                spans[sid], "table_col", None) == 0 else "body"
+            result.extend(p.model_copy(update={"role": role}) for p in segments[sid])
     return result
 
 
 def _views(unit: LogicalUnit, spans: dict, segments: dict, context: list[str],
-           bindings: list[CellBinding], tokenizer: Tokenizer, cc: OpenCC,
-           parallel_parts: list[SourceSegment] | None = None) -> list[RetrievalView]:
-    body_parts = _body_parts(unit, segments, spans) + (parallel_parts or [])
+           bindings: list[CellBinding], tokenizer: Tokenizer, cc: OpenCC) -> list[RetrievalView]:
+    body_parts = _body_parts(unit, segments, spans)
     all_parts = body_parts + [p for sid in context for p in segments[sid]]
-    languages = {p.language for p in all_parts} - {"shared"}
-    if not languages:
-        languages = {"zh-Hant", "en"}
+    languages = {p.language for p in all_parts}
     result = []
     bound = {b.cell: b.column_headers for b in bindings if b.column_headers}
     header_ids = {h for headers in bound.values() for h in headers}
@@ -310,11 +323,6 @@ def _views(unit: LogicalUnit, spans: dict, segments: dict, context: list[str],
             continue
         body, titles = [], []
         for part in _matching(body_parts, language):
-            # A neutral number in a Chinese-only table must keep its own column.
-            if part.language == "shared" and part.span_id in bound and not any(
-                _matching(segments[h], language) for h in bound[part.span_id]
-            ):
-                continue
             (titles if part.role == "title" else body).append(part)
         if not body:
             continue
@@ -349,7 +357,11 @@ def _views(unit: LogicalUnit, spans: dict, segments: dict, context: list[str],
                                 for n in getattr(spans[p.span_id], "note_refs", [])}
             present = {int(m.group(1) or m.group(2)) for m in re.finditer(
                 r"<sup>(\d+)</sup>|\$\^\{(\d+)\}\$", text)}
-            text = normalize(text, markup_refs=present & reviewed_numbers)[0]
+            markers = {m["anchor"]: m for p in contextual + parts + headers(contextual + parts)
+                       for m in getattr(spans[p.span_id], "literal_markers", [])}
+            normalized = normalize(text, markup_refs=present & reviewed_numbers)[0]
+            text = normalize(normalized, markers=[m for a, m in markers.items()
+                                                  if normalized.count(a) == 1])[0]
             if language == "zh-Hant":
                 text = cc.convert(text)
             return PREFIX + text
@@ -417,11 +429,10 @@ def build_corpus(cleaned_dir: Path = ROOT / "data/cleaned",
     cleaned_dir, rules_path, tokenizer_path = map(Path, (cleaned_dir, rules_path, tokenizer_path))
     manifest = json.loads((cleaned_dir / "manifest.json").read_text(encoding="utf-8"))
     rules = json.loads(rules_path.read_text(encoding="utf-8"))
-    if rules["schema_version"] != 1:
+    if rules["schema_version"] != 2:
         raise ValueError("Unsupported corpus rules schema")
-    for filename, key in [("units.jsonl", "cleaned_units_sha256"),
-                          ("spans.jsonl", "cleaned_spans_sha256")]:
-        if _sha(cleaned_dir / filename) != rules[key] or rules[key] != manifest["artifacts"][filename]:
+    for filename in ("units.jsonl", "spans.jsonl"):
+        if _sha(cleaned_dir / filename) != manifest["artifacts"][filename]:
             raise ValueError(f"Cleaned input changed; review boundaries: {filename}")
     if version("opencc-python-reimplemented") != OPENCC_VERSION:
         raise ValueError(f"Use opencc-python-reimplemented=={OPENCC_VERSION}")
@@ -430,27 +441,19 @@ def build_corpus(cleaned_dir: Path = ROOT / "data/cleaned",
     units = [LogicalUnit.model_validate_json(line) for line in
              (cleaned_dir / "units.jsonl").read_text(encoding="utf-8").splitlines()]
     spans = {s.id: s for s in source_spans}
-    known_units = {u.id for u in units}
-    if (set(rules["unit_context"]) | set(rules["cell_bindings"])) - known_units:
-        raise ValueError("Corpus rules reference unknown units")
-    if set(rules["spans"]) - spans.keys():
-        raise ValueError("Corpus rules reference unknown sources")
     context, bindings = {}, {}
     for unit in units:
-        context[unit.id] = list(dict.fromkeys(unit.context_span_ids
-                                            + rules["unit_context"].get(unit.id, [])))
-        raw_bindings = getattr(unit, "cell_bindings", []) + rules["cell_bindings"].get(unit.id, [])
+        context[unit.id] = list(dict.fromkeys(unit.context_span_ids))
+        raw_bindings = getattr(unit, "cell_bindings", [])
         bindings[unit.id] = [CellBinding.model_validate(b) for b in raw_bindings]
         for binding in bindings[unit.id]:
             context[unit.id] = list(dict.fromkeys(context[unit.id] + binding.column_headers))
     referenced = {sid for unit in units for sid in unit.source_span_ids + context[unit.id]}
-    segments = {sid: _language_parts(spans[sid], rules["spans"]) for sid in sorted(referenced)}
+    segments = {sid: _source_parts(spans[sid]) for sid in sorted(referenced)}
     tokenizer = load_tokenizer(tokenizer_path)
     cc = OpenCC("t2s")
     views = [view for unit in units if unit.indexable
-             for view in _views(unit, spans, segments, context[unit.id], bindings[unit.id], tokenizer, cc,
-                 [part for peer in rules["parallel_units"].get(unit.id, [])
-                  for part in _body_parts(next(u for u in units if u.id == peer), segments, spans)])]
+             for view in _views(unit, spans, segments, context[unit.id], bindings[unit.id], tokenizer, cc)]
     return Corpus(provenance={
         "source": manifest,
         "corpus_rules_sha256": _sha(rules_path),

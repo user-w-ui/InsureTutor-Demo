@@ -8,6 +8,7 @@
     "retained_table": 9,
     "retained_text": 284
   },
+  "bilingual_units": 137,
   "conflicts": [
     {
       "reason": "PDF page 17 visually confirms CN HKD 40,000 / MOP 400,000 versus EN HKD 400,000 / MOP 40,000. Neither is selected as authoritative.",
@@ -80,6 +81,8 @@
       "status": "resolved"
     }
   ],
+  "language_records": 274,
+  "mixed_source_spans": 0,
   "native_caption_tables": 2,
   "numbered_note_groups": 10,
   "pdf_corrections": [
@@ -166,7 +169,7 @@
   ],
   "required_edges": 115,
   "resolved_issue_count": 7,
-  "retained_text_blocks": 299,
+  "retained_text_blocks": 368,
   "retrieval_units": 137,
   "review": {
     "method": "Source JSON inspection; PDF visual spot checks on pages 6/8/9/12/16/17 and table crops on pages 7/13/18. Not a human sign-off or full transcription review. Targeted PDF page review on 4/8/9/10/12/13 confirms finite text and formula corrections.",
@@ -174,7 +177,11 @@
     "reviewed_by": "Codex"
   },
   "scope": "Finite PDF-verified corrections and bilingual views; independent clean fragments, not final chunks or a vector index. No whole-PDF transcription certification.",
-  "source_spans": 458,
+  "source_languages": {
+    "en": 332,
+    "zh-Hant": 328
+  },
+  "source_spans": 660,
   "status": "cleaned_ready_for_chunking",
   "tables": 9,
   "unresolved_issue_count": 0,
