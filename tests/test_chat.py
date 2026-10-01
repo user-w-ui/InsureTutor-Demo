@@ -19,7 +19,7 @@ from insuretutor.chat import evaluate
 from insuretutor.chat_models import ChatTurn
 from insuretutor.corpus import Corpus, assemble_evidence
 from insuretutor.generation import AgentGenerator, ModelConfig
-from insuretutor.guardrails.answers import AnswerRejected, check_scope, quantities
+from insuretutor.guardrails.answers import AnswerRejected, check_scope, message, quantities
 from insuretutor.sessions import HistoryTurn, SessionCapacityError, SessionStore
 from insuretutor.tutor import Tutor, response_language
 
@@ -538,9 +538,10 @@ async def test_required_note_missing_from_delivered_bundle_fails_closed(corpus):
     "language,text",
     [
         ("en", "Periodic withdrawal requires 10 years."),
-        ("zh-Hans", "定期提款只適用於生效滿10年的保單。"),
-        ("zh-Hant", "定期提款只适用于生效满10年的保单。"),
+        ("zh-Hans", "定期提款只适用于生效满10年的保单。"),
+        ("zh-Hant", "定期提款只適用於生效滿10年的保單。"),
     ],
+    ids=["en", "zh-Hans", "zh-Hant"],
 )
 async def test_three_languages_keep_original_citations(corpus, language, text):
     model = ScriptModel([draft(text)])
@@ -650,7 +651,7 @@ async def test_rule_application_uses_user_duration_not_user_amounts(corpus):
 
 @pytest.mark.asyncio
 async def test_server_supplies_essential_scope_and_education_clarification(corpus):
-    result, _, _, _ = await answer(corpus, [draft()], question="我孙子今年要上学，要投什么保险？")
+    result, _, _, _ = await answer(corpus, [draft()], question="我家孙子今年要上学，要投什么保险？")
     assert result.status == "clarification" and result.clarification_question
     assert any(c.boundary == "purchase" for c in result.claims)
     question = "我该买什么保险？住院报销、旅游出事、车撞了都管吗？"
@@ -660,15 +661,92 @@ async def test_server_supplies_essential_scope_and_education_clarification(corpu
 
 
 @pytest.mark.asyncio
-async def test_education_clarification_prioritizes_policy_ownership(corpus):
+@pytest.mark.parametrize(
+    "purpose",
+    [
+        "我家孩子明年要念书，该买什么保险？",  # education, reworded
+        "我想给儿子准备结婚的钱，买什么好？",  # marriage
+        "我想准备退休金，应该买什么保险？",  # retirement
+        "my kid is starting college, what should i buy?",  # English
+    ],
+)
+async def test_unsourced_buying_intent_asks_ownership_for_any_purpose(corpus, purpose):
+    """The rule keys on the shape of the question, not on purpose vocabulary.
+
+    Purpose words are an open set. These phrasings share no keyword with the
+    education fixture, so a keyword list would answer them with a recommendation.
+    """
+    result, _, _, _ = await answer(corpus, [draft()], question=purpose)
+    assert result.status == "clarification", purpose
+    # The clarification is server-owned and follows the response language.
+    assert result.clarification_question == message("ownership_question", result.response_language)
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "stated",
+    [
+        "我已经持有本册的保单，孩子上学能取钱吗？",
+        "I already hold this policy, can I withdraw for school?",
+    ],
+)
+async def test_stated_ownership_suppresses_the_clarification(corpus, stated):
+    """A user who says they hold the policy is not asked again."""
+    result, _, _, _ = await answer(corpus, [draft()], question=stated)
+    assert result.status == "answered", stated
+
+
+@pytest.mark.asyncio
+async def test_denied_ownership_still_asks(corpus):
+    """'I do not have a policy yet' settles nothing - it is the case that needs asking."""
     result, _, _, _ = await answer(
         corpus,
-        [draft(clarification_question="请问孙子年龄是多少岁？")],
+        [draft()],
+        question="我还没有保单，准备现在新买，能取钱交学费吗？",
+    )
+    assert result.status == "clarification"
+    assert result.clarification_question == message("ownership_question", result.response_language)
+
+
+@pytest.mark.asyncio
+async def test_server_overrides_a_model_authored_clarification(corpus):
+    """The model may draft its own clarification; the ownership rule replaces it.
+
+    The model's draft is deliberately something the ownership rule never says, so
+    a passing run proves the server wrote the question rather than adopting it.
+    """
+    result, _, _, _ = await answer(
+        corpus,
+        [draft(clarification_question="What is the insured's age?")],
         question="我孙子今年要上学，要投什么保险？",
     )
     assert result.status == "clarification"
-    assert "持有" in result.clarification_question
-    assert "年龄" not in result.clarification_question
+    assert result.clarification_question == message("ownership_question", result.response_language)
+
+
+@pytest.mark.asyncio
+async def test_server_supplies_essential_scope_boundaries(corpus):
+    """A bare buying question plus three unmatched needs still produces the scope list.
+
+    This asserts the server-owned wording, not the user's question: the three
+    product lines come from the response-language message table.
+    """
+    result, _, _, _ = await answer(
+        corpus, [draft()], question="我该买什么保险？住院报销、旅游出事、车撞了都管吗？"
+    )
+    assert {"purchase", "scope"} <= {c.boundary for c in result.claims if c.boundary}
+    language = result.response_language
+    assert all(
+        message(code, language) in result.explanation for code in ("medical", "travel", "motor")
+    )
+
+
+@pytest.mark.asyncio
+async def test_a_bare_buying_question_asks_ownership_before_anything_else(corpus):
+    """No purpose vocabulary: the ownership question is what this input needs first."""
+    result, _, _, _ = await answer(corpus, [draft()], question="我家孙子今年要上学，要投什么保险？")
+    assert result.status == "clarification"
+    assert any(c.boundary == "purchase" for c in result.claims)
 
 
 @pytest.mark.parametrize(

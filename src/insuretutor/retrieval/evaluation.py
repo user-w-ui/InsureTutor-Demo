@@ -2,7 +2,6 @@
 
 from __future__ import annotations
 
-import hashlib
 import json
 import platform
 import statistics
@@ -121,8 +120,6 @@ async def evaluate_retrieval(retriever: HybridRetriever) -> dict:
     }
     return {
         "schema_version": 1,
-        "retrieval_cases_sha256": hashlib.sha256(path.read_bytes()).hexdigest(),
-        "evaluator_items_sha256": hashlib.sha256(evaluator_path.read_bytes()).hexdigest(),
         "metric_definition": "Macro unit Recall@5 over primary targets; exact core-unit coverage after ranked top-8 whole-closure recovery (may undercount equivalent evidence in other table rows). 21 equivalent queries plus 7 original queries; excludes refusal cases. Required-evidence coverage checks requires closure of retrieved units, independently of relevance. Additional source examples are reported separately. No relevance acceptance threshold is specified.",
         "summary": summary,
         "offline_checks": checks,

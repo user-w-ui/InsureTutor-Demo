@@ -2,9 +2,9 @@
   "environment": {
     "cpu": "AMD64 Family 25 Model 117 Stepping 2, AuthenticAMD",
     "latency_ms": {
-      "max": 25.358,
-      "median": 15.618,
-      "p95": 24.815
+      "max": 139.297,
+      "median": 69.873,
+      "p95": 105.576
     },
     "latency_scope": "warm rank() including CPU query encoding, lexical/dense fusion; excludes bundle recovery and startup",
     "os": "Windows-11-10.0.26200-SP0",
@@ -15,12 +15,11 @@
     },
     "python": "3.12.13",
     "retrieval_latency_ms": {
-      "median": 25.918,
-      "p95": 46.904
+      "median": 87.502,
+      "p95": 144.793
     },
     "threads": 2
   },
-  "evaluator_items_sha256": "033aa63c8d71952c6a7d3e5dabfd2f7766186af0852b1e50459c7ddfdedc6219",
   "metric_definition": "Macro unit Recall@5 over primary targets; exact core-unit coverage after ranked top-8 whole-closure recovery (may undercount equivalent evidence in other table rows). 21 equivalent queries plus 7 original queries; excludes refusal cases. Required-evidence coverage checks requires closure of retrieved units, independently of relevance. Additional source examples are reported separately. No relevance acceptance threshold is specified.",
   "offline_checks": {
     "document_reencode_max_abs_error": 0.0,
@@ -36,7 +35,7 @@
     {
       "id": "q1",
       "language": "en",
-      "latency_ms": 24.94,
+      "latency_ms": 108.509,
       "methods": {
         "bm25": {
           "bundle": [
@@ -82,19 +81,15 @@
         "hybrid": {
           "bundle": [
             "coverage-change",
-            "coverage-summary",
             "enhancement",
             "enhancement-summary",
-            "increasing-summary",
             "insurability",
+            "life-stage-example",
             "note-1",
-            "note-10",
             "note-2",
             "note-3",
-            "premium-rate",
             "table-352-row-8",
-            "table-356-row-0",
-            "table-97-row-2"
+            "table-354-row-4"
           ],
           "core_coverage": 1.0,
           "missing_additional": [],
@@ -102,22 +97,22 @@
           "recall_at_5": 1.0,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "insurability",
-            "enhancement",
-            "table-352-row-8",
-            "coverage-summary",
-            "table-356-row-0",
-            "enhancement-summary",
-            "premium-rate",
-            "increasing-summary"
-          ],
-          "source_characters": 4576,
-          "top5": [
-            "insurability",
-            "enhancement",
             "note-3",
+            "enhancement",
             "table-352-row-8",
-            "coverage-summary"
+            "insurability",
+            "table-354-row-4",
+            "enhancement-summary",
+            "coverage-change",
+            "life-stage-example"
+          ],
+          "source_characters": 3551,
+          "top5": [
+            "note-3",
+            "enhancement",
+            "table-352-row-8",
+            "insurability",
+            "table-354-row-4"
           ]
         },
         "vector": {
@@ -167,7 +162,7 @@
     {
       "id": "q1",
       "language": "zh-Hans",
-      "latency_ms": 17.276,
+      "latency_ms": 74.82,
       "methods": {
         "bm25": {
           "bundle": [
@@ -210,18 +205,15 @@
         },
         "hybrid": {
           "bundle": [
-            "coverage-change",
-            "coverage-summary",
+            "deferred-payment",
             "enhancement",
-            "enhancement-summary",
-            "generic-coverage",
-            "generic-disclaimer",
             "insurability",
-            "note-1",
             "note-10",
             "note-2",
             "note-3",
-            "premium-rate",
+            "note-4",
+            "note-5",
+            "surrender-factor",
             "table-352-row-8",
             "table-356-row-0"
           ],
@@ -234,19 +226,19 @@
             "insurability",
             "enhancement",
             "table-352-row-8",
-            "coverage-summary",
             "table-356-row-0",
-            "premium-rate",
-            "generic-coverage",
-            "enhancement-summary"
+            "note-5",
+            "note-4",
+            "surrender-factor",
+            "deferred-payment"
           ],
-          "source_characters": 4401,
+          "source_characters": 3850,
           "top5": [
             "insurability",
             "enhancement",
             "table-352-row-8",
-            "note-3",
-            "coverage-summary"
+            "table-356-row-0",
+            "note-3"
           ]
         },
         "vector": {
@@ -295,7 +287,7 @@
     {
       "id": "q1",
       "language": "zh-Hant",
-      "latency_ms": 15.73,
+      "latency_ms": 87.697,
       "methods": {
         "bm25": {
           "bundle": [
@@ -338,18 +330,15 @@
         },
         "hybrid": {
           "bundle": [
-            "coverage-change",
-            "coverage-summary",
+            "deferred-payment",
             "enhancement",
-            "enhancement-summary",
-            "generic-coverage",
-            "generic-disclaimer",
             "insurability",
-            "note-1",
             "note-10",
             "note-2",
             "note-3",
-            "premium-rate",
+            "note-4",
+            "note-5",
+            "surrender-factor",
             "table-352-row-8",
             "table-356-row-0"
           ],
@@ -362,19 +351,19 @@
             "insurability",
             "enhancement",
             "table-352-row-8",
-            "coverage-summary",
             "table-356-row-0",
-            "premium-rate",
-            "generic-coverage",
-            "enhancement-summary"
+            "note-5",
+            "note-4",
+            "surrender-factor",
+            "deferred-payment"
           ],
-          "source_characters": 4401,
+          "source_characters": 3850,
           "top5": [
             "insurability",
             "enhancement",
             "table-352-row-8",
-            "note-3",
-            "coverage-summary"
+            "table-356-row-0",
+            "note-3"
           ]
         },
         "vector": {
@@ -423,7 +412,7 @@
     {
       "id": "q1",
       "language": "original",
-      "latency_ms": 24.066,
+      "latency_ms": 86.263,
       "methods": {
         "bm25": {
           "bundle": [
@@ -476,31 +465,32 @@
             "note-1",
             "note-2",
             "note-3",
-            "premium-rate",
-            "table-352-row-8"
+            "note-4",
+            "table-352-row-8",
+            "table-97-row-1"
           ],
           "core_coverage": 1.0,
           "missing_additional": [],
           "missing_core": [],
-          "recall_at_5": 1.0,
+          "recall_at_5": 0.6666666666666666,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "enhancement",
             "insurability",
-            "table-352-row-8",
+            "enhancement",
             "coverage-change",
-            "premium-rate",
-            "generic-coverage",
+            "coverage-summary",
             "enhancement-summary",
-            "coverage-summary"
-          ],
-          "source_characters": 3513,
-          "top5": [
-            "enhancement",
-            "insurability",
+            "generic-coverage",
             "table-352-row-8",
-            "note-3",
-            "coverage-change"
+            "table-97-row-1"
+          ],
+          "source_characters": 3683,
+          "top5": [
+            "insurability",
+            "enhancement",
+            "coverage-change",
+            "coverage-summary",
+            "enhancement-summary"
           ]
         },
         "vector": {
@@ -548,7 +538,7 @@
     {
       "id": "q2",
       "language": "en",
-      "latency_ms": 15.298,
+      "latency_ms": 70.335,
       "methods": {
         "bm25": {
           "bundle": [
@@ -592,21 +582,16 @@
         },
         "hybrid": {
           "bundle": [
-            "cash-value-risk",
+            "claims",
+            "cooling-off",
             "coverage-change",
-            "coverage-summary",
+            "disclaimer-en",
+            "disclaimer-zh",
             "generic-coverage",
             "generic-disclaimer",
             "note-1",
-            "note-10",
-            "note-3",
-            "note-5",
-            "note-6",
-            "table-352-row-8",
-            "table-354-row-5",
-            "table-356-row-0",
-            "table-97-row-3",
-            "term-and-lapse"
+            "rate-date-note",
+            "table-354-row-5"
           ],
           "core_coverage": 1.0,
           "missing_additional": [],
@@ -616,20 +601,20 @@
           "selected": [
             "table-354-row-5",
             "coverage-change",
+            "generic-disclaimer",
+            "rate-date-note",
+            "claims",
+            "disclaimer-en",
             "generic-coverage",
-            "coverage-summary",
-            "table-356-row-0",
-            "table-352-row-8",
-            "table-97-row-3",
-            "note-6"
+            "cooling-off"
           ],
-          "source_characters": 6274,
+          "source_characters": 3778,
           "top5": [
             "table-354-row-5",
             "coverage-change",
             "note-1",
-            "generic-coverage",
-            "coverage-summary"
+            "generic-disclaimer",
+            "rate-date-note"
           ]
         },
         "vector": {
@@ -677,7 +662,7 @@
     {
       "id": "q2",
       "language": "zh-Hans",
-      "latency_ms": 14.731,
+      "latency_ms": 64.348,
       "methods": {
         "bm25": {
           "bundle": [
@@ -721,16 +706,19 @@
         "hybrid": {
           "bundle": [
             "base-interest",
+            "cash-value-risk",
             "coverage-change",
             "coverage-summary",
+            "investment-links",
             "note-1",
             "note-10",
             "note-3",
-            "premium-rate",
+            "note-6",
             "rate-date-note",
             "table-352-row-8",
             "table-354-row-5",
-            "table-356-row-0"
+            "table-356-row-0",
+            "term-and-lapse"
           ],
           "core_coverage": 1.0,
           "missing_additional": [],
@@ -738,22 +726,22 @@
           "recall_at_5": 1.0,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "table-354-row-5",
-            "note-1",
-            "premium-rate",
-            "table-352-row-8",
             "coverage-summary",
+            "table-354-row-5",
+            "note-6",
             "rate-date-note",
             "table-356-row-0",
-            "base-interest"
-          ],
-          "source_characters": 3862,
-          "top5": [
-            "table-354-row-5",
-            "note-1",
-            "premium-rate",
             "table-352-row-8",
-            "coverage-summary"
+            "base-interest",
+            "investment-links"
+          ],
+          "source_characters": 6350,
+          "top5": [
+            "coverage-summary",
+            "table-354-row-5",
+            "coverage-change",
+            "note-6",
+            "rate-date-note"
           ]
         },
         "vector": {
@@ -798,7 +786,7 @@
     {
       "id": "q2",
       "language": "zh-Hant",
-      "latency_ms": 14.513,
+      "latency_ms": 56.255,
       "methods": {
         "bm25": {
           "bundle": [
@@ -842,16 +830,19 @@
         "hybrid": {
           "bundle": [
             "base-interest",
+            "cash-value-risk",
             "coverage-change",
             "coverage-summary",
+            "investment-links",
             "note-1",
             "note-10",
             "note-3",
-            "premium-rate",
+            "note-6",
             "rate-date-note",
             "table-352-row-8",
             "table-354-row-5",
-            "table-356-row-0"
+            "table-356-row-0",
+            "term-and-lapse"
           ],
           "core_coverage": 1.0,
           "missing_additional": [],
@@ -859,22 +850,22 @@
           "recall_at_5": 1.0,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "table-354-row-5",
-            "note-1",
-            "premium-rate",
-            "table-352-row-8",
             "coverage-summary",
+            "table-354-row-5",
+            "note-6",
             "rate-date-note",
             "table-356-row-0",
-            "base-interest"
-          ],
-          "source_characters": 3862,
-          "top5": [
-            "table-354-row-5",
-            "note-1",
-            "premium-rate",
             "table-352-row-8",
-            "coverage-summary"
+            "base-interest",
+            "investment-links"
+          ],
+          "source_characters": 6350,
+          "top5": [
+            "coverage-summary",
+            "table-354-row-5",
+            "coverage-change",
+            "note-6",
+            "rate-date-note"
           ]
         },
         "vector": {
@@ -919,7 +910,7 @@
     {
       "id": "q2",
       "language": "original",
-      "latency_ms": 21.287,
+      "latency_ms": 86.963,
       "methods": {
         "bm25": {
           "bundle": [
@@ -967,14 +958,15 @@
             "coverage-summary",
             "disclaimer-en",
             "disclaimer-zh",
+            "enhancement-summary",
+            "example-disclaimer",
             "generic-coverage",
             "generic-disclaimer",
-            "generic-monthly-interest",
+            "life-stage-example",
             "note-1",
-            "note-10",
-            "table-354-row-4",
-            "table-354-row-5",
-            "table-356-row-0"
+            "note-2",
+            "note-3",
+            "table-354-row-5"
           ],
           "core_coverage": 1.0,
           "missing_additional": [],
@@ -982,22 +974,22 @@
           "recall_at_5": 1.0,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "table-354-row-5",
-            "coverage-summary",
-            "generic-disclaimer",
             "disclaimer-en",
-            "generic-coverage",
-            "table-356-row-0",
-            "table-354-row-4",
-            "generic-monthly-interest"
-          ],
-          "source_characters": 3008,
-          "top5": [
             "table-354-row-5",
-            "coverage-summary",
-            "generic-disclaimer",
             "coverage-change",
-            "disclaimer-en"
+            "generic-coverage",
+            "coverage-summary",
+            "example-disclaimer",
+            "life-stage-example",
+            "enhancement-summary"
+          ],
+          "source_characters": 4078,
+          "top5": [
+            "disclaimer-en",
+            "disclaimer-zh",
+            "table-354-row-5",
+            "coverage-change",
+            "note-1"
           ]
         },
         "vector": {
@@ -1044,7 +1036,7 @@
     {
       "id": "q3",
       "language": "en",
-      "latency_ms": 22.964,
+      "latency_ms": 98.97,
       "methods": {
         "bm25": {
           "bundle": [
@@ -1093,47 +1085,46 @@
         },
         "hybrid": {
           "bundle": [
+            "base-interest",
             "bonus-rate-15-25",
             "bonus-rate-disclaimer",
+            "guarantee-summary",
             "interest-every5-note",
+            "interest-guarantee",
             "interest-year20-note",
             "rate-date-note",
             "table-114-row-1",
-            "table-114-row-12",
             "table-114-row-2",
-            "table-114-row-3",
-            "table-114-row-7",
             "table-114-row-8",
-            "table-114-row-9"
+            "table-352-row-5-early",
+            "table-352-row-6"
           ],
-          "core_coverage": 0.5,
+          "core_coverage": 0.7,
           "missing_additional": [],
           "missing_core": [
             "additional-interest",
-            "base-interest",
             "bonus-rate-30",
-            "extra-bonus-frequency",
-            "table-352-row-6"
+            "extra-bonus-frequency"
           ],
           "recall_at_5": 0.16666666666666666,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "table-114-row-8",
             "bonus-rate-15-25",
-            "table-114-row-1",
+            "table-352-row-5-early",
             "table-114-row-2",
-            "table-114-row-9",
-            "table-114-row-12",
-            "table-114-row-7",
-            "table-114-row-3"
+            "table-114-row-8",
+            "guarantee-summary",
+            "table-352-row-6",
+            "base-interest",
+            "table-114-row-1"
           ],
-          "source_characters": 1431,
+          "source_characters": 2554,
           "top5": [
-            "table-114-row-8",
             "bonus-rate-15-25",
-            "table-114-row-1",
+            "table-352-row-5-early",
             "table-114-row-2",
-            "table-114-row-9"
+            "table-114-row-8",
+            "guarantee-summary"
           ]
         },
         "vector": {
@@ -1186,7 +1177,7 @@
     {
       "id": "q3",
       "language": "zh-Hans",
-      "latency_ms": 16.846,
+      "latency_ms": 87.233,
       "methods": {
         "bm25": {
           "bundle": [
@@ -1236,47 +1227,48 @@
         },
         "hybrid": {
           "bundle": [
+            "additional-interest",
+            "bonus-example",
             "bonus-rate-15-25",
             "bonus-rate-disclaimer",
+            "example-disclaimer",
+            "extra-bonus-frequency",
             "interest-every5-note",
+            "interest-summary",
             "interest-year20-note",
             "rate-date-note",
             "table-114-row-1",
-            "table-114-row-12",
-            "table-114-row-2",
-            "table-114-row-3",
             "table-114-row-7",
             "table-114-row-8",
-            "table-114-row-9"
+            "table-114-row-9",
+            "table-352-row-5-early"
           ],
-          "core_coverage": 0.5,
+          "core_coverage": 0.7,
           "missing_additional": [],
           "missing_core": [
-            "additional-interest",
             "base-interest",
             "bonus-rate-30",
-            "extra-bonus-frequency",
             "table-352-row-6"
           ],
           "recall_at_5": 0.16666666666666666,
           "required_evidence_coverage": 1.0,
           "selected": [
+            "bonus-example",
             "table-114-row-8",
-            "table-114-row-12",
-            "table-114-row-9",
-            "table-114-row-7",
-            "bonus-rate-15-25",
             "table-114-row-1",
-            "table-114-row-3",
-            "table-114-row-2"
-          ],
-          "source_characters": 1431,
-          "top5": [
-            "table-114-row-8",
-            "table-114-row-12",
-            "table-114-row-9",
+            "bonus-rate-15-25",
             "table-114-row-7",
-            "bonus-rate-15-25"
+            "table-114-row-9",
+            "table-352-row-5-early",
+            "interest-summary"
+          ],
+          "source_characters": 2220,
+          "top5": [
+            "bonus-example",
+            "table-114-row-8",
+            "table-114-row-1",
+            "bonus-rate-15-25",
+            "table-114-row-7"
           ]
         },
         "vector": {
@@ -1331,7 +1323,7 @@
     {
       "id": "q3",
       "language": "zh-Hant",
-      "latency_ms": 16.138,
+      "latency_ms": 100.128,
       "methods": {
         "bm25": {
           "bundle": [
@@ -1381,47 +1373,48 @@
         },
         "hybrid": {
           "bundle": [
+            "additional-interest",
+            "bonus-example",
             "bonus-rate-15-25",
             "bonus-rate-disclaimer",
+            "example-disclaimer",
+            "extra-bonus-frequency",
             "interest-every5-note",
+            "interest-summary",
             "interest-year20-note",
             "rate-date-note",
             "table-114-row-1",
-            "table-114-row-12",
-            "table-114-row-2",
-            "table-114-row-3",
             "table-114-row-7",
             "table-114-row-8",
-            "table-114-row-9"
+            "table-114-row-9",
+            "table-352-row-5-early"
           ],
-          "core_coverage": 0.5,
+          "core_coverage": 0.7,
           "missing_additional": [],
           "missing_core": [
-            "additional-interest",
             "base-interest",
             "bonus-rate-30",
-            "extra-bonus-frequency",
             "table-352-row-6"
           ],
           "recall_at_5": 0.16666666666666666,
           "required_evidence_coverage": 1.0,
           "selected": [
+            "bonus-example",
             "table-114-row-8",
-            "table-114-row-12",
-            "table-114-row-9",
-            "table-114-row-7",
-            "bonus-rate-15-25",
             "table-114-row-1",
-            "table-114-row-3",
-            "table-114-row-2"
-          ],
-          "source_characters": 1431,
-          "top5": [
-            "table-114-row-8",
-            "table-114-row-12",
-            "table-114-row-9",
+            "bonus-rate-15-25",
             "table-114-row-7",
-            "bonus-rate-15-25"
+            "table-114-row-9",
+            "table-352-row-5-early",
+            "interest-summary"
+          ],
+          "source_characters": 2220,
+          "top5": [
+            "bonus-example",
+            "table-114-row-8",
+            "table-114-row-1",
+            "bonus-rate-15-25",
+            "table-114-row-7"
           ]
         },
         "vector": {
@@ -1476,7 +1469,7 @@
     {
       "id": "q3",
       "language": "original",
-      "latency_ms": 25.358,
+      "latency_ms": 139.297,
       "methods": {
         "bm25": {
           "bundle": [
@@ -1529,47 +1522,46 @@
           "bundle": [
             "bonus-example",
             "bonus-rate-disclaimer",
+            "disclaimer-en",
+            "disclaimer-zh",
             "example-disclaimer",
+            "extra-bonus-frequency",
+            "generic-disclaimer",
+            "guarantee-summary",
             "interest-every5-note",
+            "interest-guarantee",
             "interest-year20-note",
             "rate-date-note",
-            "table-114-row-1",
-            "table-114-row-12",
-            "table-114-row-2",
-            "table-114-row-3",
-            "table-114-row-7",
             "table-114-row-8",
-            "table-114-row-9"
+            "table-352-row-6"
           ],
-          "core_coverage": 0.4,
+          "core_coverage": 0.6,
           "missing_additional": [],
           "missing_core": [
             "additional-interest",
             "base-interest",
             "bonus-rate-15-25",
-            "bonus-rate-30",
-            "extra-bonus-frequency",
-            "table-352-row-6"
+            "bonus-rate-30"
           ],
-          "recall_at_5": 0.0,
+          "recall_at_5": 0.16666666666666666,
           "required_evidence_coverage": 1.0,
           "selected": [
             "table-114-row-8",
-            "table-114-row-12",
-            "table-114-row-7",
-            "table-114-row-1",
-            "table-114-row-9",
             "bonus-example",
-            "table-114-row-2",
-            "table-114-row-3"
+            "interest-guarantee",
+            "guarantee-summary",
+            "table-352-row-6",
+            "generic-disclaimer",
+            "disclaimer-en",
+            "extra-bonus-frequency"
           ],
-          "source_characters": 1727,
+          "source_characters": 3644,
           "top5": [
             "table-114-row-8",
-            "table-114-row-12",
-            "table-114-row-7",
-            "table-114-row-1",
-            "table-114-row-9"
+            "bonus-example",
+            "interest-guarantee",
+            "guarantee-summary",
+            "table-352-row-6"
           ]
         },
         "vector": {
@@ -1624,7 +1616,7 @@
     {
       "id": "q4",
       "language": "en",
-      "latency_ms": 19.537,
+      "latency_ms": 64.03,
       "methods": {
         "bm25": {
           "bundle": [
@@ -1753,7 +1745,7 @@
     {
       "id": "q4",
       "language": "zh-Hans",
-      "latency_ms": 15.505,
+      "latency_ms": 69.152,
       "methods": {
         "bm25": {
           "bundle": [
@@ -1802,13 +1794,13 @@
             "note-4",
             "note-5",
             "note-9",
-            "table-352-row-10",
             "table-352-row-7",
             "table-352-row-8",
             "table-97-row-1",
             "table-97-row-2",
             "table-97-row-3",
-            "terminal-exclusions"
+            "terminal-exclusions",
+            "terminal-illness"
           ],
           "core_coverage": 1.0,
           "missing_additional": [],
@@ -1817,20 +1809,20 @@
           "required_evidence_coverage": 1.0,
           "selected": [
             "note-5",
-            "table-97-row-3",
             "note-4",
             "table-97-row-1",
+            "table-97-row-3",
             "table-97-row-2",
             "table-352-row-7",
-            "table-352-row-10",
+            "terminal-illness",
             "table-352-row-8"
           ],
-          "source_characters": 4689,
+          "source_characters": 4891,
           "top5": [
             "note-5",
-            "table-97-row-3",
             "note-4",
             "table-97-row-1",
+            "table-97-row-3",
             "table-97-row-2"
           ]
         },
@@ -1878,7 +1870,7 @@
     {
       "id": "q4",
       "language": "zh-Hant",
-      "latency_ms": 15.425,
+      "latency_ms": 69.412,
       "methods": {
         "bm25": {
           "bundle": [
@@ -1927,13 +1919,13 @@
             "note-4",
             "note-5",
             "note-9",
-            "table-352-row-10",
             "table-352-row-7",
             "table-352-row-8",
             "table-97-row-1",
             "table-97-row-2",
             "table-97-row-3",
-            "terminal-exclusions"
+            "terminal-exclusions",
+            "terminal-illness"
           ],
           "core_coverage": 1.0,
           "missing_additional": [],
@@ -1942,20 +1934,20 @@
           "required_evidence_coverage": 1.0,
           "selected": [
             "note-5",
-            "table-97-row-3",
             "note-4",
             "table-97-row-1",
+            "table-97-row-3",
             "table-97-row-2",
             "table-352-row-7",
-            "table-352-row-10",
+            "terminal-illness",
             "table-352-row-8"
           ],
-          "source_characters": 4689,
+          "source_characters": 4891,
           "top5": [
             "note-5",
-            "table-97-row-3",
             "note-4",
             "table-97-row-1",
+            "table-97-row-3",
             "table-97-row-2"
           ]
         },
@@ -2003,7 +1995,7 @@
     {
       "id": "q4",
       "language": "original",
-      "latency_ms": 19.403,
+      "latency_ms": 68.353,
       "methods": {
         "bm25": {
           "bundle": [
@@ -2129,7 +2121,7 @@
     {
       "id": "q5",
       "language": "en",
-      "latency_ms": 14.077,
+      "latency_ms": 68.477,
       "methods": {
         "bm25": {
           "bundle": [
@@ -2176,13 +2168,10 @@
         "hybrid": {
           "bundle": [
             "cash-value-risk",
-            "interest-every5-note",
-            "interest-year20-note",
+            "generic-disclaimer",
             "note-10",
             "note-6",
             "note-7",
-            "rate-date-note",
-            "table-114-row-3",
             "table-354-row-6",
             "table-354-row-7",
             "table-354-row-8",
@@ -2198,21 +2187,21 @@
           "required_evidence_coverage": 1.0,
           "selected": [
             "note-6",
+            "withdrawal",
             "withdrawal-summary",
             "table-356-row-1",
-            "withdrawal",
-            "table-354-row-8",
-            "table-114-row-3",
+            "table-354-row-6",
             "table-354-row-7",
-            "table-354-row-6"
+            "table-354-row-8",
+            "generic-disclaimer"
           ],
-          "source_characters": 6226,
+          "source_characters": 5245,
           "top5": [
             "note-6",
+            "withdrawal",
             "withdrawal-summary",
             "table-356-row-1",
-            "withdrawal",
-            "cash-value-risk"
+            "term-and-lapse"
           ]
         },
         "vector": {
@@ -2264,7 +2253,7 @@
     {
       "id": "q5",
       "language": "zh-Hans",
-      "latency_ms": 14.423,
+      "latency_ms": 70.762,
       "methods": {
         "bm25": {
           "bundle": [
@@ -2314,10 +2303,10 @@
             "generic-disclaimer",
             "note-10",
             "note-2",
-            "note-5",
+            "note-4",
             "note-6",
             "note-7",
-            "table-354-row-6",
+            "table-354-row-5",
             "table-356-row-1",
             "term-and-lapse",
             "withdrawal",
@@ -2333,18 +2322,18 @@
             "withdrawal",
             "table-356-row-1",
             "enhancement",
-            "table-354-row-6",
             "withdrawal-summary",
-            "note-5",
-            "generic-cash-withdrawal"
+            "generic-cash-withdrawal",
+            "note-4",
+            "table-354-row-5"
           ],
-          "source_characters": 4904,
+          "source_characters": 4679,
           "top5": [
             "note-6",
             "withdrawal",
             "table-356-row-1",
-            "enhancement",
-            "table-354-row-6"
+            "note-7",
+            "enhancement"
           ]
         },
         "vector": {
@@ -2394,7 +2383,7 @@
     {
       "id": "q5",
       "language": "zh-Hant",
-      "latency_ms": 14.945,
+      "latency_ms": 58.868,
       "methods": {
         "bm25": {
           "bundle": [
@@ -2444,10 +2433,10 @@
             "generic-disclaimer",
             "note-10",
             "note-2",
-            "note-5",
+            "note-4",
             "note-6",
             "note-7",
-            "table-354-row-6",
+            "table-354-row-5",
             "table-356-row-1",
             "term-and-lapse",
             "withdrawal",
@@ -2463,18 +2452,18 @@
             "withdrawal",
             "table-356-row-1",
             "enhancement",
-            "table-354-row-6",
             "withdrawal-summary",
-            "note-5",
-            "generic-cash-withdrawal"
+            "generic-cash-withdrawal",
+            "note-4",
+            "table-354-row-5"
           ],
-          "source_characters": 4904,
+          "source_characters": 4679,
           "top5": [
             "note-6",
             "withdrawal",
             "table-356-row-1",
-            "enhancement",
-            "table-354-row-6"
+            "note-7",
+            "enhancement"
           ]
         },
         "vector": {
@@ -2524,7 +2513,7 @@
     {
       "id": "q5",
       "language": "original",
-      "latency_ms": 24.584,
+      "latency_ms": 90.831,
       "methods": {
         "bm25": {
           "bundle": [
@@ -2568,18 +2557,15 @@
         "hybrid": {
           "bundle": [
             "cash-value-risk",
-            "coverage-change",
-            "coverage-summary",
-            "enhancement",
             "generic-cash-withdrawal",
             "generic-disclaimer",
-            "note-1",
+            "generic-monthly-interest",
             "note-10",
-            "note-2",
+            "note-3",
             "note-6",
             "note-7",
-            "premium-increase",
             "table-356-row-1",
+            "table-357-row-1",
             "term-and-lapse",
             "withdrawal",
             "withdrawal-summary"
@@ -2591,21 +2577,21 @@
           "required_evidence_coverage": 1.0,
           "selected": [
             "note-6",
-            "withdrawal",
-            "table-356-row-1",
-            "premium-increase",
             "withdrawal-summary",
-            "enhancement",
+            "withdrawal",
+            "generic-monthly-interest",
+            "table-356-row-1",
             "generic-cash-withdrawal",
-            "coverage-summary"
+            "note-3",
+            "table-357-row-1"
           ],
-          "source_characters": 5317,
+          "source_characters": 4855,
           "top5": [
             "note-6",
+            "withdrawal-summary",
             "withdrawal",
-            "table-356-row-1",
-            "premium-increase",
-            "withdrawal-summary"
+            "generic-monthly-interest",
+            "table-356-row-1"
           ]
         },
         "vector": {
@@ -2657,7 +2643,7 @@
     {
       "id": "q6",
       "language": "en",
-      "latency_ms": 16.787,
+      "latency_ms": 70.808,
       "methods": {
         "bm25": {
           "bundle": [
@@ -2701,9 +2687,10 @@
           "bundle": [
             "cash-value-risk",
             "cooling-off",
+            "early-surrender",
             "generic-disclaimer",
             "note-8",
-            "skip-summary",
+            "skip-premiums",
             "table-352-row-14",
             "term-and-lapse",
             "unemployment"
@@ -2716,22 +2703,22 @@
           "recall_at_5": 0.5,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "table-352-row-14",
-            "cooling-off",
-            "note-8",
-            "unemployment",
-            "generic-disclaimer",
             "term-and-lapse",
+            "early-surrender",
             "cash-value-risk",
-            "skip-summary"
-          ],
-          "source_characters": 3358,
-          "top5": [
+            "unemployment",
             "table-352-row-14",
             "cooling-off",
-            "note-8",
+            "generic-disclaimer",
+            "skip-premiums"
+          ],
+          "source_characters": 3672,
+          "top5": [
+            "term-and-lapse",
+            "early-surrender",
+            "cash-value-risk",
             "unemployment",
-            "generic-disclaimer"
+            "note-8"
           ]
         },
         "vector": {
@@ -2781,7 +2768,7 @@
     {
       "id": "q6",
       "language": "zh-Hans",
-      "latency_ms": 14.354,
+      "latency_ms": 64.057,
       "methods": {
         "bm25": {
           "bundle": [
@@ -2826,43 +2813,41 @@
         "hybrid": {
           "bundle": [
             "cash-value-risk",
-            "disclaimer-en",
-            "disclaimer-zh",
             "generic-cash-withdrawal",
             "generic-disclaimer",
             "generic-payment-flexibility",
+            "note-1",
             "note-8",
             "skip-premiums",
             "skip-summary",
-            "table-352-row-15",
+            "table-352-row-14",
             "term-and-lapse",
-            "unemployment-summary"
+            "unemployment"
           ],
-          "core_coverage": 0.6,
+          "core_coverage": 0.8,
           "missing_additional": [],
           "missing_core": [
-            "table-352-row-14",
-            "unemployment"
+            "table-352-row-15"
           ],
           "recall_at_5": 0.0,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "skip-premiums",
             "generic-payment-flexibility",
-            "skip-summary",
-            "generic-cash-withdrawal",
+            "skip-premiums",
             "note-8",
-            "table-352-row-15",
-            "disclaimer-en",
-            "unemployment-summary"
+            "skip-summary",
+            "table-352-row-14",
+            "unemployment",
+            "generic-cash-withdrawal",
+            "note-1"
           ],
-          "source_characters": 3114,
+          "source_characters": 3019,
           "top5": [
+            "generic-payment-flexibility",
             "skip-premiums",
             "cash-value-risk",
-            "generic-payment-flexibility",
-            "skip-summary",
-            "generic-cash-withdrawal"
+            "note-8",
+            "skip-summary"
           ]
         },
         "vector": {
@@ -2916,7 +2901,7 @@
     {
       "id": "q6",
       "language": "zh-Hant",
-      "latency_ms": 14.371,
+      "latency_ms": 51.444,
       "methods": {
         "bm25": {
           "bundle": [
@@ -2961,43 +2946,41 @@
         "hybrid": {
           "bundle": [
             "cash-value-risk",
-            "disclaimer-en",
-            "disclaimer-zh",
             "generic-cash-withdrawal",
             "generic-disclaimer",
             "generic-payment-flexibility",
+            "note-1",
             "note-8",
             "skip-premiums",
             "skip-summary",
-            "table-352-row-15",
+            "table-352-row-14",
             "term-and-lapse",
-            "unemployment-summary"
+            "unemployment"
           ],
-          "core_coverage": 0.6,
+          "core_coverage": 0.8,
           "missing_additional": [],
           "missing_core": [
-            "table-352-row-14",
-            "unemployment"
+            "table-352-row-15"
           ],
           "recall_at_5": 0.0,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "skip-premiums",
             "generic-payment-flexibility",
-            "skip-summary",
-            "generic-cash-withdrawal",
+            "skip-premiums",
             "note-8",
-            "table-352-row-15",
-            "disclaimer-en",
-            "unemployment-summary"
+            "skip-summary",
+            "table-352-row-14",
+            "unemployment",
+            "generic-cash-withdrawal",
+            "note-1"
           ],
-          "source_characters": 3114,
+          "source_characters": 3019,
           "top5": [
+            "generic-payment-flexibility",
             "skip-premiums",
             "cash-value-risk",
-            "generic-payment-flexibility",
-            "skip-summary",
-            "generic-cash-withdrawal"
+            "note-8",
+            "skip-summary"
           ]
         },
         "vector": {
@@ -3051,7 +3034,7 @@
     {
       "id": "q6",
       "language": "original",
-      "latency_ms": 23.704,
+      "latency_ms": 85.967,
       "methods": {
         "bm25": {
           "bundle": [
@@ -3097,44 +3080,46 @@
         "hybrid": {
           "bundle": [
             "cash-value-risk",
+            "coverage-change",
+            "coverage-summary",
             "disclaimer-en",
             "disclaimer-zh",
-            "generic-cash-withdrawal",
             "generic-disclaimer",
             "generic-payment-flexibility",
-            "investment-links",
+            "note-1",
+            "note-10",
             "note-8",
+            "premium-rate",
             "skip-premiums",
-            "skip-summary",
-            "term-and-lapse",
-            "unemployment-summary"
+            "table-352-row-14",
+            "table-354-row-6",
+            "term-and-lapse"
           ],
-          "core_coverage": 0.4,
+          "core_coverage": 0.6,
           "missing_additional": [],
           "missing_core": [
-            "table-352-row-14",
             "table-352-row-15",
             "unemployment"
           ],
-          "recall_at_5": 0.0,
+          "recall_at_5": 0.25,
           "required_evidence_coverage": 1.0,
           "selected": [
-            "skip-summary",
-            "note-8",
             "generic-payment-flexibility",
+            "table-352-row-14",
+            "note-8",
             "skip-premiums",
+            "table-354-row-6",
+            "premium-rate",
             "disclaimer-en",
-            "unemployment-summary",
-            "investment-links",
-            "generic-cash-withdrawal"
+            "coverage-summary"
           ],
-          "source_characters": 3423,
+          "source_characters": 4595,
           "top5": [
-            "skip-summary",
-            "note-8",
             "generic-payment-flexibility",
+            "table-352-row-14",
+            "note-8",
             "skip-premiums",
-            "cash-value-risk"
+            "generic-disclaimer"
           ]
         },
         "vector": {
@@ -3187,7 +3172,7 @@
     {
       "id": "q8",
       "language": "en",
-      "latency_ms": 9.133,
+      "latency_ms": 27.047,
       "methods": {
         "bm25": {
           "bundle": [
@@ -3329,7 +3314,7 @@
     {
       "id": "q8",
       "language": "zh-Hans",
-      "latency_ms": 8.564,
+      "latency_ms": 29.481,
       "methods": {
         "bm25": {
           "bundle": [
@@ -3450,7 +3435,7 @@
     {
       "id": "q8",
       "language": "zh-Hant",
-      "latency_ms": 8.604,
+      "latency_ms": 22.927,
       "methods": {
         "bm25": {
           "bundle": [
@@ -3571,7 +3556,7 @@
     {
       "id": "q8",
       "language": "original",
-      "latency_ms": 9.182,
+      "latency_ms": 26.027,
       "methods": {
         "bm25": {
           "bundle": [
@@ -3690,7 +3675,6 @@
       "question": "我家孙子今年要上学，要投什么保啊？"
     }
   ],
-  "retrieval_cases_sha256": "f1e294f6f8cd5ffce8fdae5a26935b052ffb24e65d132b22934f8d65123cf7fd",
   "schema_version": 1,
   "summary": {
     "bm25": {
@@ -3702,8 +3686,8 @@
     "cases": 28,
     "hybrid": {
       "complete_core_cases": 16,
-      "core_coverage": 0.751786,
-      "recall_at_5": 0.607143,
+      "core_coverage": 0.801786,
+      "recall_at_5": 0.610119,
       "required_evidence_coverage": 1.0
     },
     "vector": {

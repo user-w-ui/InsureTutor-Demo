@@ -280,14 +280,37 @@ class EvidenceRegistry:
         return result
 
 
+# Positive statements that the user already holds a policy. This suppresses the
+# ownership question, so it holds only affirmative ownership. Phrases announcing a
+# NEW application ("新买", "准备投保") and phrases denying ownership ("没有保单") are
+# excluded on purpose: both are exactly the case where ownership still has to be
+# settled, and treating "I do not hold this policy" as settled would ask nothing.
+STATES_POLICY_OWNERSHIP = re.compile(
+    r"已有保单|已持有|已投保|已经买|已购买|我份保单|我的保单|手上.{0,6}保单|"
+    r"保单.{0,15}(?:生效|在供|供了|已缴)|已供|"
+    r"\b(?:already (?:hold|have|own|bought|purchased)|existing policy|in force|"
+    r"my policy|i (?:hold|own|have) (?:a|this|an) policy)\b"
+)
+
+
+PURCHASE_INTENT = re.compile(
+    # Asking which product to buy, in any of the shapes a customer uses. Purpose
+    # words (education, marriage, retirement) are deliberately absent: those are an
+    # open set, and the ownership question this feeds applies to all of them alike.
+    r"(?:该|应|适合|推荐|建议|投什么|买什么|买哪|買哪|買什麼|选哪).{0,12}(?:买|買|投保|保险|保險)"
+    r"|要投什么|买什么好|买哪个好|"
+    r"(?:想|打算|准备|计划|考虑).{0,6}(?:买|買|投保|投|購|买保险)|"
+    r"\b(?:should i buy|what (?:insurance )?(?:should i )?buy|which (?:one|policy|plan)|"
+    r"recommend.*(?:buy|insurance)|looking to (?:buy|insure)|want to buy|"
+    r"thinking (?:about|of) (?:buying|getting))\b"
+)
+
+
 def required_boundaries(question: str) -> tuple[list[str], list[str]]:
     """Small fixed domain boundaries; no question splitting or extra model."""
     q = normalized(question)
     codes, topics = [], []
-    if re.search(
-        r"(?:该|应|适合|推荐|建议|投什么).{0,12}(?:买|投保|保险)|要投什么|\b(?:should i buy|what (?:insurance )?should i buy|recommend.*(?:buy|insurance))\b",
-        q,
-    ):
+    if PURCHASE_INTENT.search(q):
         codes.append("purchase")
     if re.search(
         r"(?:保证|承诺).{0,15}(?:回报|收益)|(?:guarantee|promise).{0,25}(?:return|earn|interest)", q
@@ -384,11 +407,11 @@ def validate_answer(
                     raise AnswerRejected("invented_calculation_input")
                 inputs |= quantities(item.user_text)
                 if item.name != "withdrawal_timing":
-                    q = quantities(item.user_text)
-                    amounts = {v for k, v in q if k in {"USD", "HKD", "MOP"}}
+                    found = quantities(item.user_text)
+                    amounts = {v for k, v in found if k in {"USD", "HKD", "MOP"}}
                     financial_values |= {
                         ("number", v)
-                        for k, v in q
+                        for k, v in found
                         if k == "number" and (not amounts or v in amounts)
                     }
             # Formula substitutions can omit repeated currency labels. Timing is
@@ -422,19 +445,21 @@ def validate_answer(
         if code not in present:
             draft.claims.append(Claim(kind="boundary", text=message(code, language), boundary=code))
     if topics:
-        scope = next(c for c in draft.claims if c.boundary == "scope")
+        scope = next((c for c in draft.claims if c.boundary == "scope"), None)
+        if scope is None:
+            # required_boundaries pairs every topic with the scope code, so this is
+            # unreachable today; backfill rather than raise if that coupling changes.
+            scope = Claim(kind="boundary", text=message("scope", language), boundary="scope")
+            draft.claims.append(scope)
         scope.text = (
             message("scope", language) + " " + " ".join(message(t, language) for t in topics)
         )
-    q = normalized(user_questions[-1])
-    if (
-        "purchase" in codes
-        and re.search(r"上学|升学|大学|学费|孙子|grandchild|grandson|school|education", q)
-        and not re.search(
-            r"已有|持有|已投保|我份保单|保单.{0,15}生效|没有保单|还没有保单|新买|新投保|already hold|existing policy|do not (?:own|hold)|in force",
-            normalized(all_user),
-        )
-    ):
+    # A purchase question is asked on behalf of some purpose, and the purpose is an
+    # open set: education, marriage, retirement, a house. Enumerating those words
+    # would encode the eval fixtures into policy and miss every paraphrase, so the
+    # rule keys on the shape instead - an unsourced buying intent, with no statement
+    # that the user already holds this policy, needs its ownership settled first.
+    if "purchase" in codes and not STATES_POLICY_OWNERSHIP.search(normalized(all_user)):
         draft.clarification_question = message("ownership_question", language)
         draft.status = "clarification"
     if language == "en":
