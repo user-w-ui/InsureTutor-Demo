@@ -15,7 +15,7 @@ Ten question/answer items that stress the InsureTutor grounded QA agent, built o
 uv run --locked --extra agent --extra dev python -m pytest tests/eval -v
 ```
 
-Real retrieval and chat evaluation commands are in the [README](../../README.md#cli-and-evaluation).
+Real retrieval and chat evaluation commands are in the [development guide](../../docs/development.md#cli-and-evaluation).
 Fixtures stay outside runtime prompts and indexes. The rubric evaluates meaning and
 completeness; runtime validation checks only structure and submitted citation provenance.
 

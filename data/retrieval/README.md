@@ -6,7 +6,7 @@
   Traditional Chinese and the original question (28 query cases). The hybrid path
   uses the tutor's initial sentence expansion; BM25/vector baselines do not.
 
-Install and prepare using the [README](../../README.md#local-development). From the repository root:
+Install and prepare using the [development guide](../../docs/development.md#local-development). From the repository root:
 
 ```powershell
 uv run --locked --extra agent python -m insuretutor.retrieval prepare-model

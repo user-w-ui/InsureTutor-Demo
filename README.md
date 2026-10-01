@@ -1,155 +1,66 @@
 # InsureTutor
 
-A bilingual insurance-brochure chat demo for the AIDF AI Full Stack Engineer
-take-home task. Ask in English, Simplified Chinese or Traditional Chinese, then
-follow each answer's references to the original PDF in the same page.
+An insurance-brochure chat demo for the AIDF AI Full Stack Engineer take-home task.
+Ask in English, Simplified Chinese or Traditional Chinese; click answer references
+to inspect the original PDF alongside the conversation.
 
-**For reviewers:** [Technical architecture (中文)](docs/architecture.zh-CN.md) ·
-[Implementation notes and known limits (中文)](docs/implementation-notes.zh-CN.md) ·
-[Original task](docs/task-spec.md)
+## How it works
 
-## Quick start: Docker and the web page
+Local CPU **multilingual-e5-small + BM25**, fused with **RRF**, retrieve bilingual
+clauses and their required footnotes. **OpenCC** normalizes Chinese search text.
+The application guarantees an initial search; an **OpenAI Agents SDK** agent can
+use one read-only search tool to obtain further evidence before answering.
 
-Start Docker Desktop (Linux containers), or a Docker Engine with Compose v2.
-The Docker path needs no host Python, uv, model files or source mounts.
-Run these commands from the repository root.
+**FastAPI** serves the static chat page and local **PDF.js** viewer in one container.
+The server builds quotes, physical page links and block/table highlights. Fixed
+model instructions, restricted tools, format/reference validation and safe text
+rendering define the safety boundary; source conflicts retain both language versions.
 
-1. Create `.env` if it does not exist:
+## Quick start
+
+Start Docker Desktop (Linux containers) or Docker Engine with Compose v2.
+No host Python or model installation is required. Run from the repository root:
+
+1. Create `.env` if needed:
 
    ```powershell
    if (-not (Test-Path .env)) { Copy-Item .env.example .env }
    ```
 
-2. Fill in `LLM_API_KEY`, `LLM_BASE_URL` and `LLM_MODEL`. The API must support
-   Chat Completions **function calls**; provider JSON mode is unnecessary.
-   The tested settings are `LLM_REASONING_EFFORT=medium` and
-   `LLM_MAX_TOKENS=32768`. Leave reasoning effort blank for providers that do not
-   support it. Without a key/model, the demo runs in labelled original-excerpt mode.
+2. Set `LLM_API_KEY`, `LLM_BASE_URL` and `LLM_MODEL` in `.env`.
+   Use a Chat Completions API supporting **function calls**.
+   Without LLM configuration, the demo displays original source excerpts.
 
-3. **Windows: build, wait until ready, and automatically open the browser:**
+3. **Windows — build, start and automatically open the chat page:**
 
    ```powershell
    powershell -NoProfile -ExecutionPolicy Bypass -File .\scripts\start-demo.ps1
    ```
 
-   The script opens the actual published port, including a custom `PORT` in `.env`.
-   To reopen the default page when the container is already running:
+   **Other platforms — build and wait until ready:**
 
-   ```powershell
-   Start-Process 'http://127.0.0.1:8000/'
+   ```sh
+   docker compose up --build --wait --wait-timeout 180
    ```
 
-On any platform, the equivalent build/start command is:
+   Open [the chat page](http://127.0.0.1:8000/). Stop with `docker compose down`.
 
-```sh
-docker compose up --build --wait --wait-timeout 180
-```
+The first build downloads dependencies and the pinned E5 model (about 487 MB);
+subsequent builds reuse the model cache. Embeddings run locally; only answer
+generation calls the configured LLM API. Select a language and send a question;
+**New chat** or a page refresh starts a new conversation.
 
-The default page is <http://127.0.0.1:8000/>. To open it from a terminal on
-macOS use `open http://127.0.0.1:8000/`; on desktop Linux use
-`xdg-open http://127.0.0.1:8000/`.
+## Key links
 
-The first build needs internet access for the Python image, locked dependencies
-and about 487 MB of pinned E5 assets. Later builds reuse the model layer.
-Runtime embeddings load locally on CPU; only answer generation contacts the LLM API.
-An API hosted on your computer needs a container-accessible address rather than
-`localhost`, which refers to the container itself.
-
-```sh
-docker compose ps                         # container readiness
-docker compose logs --tail 50             # startup / request status
-docker compose down                      # stop
-```
-
-If port 8000 is occupied, set `PORT=8001` in `.env` and rerun the startup script.
-The container still listens on 8000 internally. Refreshing the page or selecting
-**New chat** starts a new conversation; container restart clears server sessions.
-`GET /api/health` reports retrieval readiness and `agent/excerpts` mode, without
-checking the remote model API.
-
-## Design
-
-A single container serves FastAPI, static HTML/CSS/JavaScript and local PDF.js.
-The server retrieves the original question first. One OpenAI Agents SDK agent
-can supplement that evidence through the read-only `search_evidence` tool.
-
-- **Small local retrieval:** multilingual-e5-small on CPU, BM25 + NumPy cosine
-  search, equal RRF. Precomputed vectors and a few hundred views make a vector
-  database or FAISS unnecessary; the caller depends on one `Retriever` interface.
-- **Complete evidence:** restore bilingual parents and required footnotes, retain
-  table headers and both sides of source conflicts. OpenCC normalizes Chinese
-  search text; citations keep the original Traditional Chinese / English text.
-- **References:** the server creates original quotes, physical PDF pages and
-  block/table coordinates. The page supports source-language switching and zoom;
-  highlights show text blocks or whole tables, not exact sentences or cells.
-- **Bounded conversation:** at most 6 searches per turn, a 60-second total timeout,
-  one format/reference repair, and bounded in-memory history.
-- **Safety:** fixed model instructions, a read-only tool, current-turn citation
-  allowlists and safe text rendering. Validation checks format and submitted
-  reference provenance; it does not judge answer meaning, completeness, uncited
-  text, safety wording or arithmetic. Those require model evaluation and review.
-
-The source is the 20-page YF Life **FLEXI-ULife Prime Saver** brochure. A known
-Chinese/English currency discrepancy is retained, with details in the
-[implementation notes](docs/implementation-notes.zh-CN.md).
-
-## Local development
-
-Use uv and Python 3.12. Dependencies are declared in `pyproject.toml` and pinned
-in `uv.lock`:
-
-```powershell
-uv sync --locked --extra agent --extra dev
-uv run --locked --extra agent python -m insuretutor.retrieval prepare-model
-uv run --locked --extra agent python -m insuretutor.api
-```
-
-Open the same web address as above. Model preparation is a one-time download;
-model files live in ignored `models/`. Missing or mismatched local artifacts fail
-explicitly, without automatic downloads or rebuilding.
-
-### Data and index rebuilding
-
-The committed `data/corpus.json` is the runtime input: 137 logical pairs,
-274 independent language records, 660 monolingual source spans and 275 retrieval
-views. The committed float32 vector matrix has 275 × 384 entries.
-Only rebuild these artifacts when changing their inputs or encoding:
-
-```powershell
-uv run --locked --extra agent python -m insuretutor.ingest.clean
-uv run --locked --extra agent python -m insuretutor.corpus
-uv run --locked --extra agent python -m insuretutor.retrieval build-index
-```
-
-`raw data/` is frozen. Reviewed corrections, language boundaries and footnote
-relationships belong to `data/cleaning-rules.json`. Corpus assembly restores
-complete conditions; source text, ranges and pages remain traceable.
-See [cleaning output](data/cleaned/README.md),
-[tokenizer](data/tokenizer/README.md) and [vector artifacts](data/retrieval/README.md).
-
-### CLI and evaluation
-
-```powershell
-uv run --locked --extra agent python -m insuretutor.chat
-uv run --locked --extra agent python -m insuretutor.chat --question "定期提款有什么条件？" --language zh-Hans
-uv run --locked --extra agent python -m insuretutor.chat --question "Withdrawal conditions?" --excerpts
-uv run --locked --extra agent python -m insuretutor.retrieval query "保證可保權益最多可行使幾次？" --output tmp/query.json
-
-# Offline contracts; no model API or embedding weights required.
-uv run --locked --extra agent --extra dev python -m pytest -q
-
-# Real local E5 benchmark; no LLM API. Save a fresh report separately.
-uv run --locked --extra agent python -m insuretutor.retrieval evaluate --output tmp/retrieval-evaluation.json
-
-# Real LLM runs require .env and consume provider tokens.
-uv run --locked --extra agent python -m insuretutor.chat --evaluate tests/eval/items.json --output tmp/chat-evaluation.json
-uv run --locked --extra agent python -m insuretutor.chat --evaluate tests/eval/chat-scenarios.json --output tmp/chat-scenarios.json
-```
-
-CLI commands: `/new`, `/exit`; languages: `auto/en/zh-Hans/zh-Hant`.
-[Evaluation questions and rubrics](tests/eval/README.md) stay in tests and never
-enter runtime prompts or indexes. Generated answers need semantic review;
-citation coverage and a non-excerpt status do not prove correctness.
+| Location | Contents |
+| --- | --- |
+| [Architecture (中文)](docs/architecture.zh-CN.md) | Components, retrieval flow, citations and safety design |
+| [Original PDF](raw%20data/source/FLEXI-ULife%20Prime%20Saver.pdf) · [MinerU output](raw%20data/mineru-official/MANIFEST.md) | Source brochure and frozen extraction |
+| [Runtime corpus](data/corpus.json) | Bilingual clauses, footnotes and provenance |
+| [Vector artifacts](data/retrieval/README.md) | Precomputed vectors and model metadata |
+| [Evaluation set](tests/eval/README.md) | Questions, source references and rubrics |
+| [Development guide](docs/development.md) | Local installation, CLI, artifact rebuilding and evaluation commands |
+| [Task specification](docs/task-spec.md) | Original requirements |
 
 ## Layout
 
@@ -166,16 +77,11 @@ src/insuretutor/
   chat.py                   Interactive / evaluation CLI
   api/                      FastAPI entry point
   web/                      Static chat UI and vendored PDF.js
- data/                      Cleaned data, corpus, tokenizer and vector artifacts
- raw data/                  Original PDF and frozen MinerU extraction
- docs/                      Architecture, implementation notes and source research
- tests/                     Offline contracts and evaluation fixtures
- scripts/start-demo.ps1     Build, wait and open the web page
- Dockerfile                 Locked runtime dependencies and cached model download
- docker-compose.yml         Local-only port and runtime LLM configuration
+data/                       Cleaned data, corpus, tokenizer and vector artifacts
+raw data/                   Original PDF and frozen MinerU extraction
+docs/                       Architecture, development guide and source research
+tests/                      Offline contracts and evaluation fixtures
+scripts/start-demo.ps1      Build, wait and open the web page
+Dockerfile                 Locked runtime dependencies and cached model download
+docker-compose.yml         Local-only port and runtime LLM configuration
 ```
-
-Re-parsing is optional; the extraction is already committed. See the
-[provenance record](docs/data-provenance.md) for that historical workflow.
-`.env`, local model weights, caches and `tmp/` are ignored. Build context excludes
-secrets, tests and extraction intermediates. API keys are supplied only at runtime.
