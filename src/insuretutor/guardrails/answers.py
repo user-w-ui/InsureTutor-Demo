@@ -1,0 +1,352 @@
+"""Deterministic provenance/number checks, not semantic or arithmetic verification."""
+
+from __future__ import annotations
+
+import re
+import unicodedata
+from decimal import Decimal
+
+from opencc import OpenCC
+
+from insuretutor.agent_tools import EvidenceSearchSession
+from insuretutor.chat_models import Citation, DraftAnswer
+
+_CC = OpenCC("t2s")
+_NUMBER = r"\d+(?:,\d{3})*(?:\.\d+)?"
+_CURRENCY = r"us\$|usd|hk\$|hkd|mop\$?|美元|港元|澳门元"
+FORMULAS = {
+    "table-97-row-1": "max(account_value,basic_sum_insured-recent_withdrawals)",
+    "table-97-row-2": "account_value+basic_sum_insured",
+    "table-97-row-3": "max(account_value,basic_sum_insured+0.5*account_value-0.5*recent_withdrawals)",
+}
+
+
+class AnswerRejected(ValueError):
+    pass
+
+
+def normalized(text: str) -> str:
+    text = _CC.convert(unicodedata.normalize("NFKC", text)).lower()
+    text = re.sub(r"\b(?:us\s+dollars?|u\.s\.\s+dollars?)\b", "usd", text)
+    text = re.sub(r"\b(?:hk|hong kong)\s+dollars?\b", "hkd", text)
+    text = re.sub(r"\b(?:macau\s+)?patacas?\b", "mop", text)
+    text = re.sub(r"\b(us|hk)\s+\$", r"\1$", text)
+    text = re.sub(r"\b(?:per\s+cent|percent)\b", "%", text)
+    # Only convert written Chinese numbers next to quantitative units.
+    chars = "零〇一二两三四五六七八九十百千万亿"
+
+    def cn_number(match):
+        digits = dict(zip("零〇一二两三四五六七八九", [0, 0, 1, 2, 2, 3, 4, 5, 6, 7, 8, 9]))
+        total = section = number = 0
+        for char in match[1]:
+            if char in digits:
+                number = digits[char]
+            else:
+                unit = {"十": 10, "百": 100, "千": 1000, "万": 10000, "亿": 100000000}[char]
+                if unit < 10000:
+                    section += (number or 1) * unit
+                else:
+                    total += (section + number) * unit
+                    section = 0
+                number = 0
+        return str(total + section + number)
+
+    text = re.sub(rf"百分之([{chars}]+)", lambda m: cn_number(m) + "%", text)
+    text = re.sub(
+        rf"(?<![0-9{chars}])([{chars}]+)(?=\s*(?:年|个月|月|岁|次|天|美元|港元|澳门元|%))", cn_number, text
+    )
+    text = re.sub(r"百分之(\d+(?:\.\d+)?)", r"\1%", text)
+    for word, digit in (
+        ("eleven", "11"),
+        ("ten", "10"),
+        ("three", "3"),
+        ("two", "2"),
+        ("one", "1"),
+    ):
+        text = re.sub(rf"\b{word}(?=\s+(?:years?|months?|times?|days?))", digit, text)
+    text = re.sub(r"\btwice\b", "2 times", text)
+    return text
+
+
+def _amount(raw: str, scale: str = "") -> str:
+    factor = {"万": 10000, "亿": 100000000, "million": 1000000, "thousand": 1000}.get(scale, 1)
+    return str((Decimal(raw.replace(",", "")) * factor).normalize())
+
+
+def quantities(text: str) -> set[tuple[str, str]]:
+    """Keep number, percent and currency associations distinct across languages."""
+    text = normalized(text)
+    out: set[tuple[str, str]] = set()
+    scale = r"(?:万|亿|million|thousand)?"
+    # Plain numbers also support user inputs, dates and policy durations.
+    for m in re.finditer(rf"({_NUMBER})\s*({scale})", text):
+        out.add(("number", _amount(m[1], m[2])))
+    for m in re.finditer(rf"({_NUMBER})\s*%", text):
+        out.add(("percent", _amount(m[1])))
+    currencies = {
+        "us$": "USD",
+        "usd": "USD",
+        "美元": "USD",
+        "hk$": "HKD",
+        "hkd": "HKD",
+        "港元": "HKD",
+        "mop": "MOP",
+        "mop$": "MOP",
+        "澳门元": "MOP",
+    }
+    for pattern, before in (
+        (rf"({_CURRENCY})\s*({_NUMBER})\s*({scale})", True),
+        (rf"({_NUMBER})\s*({scale})\s*({_CURRENCY})", False),
+    ):
+        for m in re.finditer(pattern, text):
+            cur, num, mul = (m[1], m[2], m[3]) if before else (m[3], m[1], m[2])
+            out.add((currencies[cur], _amount(num, mul)))
+    return out
+
+
+MESSAGES = {
+    "purchase": (
+        "I can explain this brochure, but cannot recommend a personal purchase.",
+        "我可以解释本册，但不能提供个体购买建议。",
+    ),
+    "returns": (
+        "Illustrations and non-guaranteed rates are not promises of future returns.",
+        "示例及非保证利率不构成未来收益承诺。",
+    ),
+    "eligibility": (
+        "Unrecorded eligibility or actual claim entitlement cannot be determined from this brochure; confirm with the insurer or a licensed adviser.",
+        "本册未记载的投保资格或实际理赔资格无法据此认定，请向保险公司或持牌顾问确认。",
+    ),
+    "scope": (
+        "I can only explain this brochure; other products and unrecorded terms are outside its scope.",
+        "我只解释本册；其他产品及未记载条款超出本册范围。",
+    ),
+    "insufficient": (
+        "The available brochure evidence is insufficient to answer this part.",
+        "现有宣传册证据不足以回答这一部分。",
+    ),
+    "conflict": (
+        "The cited sources disagree. Both versions are shown; neither is selected as authoritative. Confirm with the insurer.",
+        "已引用来源存在差异，双方原文均已列出；不选择任一版本为权威，请向保险公司确认。",
+    ),
+    "calculation": (
+        "This is a brochure-based illustration, not a determination of actual claim entitlement. Inputs and formula sources were checked; arithmetic was not independently recomputed.",
+        "这是按宣传册公式作出的算例，并非实际理赔资格认定；已核对输入和公式来源，未独立复算结果。",
+    ),
+    "reset": (
+        "Conversation context was reset (expired, evicted or unknown session).",
+        "会话上下文已重置（已过期、被清理或会话不存在）。",
+    ),
+    "excerpts": (
+        "Source excerpt mode: no generated answer was accepted. The following is original brochure text, not a personalized answer.",
+        "原文摘录模式：未采用生成答案。以下为宣传册原文，不是针对个人情况的回答。",
+    ),
+}
+
+
+def message(code: str, language: str) -> str:
+    text = MESSAGES[code][0 if language == "en" else 1]
+    return OpenCC("s2t").convert(text) if language == "zh-Hant" else text
+
+
+def check_scope(text: str, user_text: str = ""):
+    """Conservative phrase checks complement the fixed model policy and evals."""
+    t = normalized(text)
+    patterns = (
+        r"(?:建议|推荐|适合|应该|应当|最好).{0,12}(?:你|您).{0,12}(?:购买|投保|买)",
+        r"(?:你|您).{0,12}(?:应该|应当|适合|最好).{0,12}(?:购买|投保|买)",
+        r"\b(?:you should buy|i recommend|suitable for you|best for you|you should purchase)\b",
+        r"\b(?:i suggest (?:buying|choosing)|you ought to buy|this plan is perfect for you)\b",
+        r"(?:推荐|建议)(?:购买|投保|买入)|(?:稳赚|包赚|保本保息)",
+        r"(?:保证|确保|必定|一定).{0,12}(?:收益|回报|赚钱|获利)",
+        r"\b(?:guaranteed returns?|will definitely earn|guarantee (?:a |your )?return)\b",
+        r"(?:system prompt|api[_ -]?key|系统提示|密钥)\s*[:：=]",
+        r"https?://|file://|/sources/|raw data[/\\]|#page=",
+        r"ignore (?:all |the |previous )?(?:instructions|rules|policy)|忽略.{0,8}(?:指令|规则|政策)",
+        r"<\s*/?\s*(?:system|developer|assistant)\b|\[\s*(?:system|developer)\s*\]",
+    )
+    # Negated policy statements are produced by the server boundary codes; the
+    # factual channel remains deliberately conservative.
+    if any(re.search(p, t) for p in patterns):
+        raise AnswerRejected("scope_violation")
+    if re.search(
+        r"居留|国籍|居民|resident|nationality|citizenship", normalized(user_text)
+    ) and re.search(
+        r"(?:你|您|非香港居民).{0,12}(?:可以投保|能投保|符合资格)|\b(?:you (?:can|may) (?:apply|buy)|eligible to apply|non.residents? can)\b",
+        t,
+    ):
+        raise AnswerRejected("unrecorded_eligibility")
+
+
+class EvidenceRegistry:
+    """Only evidence actually delivered in this turn, without merging rankings."""
+
+    def __init__(self, session: EvidenceSearchSession):
+        self.units, self.spans, self.context, self.peers, self.conflicts = {}, {}, {}, {}, set()
+        for bundle in session.bundles:
+            self.units.update({u.id: u for u in bundle.units})
+            self.spans.update({s.id: s for s in bundle.source_spans})
+            self.context.update(bundle.context_by_unit)
+            self.peers.update(bundle.parallel_units)
+            self.conflicts.update(bundle.conflicts)
+
+    def closure(self, ids: list[str]) -> list[str]:
+        out = []
+        pending = list(reversed(ids))
+        while pending:
+            uid = pending.pop()
+            if uid in out:
+                continue
+            if uid not in self.units:
+                raise AnswerRejected("unknown_or_missing_evidence")
+            out.append(uid)
+            u = self.units[uid]
+            pending.extend(reversed(u.requires + self.peers.get(uid, [])))
+        return out
+
+    def span_ids(self, uid: str) -> list[str]:
+        u = self.units[uid]
+        return list(
+            dict.fromkeys(u.source_span_ids + u.context_span_ids + self.context.get(uid, []))
+        )
+
+    def evidence_text(self, ids: list[str]) -> str:
+        sids = dict.fromkeys(s for uid in self.closure(ids) for s in self.span_ids(uid))
+        if any(s not in self.spans for s in sids):
+            raise AnswerRejected("missing_source")
+        return "\n".join(self.spans[s].evidence_text for s in sids)
+
+    def citations(self, ids: list[str], language: str) -> list[Citation]:
+        ids = self.closure(ids)
+        span_units: dict[str, list[str]] = {}
+        for uid in ids:
+            u = self.units[uid]
+            both = u.conflict or uid in self.conflicts
+            for sid in self.span_ids(uid):
+                if sid not in self.spans:
+                    raise AnswerRejected("missing_source")
+                s = self.spans[sid]
+                if both or s.language == ("en" if language == "en" else "zh-Hant"):
+                    span_units.setdefault(sid, []).append(uid)
+        result = []
+        for sid, owners in span_units.items():
+            s = self.spans[sid]
+            source_id = sid.split("/", 1)[0]
+            if not re.fullmatch(r"[a-zA-Z0-9_-]+", source_id):
+                raise AnswerRejected("invalid_source_id")
+            result.append(
+                Citation(
+                    unit_ids=owners,
+                    span_id=s.id,
+                    quote=s.evidence_text,
+                    pdf_page=s.pdf_page,
+                    language=s.language,
+                    source_id=source_id,
+                    source_url=f"/sources/{source_id}.pdf#page={s.pdf_page}",
+                    bbox_raw=s.bbox_raw,
+                    text_origin=s.text_origin,
+                    origin_span_id=getattr(s, "origin_span_id", None),
+                    origin_ranges=getattr(s, "origin_ranges", []),
+                    bbox_precision=getattr(s, "bbox_precision", None),
+                    quality_flags=s.quality_flags,
+                )
+            )
+        return result
+
+
+def validate_answer(
+    draft: DraftAnswer, registry: EvidenceRegistry, user_questions: list[str], language: str
+):
+    """Return a sanitized draft. All failures discard the whole answer in Tutor."""
+    draft = draft.model_copy(deep=True)
+    all_user = "\n".join(user_questions)
+    for claim in draft.claims:
+        if claim.kind == "boundary":
+            claim.text = message(claim.boundary, language)
+            continue
+        check_scope(claim.text, all_user)
+        source = registry.evidence_text(claim.evidence_ids)
+        if any(
+            registry.units[u].conflict or u in registry.conflicts
+            for u in registry.closure(claim.evidence_ids)
+        ) and re.search(
+            r"(?:英文|中文).{0,10}(?:正确|权威|为准)|(?:english|chinese).{0,20}(?:correct|authoritative)|prefer (?:the )?(?:english|chinese)",
+            normalized(claim.text),
+        ):
+            raise AnswerRejected("conflict_authority_selected")
+        allowed = quantities(source)
+        for user_input in claim.user_inputs:
+            if not user_input or not any(user_input in q for q in user_questions):
+                raise AnswerRejected("invented_user_input")
+            allowed |= quantities(user_input)
+        if claim.calculation:
+            calc = claim.calculation
+            if calc.formula_expression != FORMULAS[calc.formula_id]:
+                raise AnswerRejected("formula_mismatch")
+            if calc.formula_id not in claim.evidence_ids:
+                raise AnswerRejected("missing_formula")
+            formula = registry.units[calc.formula_id]
+            if set(formula.requires) - set(claim.evidence_ids):
+                raise AnswerRejected("missing_calculation_notes")
+            if not re.search(r"death benefit|身故保障|身故赔偿", normalized(source)):
+                raise AnswerRejected("not_death_benefit_formula")
+            check_scope(calc.steps + "\n" + calc.result, all_user)
+            if re.search(r"收益|回报|return|yield|forecast", normalized(calc.steps + claim.text)):
+                raise AnswerRejected("unsupported_calculation")
+            inputs = set()
+            input_names = {item.name for item in calc.inputs}
+            if (
+                len(input_names) != len(calc.inputs)
+                or not {"basic_sum_insured", "account_value"} <= input_names
+            ):
+                raise AnswerRejected("missing_calculation_input")
+            if calc.formula_id != "table-97-row-2":
+                withdrawal = next((i for i in calc.inputs if i.name == "withdrawals"), None)
+                if withdrawal is None:
+                    raise AnswerRejected("missing_calculation_input")
+                if ("number", "0") not in quantities(
+                    withdrawal.user_text
+                ) and "withdrawal_timing" not in input_names:
+                    raise AnswerRejected("missing_withdrawal_timing")
+            for item in calc.inputs:
+                if not any(item.user_text in q for q in user_questions) or not quantities(
+                    item.user_text
+                ):
+                    raise AnswerRejected("invented_calculation_input")
+                inputs |= quantities(item.user_text)
+            if not inputs <= quantities(calc.steps):
+                raise AnswerRejected("calculation_input_omitted")
+            if calc.result not in claim.text or not quantities(calc.result):
+                raise AnswerRejected("missing_calculation_result")
+            input_currencies = {k for k, _ in inputs if k in {"USD", "HKD", "MOP"}}
+            result_currencies = {
+                k for k, _ in quantities(calc.result) if k in {"USD", "HKD", "MOP"}
+            }
+            if not input_currencies or result_currencies != input_currencies:
+                raise AnswerRejected("calculation_currency_mismatch")
+            # Derived amounts are permitted only in a marked death-benefit
+            # calculation. No arithmetic evaluation or semantic guarantee here.
+            allowed |= quantities(calc.steps) | quantities(calc.result) | inputs
+        if not quantities(claim.text) <= allowed:
+            raise AnswerRejected("unsupported_quantity")
+    if draft.clarification_question:
+        check_scope(draft.clarification_question, all_user)
+        if quantities(draft.clarification_question):
+            raise AnswerRejected("numeric_assumption_in_clarification")
+        if len(re.findall(r"[?？]", draft.clarification_question)) > 1:
+            raise AnswerRejected("multiple_clarifications")
+    if language == "en" and re.search(
+        r"[\u3400-\u9fff]",
+        "\n".join([c.text for c in draft.claims] + [draft.clarification_question or ""]),
+    ):
+        raise AnswerRejected("response_language_mismatch")
+    if language in {"zh-Hans", "zh-Hant"}:
+        convert = OpenCC("t2s" if language == "zh-Hans" else "s2t").convert
+        for claim in draft.claims:
+            claim.text = convert(claim.text)
+            if claim.calculation:
+                claim.calculation.steps = convert(claim.calculation.steps)
+                claim.calculation.result = convert(claim.calculation.result)
+        if draft.clarification_question:
+            draft.clarification_question = convert(draft.clarification_question)
+    return draft
