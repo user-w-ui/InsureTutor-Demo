@@ -45,5 +45,6 @@ desktop.ini
 # ---- Scratch ----
 tmp/
 scratch/
+.tmp-pdfcheck/
 *.tmp
 *.log

@@ -3,14 +3,15 @@
 - `vectors.npy`: 275 × 384, NumPy float32, L2-normalized; 422,528 bytes.
 - `manifest.json`: corpus SHA-256, ordered view IDs, fixed asset SHA-256 and encoding configuration.
 - `evaluation.json`: seven positive scenarios, each with English, Simplified Chinese,
-  Traditional Chinese and the original question (28 searches), without rewriting.
+  Traditional Chinese and the original question (28 query cases). The hybrid path
+  uses the tutor's initial sentence expansion; BM25/vector baselines do not.
 
-Run from the repository root after `pip install -e ".[dev]"`:
+Install and prepare using the [README](../../README.md#local-development). From the repository root:
 
-```text
-python -m insuretutor.retrieval prepare-model
-python -m insuretutor.retrieval build-index
-python -m insuretutor.retrieval evaluate
+```powershell
+uv run --locked --extra agent python -m insuretutor.retrieval prepare-model
+uv run --locked --extra agent python -m insuretutor.retrieval build-index
+uv run --locked --extra agent python -m insuretutor.retrieval evaluate --output tmp/retrieval-evaluation.json
 ```
 
 Only preparation downloads files. Model assets are kept in ignored `models/`, pinned

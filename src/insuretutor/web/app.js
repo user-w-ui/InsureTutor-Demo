@@ -36,23 +36,15 @@ const words = {
   model_or_tool_failed: ['The model or search call failed; showing available original evidence.', '模型或补查调用失败，展示已取得的原文证据。', '模型或補查呼叫失敗，展示已取得的原文證據。'],
   timeout: ['The answer timed out; showing available original evidence.', '回答超时，展示已取得的原文证据。', '回答逾時，展示已取得的原文證據。'],
   invalid_json: ['Format validation failed (JSON syntax or fields); showing original evidence.', '格式层校验未通过（JSON 语法或字段），展示原文证据。', '格式層校驗未通過（JSON 語法或欄位），展示原文證據。'],
-  content_rejected: ['Content validation failed (evidence, quantities or answer boundaries); showing original evidence.', '内容层校验未通过（引用、数字或回答边界等），展示原文证据。', '內容層校驗未通過（引用、數字或回答邊界等），展示原文證據。'],
-  partial_validation: ['Partial answer: related unverifiable paragraphs were omitted.', '部分回答：未通过校验的段落及关联内容已省略。', '部分回答：未通過校驗的段落及關聯內容已省略。'],
+  reference_rejected: ['Citation validation failed; showing original evidence.', '引用校验未通过，展示原文证据。', '引用校驗未通過，展示原文證據。'],
   turn_limit: ['The agent reached its turn limit; showing available original evidence.', 'Agent 达到回合上限，展示已取得的原文证据。', 'Agent 達到回合上限，展示已取得的原文證據。'],
   degraded: ['The answer fell back to original evidence; the failure layer is unknown.', '回答已降级为原文证据，未识别失败层级。', '回答已降級為原文證據，未識別失敗層級。'],
 };
-const contentRejectionReasons = new Set([
+const referenceRejectionReasons = new Set([
   'unknown_or_missing_evidence', 'missing_source', 'invalid_source_id',
-  'invented_user_input', 'instruction_is_not_user_condition', 'unsupported_quantity',
-  'scope_violation', 'unrecorded_eligibility', 'conflict_authority_selected',
-  'formula_mismatch', 'missing_formula', 'missing_calculation_notes',
-  'not_death_benefit_formula', 'unsupported_calculation', 'missing_calculation_input',
-  'missing_withdrawal_timing', 'invented_calculation_input', 'calculation_input_omitted',
-  'missing_calculation_result', 'calculation_currency_mismatch',
-  'numeric_assumption_in_clarification', 'multiple_clarifications', 'response_language_mismatch',
 ]);
 function reasonMessageKey(reason) {
-  if (contentRejectionReasons.has(reason)) return 'content_rejected';
+  if (referenceRejectionReasons.has(reason)) return 'reference_rejected';
   return Object.hasOwn(words, reason) ? reason : 'degraded';
 }
 let language = initialLanguage(), sessionId = null, pending = false, ready = false, mode = null;

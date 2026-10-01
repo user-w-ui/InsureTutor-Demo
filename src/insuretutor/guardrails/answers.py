@@ -53,16 +53,6 @@ MESSAGES = {
     ),
     "user_condition": ("User-provided condition:", "用户给定条件："),
     "application": ("Based on the user-provided conditions:", "按用户给定条件："),
-    "medical": (
-        "This brochure does not record hospital medical-expense reimbursement terms.",
-        "本册未记载住院医疗费用报销条款。",
-    ),
-    "travel": ("This brochure does not record travel-insurance cover.", "本册未记载旅游保险保障。"),
-    "motor": ("This brochure does not record motor-insurance cover.", "本册未记载汽车保险保障。"),
-    "ownership_question": (
-        "Do you already hold this policy, or are you considering a new application?",
-        "你已经持有本册计划的保单，还是准备新投保？",
-    ),
     "excerpts": (
         "Source excerpt mode: no generated answer was accepted. The following is original brochure text, not a personalized answer.",
         "原文摘录模式：未采用生成答案。以下为宣传册原文，不是针对个人情况的回答。",

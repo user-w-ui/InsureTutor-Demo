@@ -9,10 +9,15 @@ Ten question/answer items that stress the InsureTutor grounded QA agent, built o
 | [`ANSWER_KEY.md`](ANSWER_KEY.md) | **Start here.** Human-readable questions, answers, citations, rubrics and traps. |
 | [`items.json`](items.json) | Machine-readable source of truth (schema `insuretutor.eval-set/1`). |
 | [`test_eval_set.py`](test_eval_set.py) | Contract tests over the *dataset* — not over the tutor. |
+| [`chat-scenarios.json`](chat-scenarios.json) | Additional multilingual, multi-turn and misuse scenarios for the chat CLI. |
 
-```bash
-pytest tests/eval -v     # 19 tests, all green
+```powershell
+uv run --locked --extra agent --extra dev python -m pytest tests/eval -v
 ```
+
+Real retrieval and chat evaluation commands are in the [README](../../README.md#cli-and-evaluation).
+Fixtures stay outside runtime prompts and indexes. The rubric evaluates meaning and
+completeness; runtime validation checks only structure and submitted citation provenance.
 
 ## What the ten items cover
 
@@ -66,9 +71,10 @@ These grade the dataset, not the model — so regenerating `data/cleaned/` fails
 letting the eval set silently drift from the corpus it grades against:
 
 - every `unit_id` resolves, and its `pdf_page` is in that unit's `pages`;
-- every quote is a **literal substring** of the cleaned unit text (the same standard the runtime
-  citation verifier is held to), fragment-wise and whitespace-tolerant;
-- **quotes stay Traditional** while questions may be Simplified — a Simplified fold inside a
+- every fixture quote is a **literal substring** of a cleaned language record,
+  fragment-wise and whitespace-tolerant; runtime quotes instead come directly
+  from the registered source span's `evidence_text`;
+- **Chinese quotes stay Traditional** and English quotes stay English, while questions may be Simplified — a Simplified fold inside a
   quote would make it unciteable;
 - footnote-dependent answers reach their note via `requires` / `note_refs`;
 - exactly one conflict item, and it must **not** pick a single answer;

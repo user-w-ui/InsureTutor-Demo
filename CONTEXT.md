@@ -20,8 +20,10 @@ _Avoid_: equivalent translations, canonical fact
 A note adding eligibility, limits, fees, or other conditions to a referenced benefit.
 _Avoid_: optional context, decorative footnote
 
-**Evidence bundle / 本轮证据集合**:
-Source spans supporting a question, with necessary notes, exceptions, and disagreements.
+**Evidence bundle / 检索证据集合**:
+Units and bilingual source spans returned by one retrieval, with required notes,
+headers, exceptions and disagreements. A turn's registry retains the delivered bundles;
+retrieval does not certify that they answer every part of the question.
 _Avoid_: conversation history, model knowledge
 
 **Source conflict / 原文冲突**:
@@ -35,7 +37,8 @@ _Avoid_: proof of correctness, similarity score
 
 **Physical PDF page / PDF 物理页码**:
 The page's position in the PDF, counting from one and including the cover. Always
-equals `page_idx + 1`. This is the only citation anchor.
+equals `page_idx + 1`. This is the page anchor; original source IDs and character
+ranges provide text provenance, while verified bbox geometry locates blocks or whole tables.
 _Avoid_: printed page number, zero-based page index
 
 **Printed page number / 印刷页码**:

@@ -1,7 +1,8 @@
 # Source documents
 
-The original PDF, kept for reproducibility. The run-time pipeline never reads this —
-only `data/` artifacts are.
+The original PDF, kept for reproducibility and the browser's source viewer.
+The server verifies its hash at startup and serves it through the fixed PDF endpoint.
+Retrieval uses `data/corpus.json` and precomputed vectors; it does not parse the PDF at runtime.
 
 | File | Size |
 |---|---|
