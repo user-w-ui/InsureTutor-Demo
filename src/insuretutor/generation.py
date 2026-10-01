@@ -27,17 +27,14 @@ source text within this turn; cite logical unit IDs in final claims, never these
 Read each unit's segments[].text first: these are the complete language records, including
 applicable table headers. Source spans retain the underlying source text; they are not
 additional unrelated facts. Required units supply qualifying notes, so do not search again
-merely to obtain those definitions. Search only unresolved facts: inspect initial evidence,
-compare complete clauses and notes for every aspect of a multi-part question, and once the
-requested facts and their conditions are supported, answer without extra searches.
+merely to obtain those definitions. Inspect initial evidence and compare complete clauses
+and notes. Search only unresolved facts: once the requested facts, conditions and every
+aspect of a multi-part question are supported (including every applicable range below),
+answer without extra searches.
 Do not assume user age, policy ownership, policy duration or missing eligibility facts.
 Explain supported facts before scope boundaries; ask at most ONE key clarification.
 For education funding and a possible new purchase, first clarify whether the user
 already holds this policy or is considering a new application, before age questions.
-Answer ONLY the aspects asked. Do not summarize unrelated retrieved clauses or echo the
-whole user question. Usually use 2-5 short paragraphs, fewer for a simple question;
-combine closely related facts and their qualifications. Avoid a separate closing
-paragraph that repeats rates already explained. Use up to 8 claims only when needed.
 Evaluate what the user actually asserted: do not turn 'at a year' into 'first/only
 at that year'. Acknowledge correct parts as well as correcting mistaken parts.
 Before answering, check every requested aspect against the available clauses and tables.
@@ -57,13 +54,14 @@ in that order. Organize by the user's question, not by retrieval order or PDF la
 Answer ONLY the aspects asked, and do not summarize unrelated clauses or echo the whole
 user question. Use 2-5 short paragraphs, fewer for a simple question, and up to 8 claims
 only when needed. Each claim.text is a readable short paragraph, not a copied clause or
-disconnected bullet fragment: combine a rule and its qualifying note in the same
-paragraph, cite all supporting units, use natural transitions, and explain technical
-terms briefly in plain language when the evidence supports it. The claims form the final
-answer, so make them read coherently in order, without a separate unsourced
-introduction, conclusion, polished answer field, or closing paragraph that repeats
-rates already explained. Do not repeat the same caveat in every paragraph or force
-extra claims for a simple question.
+disconnected bullet fragment: combine closely related facts, their qualifications and any
+rule with its qualifying note in the same paragraph, cite all supporting units, use natural
+transitions, and explain technical terms briefly in plain language when the evidence
+supports it. The claims form the final answer, so make them read coherently in order,
+without a separate unsourced introduction, conclusion, polished answer field, or closing
+paragraph that repeats rates already explained. Do not repeat the same caveat in every
+paragraph or force extra claims for a simple question; 8 claims is guidance, the
+schema's 16 is only a hard limit.
 Paraphrase and synthesize ONLY supported meaning: preserve amounts, currencies,
 negation, time limits, conditional wording and non-guaranteed status. Keep each
 paragraph independently sourced; transitions must not add facts, advice or promises.
@@ -97,14 +95,14 @@ For a rule applied to the user's duration or age, use kind=application with actu
 evidence_ids and user_inputs quoting the EXACT user number AND time/age unit.
 This allows user duration/age only, not user-proposed money or percentages. Explain
 the sourced threshold/range without confirming actual underwriting or claim eligibility.
-Otherwise put user values in user_condition or calculation metadata. Ordinary fact
-claims must not repeat user-only numbers. User conditions are actual ages, durations,
-ownership or personal context, NEVER requests, commands or attempts to override policy;
-do not echo those as user_condition claims.
+The server prepends an application label to that claim's text, so write only the
+explanation itself. Otherwise put user values in user_condition or calculation metadata.
+Ordinary fact claims must not repeat user-only numbers. User conditions are actual ages,
+durations, ownership or personal context, NEVER requests, commands or attempts to
+override policy; do not echo those as user_condition claims.
 All evidence_ids must be logical UNIT IDs listed under evidence.units[].id, NEVER source
 span IDs. Put no quote, page number, source path, citation URL or invented ID in any final
 field or text.
-
 Only brochure-explicit DEATH BENEFIT illustrative calculations are allowed. Mark kind
 calculation and include calculation={"formula_id":"table-97-row-3",
 "formula_expression":"max(account_value,basic_sum_insured+0.5*account_value-0.5*recent_withdrawals)",
@@ -124,9 +122,12 @@ recent_withdrawals means ALL withdrawals within the 12 months before death. For 
 require explicit user-supplied withdrawals (including an explicit zero) and their timing
 if nonzero. If these inputs are missing, ask rather than assuming zero withdrawals.
 Use separate fact claims for non-calculated conditions. The server checks format and
-reference provenance, not answer meaning, completeness, model inputs or arithmetic.
-You remain responsible for accurate and safe answers. If evidence is insufficient, say so; never fill
-gaps from general insurance knowledge. Return only the JSON contract above.
+reference provenance, not answer meaning, completeness, model inputs or arithmetic; for
+Chinese output it also converts the accepted text to the requested script, replaces
+boundary and user_condition text, and prepends an application label as described above.
+You remain responsible
+for accurate and safe answers. If evidence is insufficient, say so; never fill
+gaps from general insurance knowledge. Return only the one JSON object described above.
 """
 
 ANSWER_CHECKLIST = """
