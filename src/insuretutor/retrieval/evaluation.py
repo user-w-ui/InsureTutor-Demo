@@ -34,12 +34,22 @@ async def evaluate_retrieval(retriever: HybridRetriever) -> dict:
         variants["original"] = originals[case["id"]]
         for language, question in variants.items():
             started = time.perf_counter()
-            rankings = await retriever.rank(QueryContext(original_question=question))
+            # Hybrid mirrors the tutor's mandatory initial retrieval, which expands a
+            # multi-sentence question. The single-channel baselines stay unexpanded so
+            # each channel is still measured on the query exactly as written.
+            unexpanded = await retriever.rank(QueryContext(original_question=question))
+            expanded = await retriever.rank(
+                QueryContext(original_question=question, expand_sentences=True)
+            )
             latency = (time.perf_counter() - started) * 1000
             latencies.append(latency)
             methods = {}
-            for name in ("bm25", "vector", "hybrid"):
-                ranked = getattr(rankings, name)
+            rankings = {
+                "bm25": unexpanded.bm25,
+                "vector": unexpanded.vector,
+                "hybrid": expanded.hybrid,
+            }
+            for name, ranked in rankings.items():
                 recovery_started = time.perf_counter()
                 bundle = retriever.evidence_for(ranked)
                 if name == "hybrid":

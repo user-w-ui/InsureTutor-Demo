@@ -294,3 +294,97 @@ def test_cancelled_request_waits_for_worker_before_next_encode(corpus):
         await second
 
     asyncio.run(run())
+
+
+def test_sentence_expansion_splits_only_on_terminators():
+    from insuretutor.retrieval.hybrid import query_sentences
+
+    # query_sentences normalizes each part, so fullwidth "？" and "，" come back as
+    # their ASCII forms. Asserting the fullwidth characters would assert a behaviour
+    # the normalizer deliberately removes.
+    assert query_sentences(
+        "保单里有两个权益，哪个每年自动增加？分别何时失效？保证可保权益最多几次？"
+    ) == [
+        "保单里有两个权益,哪个每年自动增加?",
+        "分别何时失效?",
+        "保证可保权益最多几次?",
+    ]
+    # A comma must never split a benefit from the condition that qualifies it.
+    assert query_sentences(
+        "顾问说第20个保单年度额外回报为2.75%，基本派息4%连同额外利息0.25%一起复利滚存，对吗？"
+    ) == ["顾问说第20个保单年度额外回报为2.75%,基本派息4%连同额外利息0.25%一起复利滚存,对吗?"]
+    # A ten-character premise clears MIN_SENTENCE_CHARACTERS, so it is kept as its own
+    # query rather than folded into the sentence that follows it.
+    assert query_sentences("我要增加基本保障额。产品册规定每次增加或减少的最低金额是多少？") == [
+        "我要增加基本保障额。",
+        "产品册规定每次增加或减少的最低金额是多少?",
+    ]
+    # Halfwidth English terminators split the same way.
+    assert query_sentences("Which increase is automatic? When does it expire?") == [
+        "Which increase is automatic?",
+        "When does it expire?",
+    ]
+    # Nothing to split: the whole normalized question comes back, including its comma.
+    assert query_sentences("我家孙子今年要上学，要投什么保啊？") == [
+        "我家孙子今年要上学,要投什么保啊?"
+    ]
+
+
+def test_sentence_expansion_is_bounded_and_deduplicated():
+    from insuretutor.retrieval.hybrid import MAX_QUERY_SENTENCES, query_sentences
+
+    many = "？".join(f"第{i}个问题内容是什么" for i in range(9)) + "？"
+    kept = query_sentences(many)
+    assert len(kept) == MAX_QUERY_SENTENCES
+    assert kept[:2] == ["第0个问题内容是什么?", "第1个问题内容是什么?"]
+
+
+def test_expansion_off_matches_old_single_query_behaviour(corpus):
+    """Agent tool searches must retrieve the submitted query verbatim."""
+    retriever = make_retriever(corpus)
+    question = "澳门签发的保单有哪些货币和缴费方式？暂停缴付保费会在什么情况下失效？"
+    plain = asyncio.run(retriever.rank(QueryContext(original_question=question)))
+    off = asyncio.run(
+        retriever.rank(QueryContext(original_question=question, expand_sentences=False))
+    )
+    assert plain == off
+    # A single sentence cannot be expanded into anything, so both paths encode the
+    # same text even with expansion requested.
+    single = "澳门签发的保单有哪些货币和缴费方式？"
+    assert asyncio.run(retriever.rank(QueryContext(original_question=single))) == asyncio.run(
+        retriever.rank(QueryContext(original_question=single, expand_sentences=True))
+    )
+
+
+def test_expansion_encodes_each_sentence_and_fuses_by_rank(corpus):
+    retriever = make_retriever(corpus)
+    question = "澳门签发的保单有哪些货币和缴费方式？失业保障是不是让我失业以后一直不用交保费？"
+    asyncio.run(retriever.rank(QueryContext(original_question=question, expand_sentences=True)))
+    assert retriever.encoder.texts == [
+        "澳门签发的保单有哪些货币和缴费方式?",
+        "失业保障是不是让我失业以后一直不用交保费?",
+    ]
+
+    # Merge by rank, not magnitude. Views 0 and 2 belong to different parents.
+    def row(weight_by_view):
+        scores = np.zeros(len(retriever.corpus.retrieval_views))
+        for index, value in weight_by_view.items():
+            scores[index] = value
+        return scores
+
+    spread = retriever._per_query(np.array([row({0: 10.0}), row({2: 9.0})]), positive_only=True)
+    distributed = {r.unit_id: r.score for r in spread}
+    assert distributed == pytest.approx({"intro": 1 / 61, "market-context": 1 / 61})
+
+    stacked = retriever._per_query(
+        np.array([row({0: 10.0, 2: 9.0}), row({0: 8.0, 2: 7.0})]), positive_only=True
+    )
+    concentrated = {r.unit_id: r.score for r in stacked}
+    assert concentrated == pytest.approx({"intro": 2 / 61, "market-context": 2 / 62})
+    # Two first places on one unit outrank one first place on each of two units.
+    assert concentrated["intro"] > distributed["intro"]
+
+    # A huge magnitude buys no extra vote: only the position matters.
+    alone = retriever._per_query(np.array([row({0: 1e6})]), positive_only=True)
+    assert [r.unit_id for r in alone] == ["intro"]
+    assert alone[0].score == pytest.approx(1 / 61)

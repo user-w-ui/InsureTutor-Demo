@@ -128,18 +128,27 @@ class EvidenceSearchSession:
         )
 
     async def initialize(self, original_question: str) -> SearchResult:
-        """Retrieve the unsplit original question once, before the model runs."""
+        """Retrieve the original question once, before the model runs.
+
+        This is the one search that expands a multi-sentence question, so a single
+        long clause cannot crowd the others out of the channel top-k. Agent-issued
+        searches retrieve the submitted query verbatim; expansion belongs to the
+        opening turn, not to every tool call the model decides to make.
+        """
         async with self.lock:
             if self._initial_started:
                 raise RuntimeError(
                     "Initial retrieval already attempted; use a new session per turn"
                 )
             self._initial_started = True
-            self.initial_result = await self._search(original_question)
+            self.initial_result = await self._search(original_question, expand_sentences=True)
             return self.initial_result
 
     async def search(self, query: str) -> SearchResult:
-        """Supplement initial evidence; limits include the initial search."""
+        """Supplement initial evidence; limits include the initial search.
+
+        Retrieves exactly the query the model submitted, with no sentence splitting.
+        """
         async with self.lock:
             if self.initial_result is None:
                 raise RuntimeError(
@@ -147,20 +156,27 @@ class EvidenceSearchSession:
                 )
             return await self._search(query)
 
-    async def _search(self, query: str) -> SearchResult:
+    async def _search(self, query: str, *, expand_sentences: bool = False) -> SearchResult:
         # Caller holds the session lock. Normalize only the cache key here;
-        # Retriever owns normalization of the actual raw query.
+        # Retriever owns normalization of the actual raw query. The expansion mode
+        # is part of the key: the agent may resubmit the opening question verbatim,
+        # and that call must not inherit the expanded bundle.
         if self.calls >= self.max_calls:
             return self._result("search_limit")
         self.calls += 1
         key = normalize_search(query)
         if not key or len(key) > 8192:
             return self._result("invalid_query")
+        key = f"{key}|e{int(expand_sentences)}"
         if key in self.cache:
             return self._result("evidence", self.cache[key])
         try:
             bundle = await self.retriever.retrieve(
-                QueryContext(original_question=query, response_language=self.response_language)
+                QueryContext(
+                    original_question=query,
+                    response_language=self.response_language,
+                    expand_sentences=expand_sentences,
+                )
             )
         except QueryInputError:
             # Length / input validation errors are recoverable feedback.

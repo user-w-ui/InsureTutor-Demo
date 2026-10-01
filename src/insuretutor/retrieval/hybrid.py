@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import asyncio
+import re
 from dataclasses import dataclass
 from pathlib import Path
 from typing import Literal, Protocol
@@ -23,6 +24,10 @@ class QueryContext(BaseModel):
     original_question: str
     rewritten_query: str | None = None
     response_language: Literal["auto", "en", "zh-Hans", "zh-Hant"] = "auto"
+    # Initial tutor retrieval expands a multi-sentence question so one long clause
+    # cannot crowd the others out of the channel top-k. Supplemental agent searches
+    # pass False: the query the model submitted is retrieved verbatim.
+    expand_sentences: bool = False
 
 
 class Retriever(Protocol):
@@ -44,6 +49,33 @@ class Rankings:
     bm25: list[RankedUnit]
     vector: list[RankedUnit]
     hybrid: list[RankedUnit]
+
+
+# Both fullwidth and halfwidth terminators. Commas are deliberately absent: a
+# comma often separates a benefit from the condition that qualifies it.
+SENTENCE_BREAK = re.compile(r"(?<=[。！？!?；;])")
+MAX_QUERY_SENTENCES = 4
+MIN_SENTENCE_CHARACTERS = 6
+
+
+def query_sentences(question: str) -> list[str]:
+    """Split a question on sentence terminators, bounded and noise-filtered.
+
+    Split before normalization: NFKC folds the fullwidth terminators this relies
+    on into their ASCII forms, so splitting afterwards would never match Chinese.
+    Returns [question] unchanged when there is nothing useful to split, so the
+    single-sentence path stays byte-identical to unexpanded retrieval.
+    """
+    raw = [part.strip() for part in SENTENCE_BREAK.split(question)]
+    parts = [normalize_search(part) for part in raw if part.strip()]
+    if len(parts) < 2:
+        return [normalize_search(question)]
+    # Short leading fragments ("我要增加基本保障额。") are premises, not questions;
+    # they only add noise as standalone queries.
+    kept = [part for part in parts if len(part) >= MIN_SENTENCE_CHARACTERS]
+    if len(kept) < 2:
+        return [normalize_search(question)]
+    return kept[:MAX_QUERY_SENTENCES]
 
 
 def fuse(bm25: list[RankedUnit], vector: list[RankedUnit], constant: int = 60) -> list[RankedUnit]:
@@ -105,15 +137,39 @@ class HybridRetriever:
             key=lambda item: (-item.score, item.unit_id),
         )[: self.channel_top_k]
 
+    @staticmethod
+    def _queries(context: QueryContext) -> list[str]:
+        """Every query text this retrieval will encode, in stable order."""
+        queries: list[str] = []
+        for variant in (context.original_question, context.rewritten_query):
+            if not variant or not variant.strip():
+                continue
+            if context.expand_sentences:
+                queries.extend(query_sentences(variant))
+            else:
+                queries.append(normalize_search(variant))
+        return list(dict.fromkeys(queries))
+
+    def _per_query(self, scores_per_query: np.ndarray, *, positive_only: bool) -> list[RankedUnit]:
+        """Collapse each query independently, then vote by rank across queries.
+
+        Scores from different queries share no scale (a short sentence and a long
+        question produce wildly different BM25 magnitudes), so they are merged by
+        position rather than by value. A unit ranked first by any single sentence
+        earns the same vote it would have earned from a whole-question match.
+        """
+        votes: dict[str, float] = {}
+        for row in scores_per_query:
+            for rank, unit in enumerate(self._collapse(row, positive_only=positive_only), 1):
+                votes[unit.unit_id] = votes.get(unit.unit_id, 0) + 1 / (self.rrf_constant + rank)
+        return sorted(
+            (RankedUnit(uid, score) for uid, score in votes.items()),
+            key=lambda item: (-item.score, item.unit_id),
+        )[: self.channel_top_k]
+
     async def rank(self, context: QueryContext) -> Rankings:
         """Diagnostics for CLI/evaluation; Tutor uses retrieve() exclusively."""
-        queries = list(
-            dict.fromkeys(
-                normalize_search(q)
-                for q in (context.original_question, context.rewritten_query)
-                if q and q.strip()
-            )
-        )
+        queries = self._queries(context)
         if not queries:
             return Rankings([], [], [])
         # Encoding remains serialized across callers; cancellation must not release the
@@ -126,12 +182,12 @@ class HybridRetriever:
                 await task
                 raise
         validate_vectors(query_vectors, len(queries))
-        lexical = np.max(
-            [self.bm25.get_scores(lexical_tokens(q, self.terms)) for q in queries], axis=0
+        lexical = np.array(
+            [self.bm25.get_scores(lexical_tokens(q, self.terms)) for q in queries], dtype=float
         )
-        dense = np.max(self.vectors @ query_vectors.T, axis=1)
-        bm25 = self._collapse(lexical, positive_only=True)
-        vector = self._collapse(dense, positive_only=False)
+        dense = np.array([self.vectors @ vector for vector in query_vectors], dtype=float)
+        bm25 = self._per_query(lexical, positive_only=True)
+        vector = self._per_query(dense, positive_only=False)
         return Rankings(bm25, vector, fuse(bm25, vector, self.rrf_constant))
 
     def evidence_for(self, ranked: list[RankedUnit]) -> EvidenceBundle:

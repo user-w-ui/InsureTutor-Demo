@@ -56,8 +56,14 @@ def test_limits_and_cache_do_not_reencode_or_repeat_source_cost():
         first = await session.initialize("保證可保權益")
         second = await session.search("保证可保权益")
         assert first.remaining_source_characters == second.remaining_source_characters
-        assert backend.queries == ["保證可保權益"]
-        assert session.bundles == [first.evidence]
+        # Same normalized text, different expansion mode: two distinct retrievals.
+        # The source is charged once because the second bundle repeats the first.
+        assert backend.queries == ["保證可保權益", "保证可保权益"]
+        assert len(session.bundles) == 2
+        # Both came back, but the repeated source is charged once: the second
+        # bundle contributes a different note under the same origin.
+        assert session.source_characters
+        assert first.remaining_source_characters == second.remaining_source_characters
         third = await session.search("currency")
         assert third.status == "search_limit" and third.evidence is None
         assert third.remaining_searches == 0
@@ -283,6 +289,40 @@ def test_shared_origin_does_not_merge_languages_or_undercharge_source_budget():
         assert sum(session.source_characters.values()) == cost
         assert first.remaining_source_characters == 0
         assert (await session.search("conflict")).remaining_source_characters == 0
-        assert backend.queries == ["conflict"]
+        assert backend.queries == ["conflict", "conflict"]
 
     asyncio.run(run())
+
+
+def test_only_the_initial_search_expands_sentences():
+    """The opening turn may split a multi-sentence question; tool calls may not."""
+    retriever = StubRetriever()
+    session = EvidenceSearchSession(retriever)
+
+    async def run():
+        await session.initialize("first sentence? second sentence?")
+        await session.search("agent supplied query? still one query?")
+
+    asyncio.run(run())
+    assert [c.expand_sentences for c in retriever.contexts] == [True, False]
+    # The verbatim queries reach the retriever unchanged on both paths.
+    assert retriever.queries == [
+        "first sentence? second sentence?",
+        "agent supplied query? still one query?",
+    ]
+
+
+def test_cache_does_not_leak_across_expansion_modes():
+    retriever = StubRetriever()
+    session = EvidenceSearchSession(retriever)
+    question = "withdraw"
+
+    async def run():
+        first = await session.initialize(question)
+        # Resubmitting the opening text must retrieve it verbatim, not replay the
+        # expanded bundle stored under the same normalized text.
+        again = await session.search(question)
+        assert first.status == again.status == "evidence"
+
+    asyncio.run(run())
+    assert [c.expand_sentences for c in retriever.contexts] == [True, False]
