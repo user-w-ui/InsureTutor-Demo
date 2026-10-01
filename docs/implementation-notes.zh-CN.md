@@ -110,13 +110,16 @@ PDF 点值。优先使用页码链接与原文摘录。区域高亮需要经过�
 1. 接收问题、可选会话 ID 与响应语言区域。校验请求长度与结构。加载有界对话状态。
 2. 在应用代码中处理明显的越界请求与个人购买建议请求。其中受支持的事实性子问题
    仍可解释。
-3. 为本轮创建 `EvidenceSearchSession`，启动仅含 `search_evidence(query)` 的 agent。
-4. Agent 读取证据、核对条件与缺项后决定继续检索、澄清或输出草稿；SDK 执行循环。
+3. 为本轮创建 `EvidenceSearchSession`，以完整原问调用 `initialize(original_question)` 一次，
+   不先拆题或改写；首次结果登记引用，并作为结构化数据提供给模型。
+4. 启动仅含 `search_evidence(query)` 的 agent；它读取初始证据、核对条件与缺项后决定
+   补查、澄清或直接输出草稿，SDK 执行循环。
 5. 服务端校验本轮引用白名单、已知冲突与回答边界；检索失败不许可凭模型补答。
 6. 服务端构建原文引用并返回结果。模型未配置或运行失败时，降级为有标注的可用原文摘录。
 
-默认上限：每轮 6 次检索、8 个 SDK 回合，并设总超时。工具按实际调用次数强制限制；
-SDK 回合并不等于工具调用次数。最多一次格式修复。循环与最终答案校验将在下一步实现。
+默认上限：每轮 6 次检索，其中首次 1 次、补查最多 5 次；8 个 SDK 回合，并设总超时。
+首次检索不消耗 SDK 回合。SDK 回合并不等于工具调用次数。最多一次格式修复。
+首轮入口与补查工具已实现，Tutor 调用、循环与最终答案校验将在下一步实现。
 
 ## 检索与证据补全
 
@@ -135,7 +138,7 @@ token。对语料库与查询应用完全相同的规范化。经审核的双语
    注释，也不把它与其权益分离。
 5. 返回一个 EvidenceBundle，包含源片段、关系理由与冲突标记。
 
-当前默认：每个查询组双路各 12 个单元，所有组共用 8 个直接命中名额、12,000 个去重后的
+当前默认：每次检索双路各 12 个单元，最多 8 个直接命中名额、12,000 个去重后的
 完整来源字符。脚注可独立命中；自动补入的脚注不占名额。该设置是演示基线，尚非最优值。
 
 ## 上下文注入
@@ -145,7 +148,9 @@ token。对语料库与查询应用完全相同的规范化。经审核的双语
 序列化的 user 载荷。
 
 使用 Agents SDK 时，证据放入 `Runner.run` 的消息输入；本地 `context` 不会自动进入
-模型上下文，不能用它替代证据注入。应用负责检索，Agent 的 `tools` 为空。
+模型上下文，不能用它替代证据注入。应用保证首次检索，将其 `SearchResult.to_agent_json()`
+作为序列化输入数据；Agent 的 `tools` 只有只读 `search_evidence`，补查证据作为工具结果。
+两种证据使用同一序列化结构，均不能放入 system 指令。
 
 示例 system 策略：
 
@@ -165,16 +170,23 @@ token。对语料库与查询应用完全相同的规范化。经审核的双语
         "recent_user_questions": ["定期提款有什么条件？"],
         "previous_evidence_groups": ["automatic-periodic-withdrawal"]
       },
-      "resolved_question": "定期提款权益每月最低提款金额是多少？",
-      "evidence": [
-        {"id": "E1", "kind": "clause", "pdf_page": 10,
-         "original_text": "<verbatim clause>", "requires": ["E2"]},
-        {"id": "E2", "kind": "note", "pdf_page": 12,
-         "original_text": "<verbatim Note 6, including amount and conditions>"}
-      ]
+      "initial_evidence": {
+        "status": "evidence",
+        "remaining_searches": 5,
+        "remaining_source_characters": "<server-computed integer>",
+        "evidence": {
+          "selected_unit_ids": ["withdrawal"],
+          "units": ["<complete units and required-note relationships>"],
+          "source_spans": ["<verbatim spans with physical pages and original bbox>"],
+          "conflicts": {},
+          "quality_flags": {}
+        }
+      }
     }
 
-本示例中的页码是物理 PDF 页。摘录来自产物。模型不能创建摘录或来源 URL。使用原始
+以上为省略字段的示意；实际初始结果使用 `to_agent_json()`，不手工拼接证据。首次仍检索
+当前完整原问；历史由 agent 用来解析指代并决定补查。页码是物理 PDF 页，摘录来自产物。
+模型不能创建摘录或来源 URL。使用原始
 源语言，优先与查询语言一致；对已知冲突要包含两个语言版本。简体检索别名不是可引用
 证据。
 
@@ -279,21 +291,29 @@ manifest 固定语料哈希、行序、模型和 tokenizer 各文件哈希及编
 
 ### 有界的 agent 检索工具
 
-根据用户的最新决定，撤掉无工具 agent 与应用拆题／跨查询融合的设计。调用一次
-`search_evidence(query)` 就执行一次独立的 Retriever；agent 根据当前证据自主选择下一次
-查询并综合回答。单次原问／可选改写仍按逻辑单元归并后做等权 RRF。
+程序保证首次检索，agent 负责按需补查。`initialize(original_question)` 直接以完整原问调用
+Retriever 一次，首次不传改写；其后每次 `search_evidence(query)` 执行一次独立的 Retriever，
+agent 根据已有证据选择聚焦查询并综合回答。应用不拆题，也不融合跨查询排名。
+单次查询内部的原问／可选改写仍按逻辑单元归并后做等权 RRF。
 
 `agent_tools.py` 实现 `EvidenceSearchSession` 和 `make_search_evidence_tool`。
+先等待 `session.initialize(question)`，将结果的 `to_agent_json()` 注入模型输入，再创建
+`make_search_evidence_tool(session)`。初始化仅允许一次；未完成时不允许补查或创建工具。
+首次后端错误向上抛出，由 Tutor 降级；首次无证据或查询无效会提供明确状态，仍可补查。
 SDK 作为可选依赖 `.[agent]` 固定 openai-agents 0.22.3；工具 schema 只暴露 `query`。
 返回单元 ID、必需关系、完整原文、物理页码、原始 bbox、text_origin 和冲突／质量标记；
 省去重复的单元正文与清洗中间字段。它不能选择文件、URL、索引、top-k 或预算。
 
-每轮新建工具状态，默认最多 6 次调用、12,000 个去重后的来源字符。每次结果保留独立的
+每轮新建工具状态，默认最多 6 次检索尝试（首次 1 次＋补查最多 5 次），首次和补查共用
+12,000 个去重后的来源字符。两类结果共用 `SearchResult.to_agent_json()`，每次结果保留独立的
 完整 EvidenceBundle；新结果使本轮预算超限时，整组拒绝并返回限额状态。自动脚注由
 Retriever 强制补入，不由 agent 决定。已有来源不重复计算成本，同一规范化查询可复用
-结果，但仍计一次工具调用；并发调用由锁串行处理。CPU 编码同样在串行工作线程中执行。
+首次或补查结果，但仍计一次补查尝试；无效、无结果与被预算拒绝的尝试也计数。
+并发调用由锁串行处理。CPU 编码同样在串行工作线程中执行。
 
-引用登记表只记录实际送达的单元和来源，不做跨查询排名或替 agent 判断事实。
+引用登记表记录首次及补查提供的单元和来源，不做跨查询排名或替 agent 判断事实。
+初始结果必须随问题送入模型，不能只存在 SDK 本地 context；未调用工具的 agent 也能引用
+首次证据。是否需要补查由 agent 判断，应用不强制其重复查询已有结果。
 超预算／无结果／失败的调用不登记新引用。最终草稿只能引用本轮已返回的 ID；该校验、
 source_conflict、提示注入与购买建议边界将在下一步 Tutor／Guardrails 完成。
 检索工具的范围限制不代表能保证语义安全。模型 API 需要支持函数调用；不支持时按运行
@@ -302,6 +322,8 @@ source_conflict、提示注入与购买建议边界将在下一步 Tutor／Guard
 官方依据：[Agents SDK 工具示例](https://developers.openai.com/api/docs/guides/agents/quickstart?lang=python)。
 工具与完整 Runner 循环是两项验收：当前工具 schema、SDK 本地调用以及真实 CPU 检索
 调用已验证；由生成模型选择多次查询并综合作答尚未验证。
+本次首轮入口调整的 9 项测试通过，覆盖初始化顺序、完整原问仅检索一次、首次证据引用、
+共享预算、缓存、无结果后补查，以及后端失败不能启动工具；未重跑既有真实 E5 评测。
 
 ### 真实 E5 评测与剩余缺口
 

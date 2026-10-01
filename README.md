@@ -98,12 +98,15 @@ text, physical PDF pages and bounding boxes; this CLI does not generate answers.
 python -m pip install -e ".[agent,dev]"
 ```
 
-`make_search_evidence_tool(EvidenceSearchSession(retriever))` wraps the same
-`await retriever.retrieve(QueryContext(...))` as an SDK `function_tool`.
-The agent will choose focused searches, inspect results and search again before
-answering. Each call returns complete evidence; results are not manually ranked or
-merged across searches. The per-turn registry only enforces limits and records
-which unit IDs are citable: default 6 calls and 12,000 unique source characters.
+Create a per-turn `EvidenceSearchSession`, then call `await session.initialize(question)`
+once with the full original question before starting the agent. Include the result's
+`to_agent_json()` in the model input as structured, untrusted evidence.
+`make_search_evidence_tool(session)` wraps the same Retriever as an SDK `function_tool`
+and requires initial retrieval to have completed. The agent will inspect initial
+evidence, answer directly when sufficient, or choose focused supplemental searches.
+Each result is complete; results are not manually ranked or merged across searches.
+Initial and supplemental evidence share the citation registry and 12,000 unique source
+characters. The default 6 searches include 1 initial search and up to 5 tool calls.
 Schema and actual SDK tool execution are tested without a model API; the Runner
 loop, answer generation and safety validation are the next step.
 See [implementation notes](docs/implementation-notes.zh-CN.md) for measured recall,
@@ -132,8 +135,9 @@ citation-verified answering** — not the chat loop.
 
 A single Docker container serves a FastAPI backend and static chat UI. It loads a
 committed corpus and precomputed vectors for BM25 + NumPy hybrid retrieval.
-One OpenAI Agents SDK agent will query a read-only evidence tool, inspect results,
-and search again when needed. The server controls tool budgets, preserves required
+The server first retrieves the full original question and provides structured evidence
+to one OpenAI Agents SDK agent, which may supplement it through a read-only search tool.
+The server controls shared retrieval budgets, preserves required
 notes, records citable evidence and validates the draft. It constructs
 PDF citations before returning the answer. Without an LLM, it returns labelled
 source excerpts. Query embeddings run locally on CPU with multilingual-e5-small
@@ -160,7 +164,7 @@ src/insuretutor/
   retrieval/                 Offline CPU E5, BM25 + NumPy, RRF, evidence completion
   guardrails/                Refusal & scope policy
   tutor.py                   Full request lifecycle (to add)
-  generation.py              Tool-free Agents SDK adapter (to add)
+  generation.py              Agents SDK runtime with optional supplemental searches (to add)
   api/                       FastAPI app
 data/
   cleaning-rules.json        Source-pinned corrections, structure & evidence links

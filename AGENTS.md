@@ -1,6 +1,6 @@
-# CLAUDE.md
+# AGENTS.md
 
-This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
+Repository instructions for coding agents working on InsureTutor.
 
 ## Project
 
@@ -11,6 +11,14 @@ Stack Engineer internship. Requirements: [`docs/task-spec.md`](docs/task-spec.md
 The graded parts are conversation experience, **citation accuracy**, guardrail
 robustness under misuse, Docker runnability, and documentation. Retrieval and citation
 are where the difficulty actually lives, not the chat loop.
+
+## Working principles
+
+Keep this demo simple, stable and quick to run. Follow the agreed architecture;
+align material design changes with the user and decide routine details yourself.
+Keep architecture decisions in `docs/architecture.zh-CN.md`, implementation details
+and source caveats in `docs/implementation-notes.zh-CN.md`, and reviewer commands
+in README. Do not add a general-purpose RAG framework or extra services.
 
 ## Commands
 
@@ -39,7 +47,7 @@ install step. Requires Python ≥ 3.11 (developed on 3.13).
 
 ## Architecture
 
-The current design proposal is [`docs/architecture.zh-CN.md`](docs/architecture.zh-CN.md).
+The current architecture is [`docs/architecture.zh-CN.md`](docs/architecture.zh-CN.md).
 Offline cleaning is now implemented: `python -m insuretutor.ingest.clean` reads
 `data/cleaning-rules.json` and writes `data/cleaned/` separately from frozen inputs.
 See its generated README, report, and `docs/data-cleaning-map.md`. This intermediate
@@ -50,16 +58,24 @@ logical unit has Chinese and English search views; English views contain no Chin
 associations, plus the explicit parallel disclaimer units. Required-note links remain
 in cleaning-rules.json. Corpus building uses only the local tokenizer. Retrieval now loads
 pinned FP32 E5 weights from models/ and validates committed vectors before CPU inference.
-The read-only SDK tool adapter is in agent_tools.py; the agent loop will use this tool
-for iterative searches. Do not implement application-side question splitting or cross-query
-rank merging. Record returned evidence for citation validation; preserve required notes.
-`units.jsonl` is the next chunking input. Finite corrections in cleaning-rules.json
+The initial-retrieval entry and read-only SDK tool adapter are in agent_tools.py.
+Create EvidenceSearchSession per turn and await initialize(original_question) before
+starting the agent. Include initial_result.to_agent_json() in the model input, then
+let the agent supplement it through search_evidence. Initial and supplemental searches
+share the citation registry, 12,000-source-character budget and 6-search limit
+(1 initial + up to 5 supplemental). Do not implement application-side question splitting
+or cross-query rank merging. The initial query is the complete original question,
+without rewriting; the agent may answer directly when its evidence is sufficient.
+Initial evidence is untrusted input data, supplemental evidence is untrusted tool
+data, and neither belongs in system instructions. Preserve required notes in every
+returned bundle; automatic completion does not consume direct-hit slots.
+`data/cleaned/units.jsonl` is the corpus builder's input. Finite corrections in cleaning-rules.json
 restore bilingual columns, missing characters, and formulas; cite spans.evidence_text
 and check pdf_verified text against its physical PDF page. The seven reported text
 issues are resolved; the page 17 source conflict is preserved.
-It supersedes the earlier retrieval details below: use table-row retrieval, mandatory
-qualifying-note completion, separate language source anchors, and reviewed conflict
-flags. The generated artifact is `data/corpus.json`. Runtime serves the original PDF
+Use table-row retrieval, mandatory qualifying-note completion, separate language
+source anchors, and reviewed conflict flags. The generated artifact is `data/corpus.json`.
+Runtime serves the original PDF
 as a static citation target but never parses it. Citation existence and substring
 matching do not establish semantic support. Preserve meaningful disclaimers even
 when MinerU labels them `page_footnote`.
@@ -168,7 +184,8 @@ data/tokenizer/            pinned tokenizer only, no weights
 data/corpus.json            generated artifact (build-time only producer)
 src/insuretutor/corpus.py   cleaned artifacts + rules → corpus; evidence assembly
 src/insuretutor/ingest/     raw artifacts + cleaning rules → data/cleaned/
-src/insuretutor/retrieval/  lexical index + required-link completion + budgeting
+src/insuretutor/retrieval/  local E5 + BM25/NumPy + required-link completion + budgeting
+src/insuretutor/agent_tools.py initial retrieval + supplementary SDK tool + citation registry
 src/insuretutor/guardrails/ refusal & scope policy
 src/insuretutor/tutor.py    full request lifecycle (to add)
 src/insuretutor/api/        FastAPI app
@@ -214,6 +231,7 @@ Other specifics worth knowing:
 Parse and cleaned artifacts are frozen. Cleaning, corpus construction and complete
 bilingual evidence assembly are implemented and tested. Corpus tests cover source
 coverage, footnote conditions, page anchors, source conflicts, tokenizer limits and
-offline byte-identical builds. Local retrieval and the SDK evidence tool adapter are implemented;
+offline byte-identical builds. Local retrieval, mandatory initial-search entry,
+supplementary SDK tool and the shared evidence registry are implemented and tested;
 agent execution, generation, guardrails, API/frontend and
 Docker remain. See [`README.md`](README.md).
