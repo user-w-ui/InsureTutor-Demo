@@ -963,7 +963,9 @@ async def test_content_correction_sees_tool_results_and_has_no_tools(corpus):
     assert any(i.get("type") == "function_call_output" for i in final["input"])
     feedback = json.loads(final["input"][-1]["content"])
     assert feedback["operation"] == "content_correction"
-    assert feedback["issues"] == [{"issue": "unsupported_quantity"}]
+    assert feedback["issues"][0]["issue"] == "unsupported_quantity"
+    assert feedback["issues"][0]["path"] == ["claims", 0]
+    assert ["number", "999"] in feedback["issues"][0]["unsupported_quantities"]
 
 
 @pytest.mark.asyncio
@@ -1100,6 +1102,65 @@ async def test_numeric_failure_cannot_hide_unknown_citation_in_another_group(cor
     )
     assert result.status == "excerpts" and result.reason == "unknown_or_missing_evidence"
     assert not result.claims
+
+
+@pytest.mark.asyncio
+async def test_q3_natural_first_and_once_distribution_wording(corpus):
+    text = (
+        "额外回报并不是第20个保单年度才开始派发，而是于第15个保单周年日及其后每5年派发一次，"
+        "因此第20年只是这个周期中的其中一次派发，第一次其实是在第15年。"
+    )
+    result, _, model, _ = await answer(
+        corpus,
+        [draft(text, ["extra-bonus-frequency", "bonus-rate-15-25"])],
+        groups=[["extra-bonus-frequency", "bonus-rate-15-25"]],
+        question="额外回报什么时候派发？",
+    )
+    assert result.status == "answered" and result.reason is None
+    assert len(model.seen) == 1
+
+
+@pytest.mark.asyncio
+@pytest.mark.parametrize(
+    "text",
+    [
+        "额外回报每7年派发一次。",
+        "额外回报每5年派发2次。",
+        "额外回报最多派发1次。",
+        "第2次派发额外回报。",
+        "每5年派发一次，金额为US$999。",
+    ],
+)
+async def test_cadence_normalization_does_not_allow_new_limits_or_amounts(corpus, text):
+    result, _, _, _ = await answer(
+        corpus,
+        [draft(text, ["extra-bonus-frequency"])],
+        groups=[["extra-bonus-frequency"]],
+        question="额外回报什么时候派发？",
+    )
+    assert result.reason == "unsupported_quantity" and not result.claims
+
+
+@pytest.mark.asyncio
+async def test_q3_closing_comparison_must_repeat_rate_sources(corpus):
+    text = "2.5%是账户价值下限保证；4%、0.25%与2.75%属于现时假设数字。"
+    missing = ["interest-guarantee", "rate-date-note", "bonus-rate-disclaimer"]
+    complete = missing + ["base-interest", "additional-interest", "bonus-rate-15-25"]
+    result, _, model, _ = await answer(
+        corpus,
+        [draft(text, missing), draft(text, complete)],
+        groups=[complete],
+        question="什么利率是保证的？",
+    )
+    assert result.status == "answered" and result.model_calls == 2
+    feedback = json.loads(model.seen[-1]["input"][-1]["content"])
+    issue = feedback["issues"][0]
+    assert issue["path"] == ["claims", 0]
+    assert {tuple(x) for x in issue["unsupported_quantities"]} >= {
+        ("percent", "4"),
+        ("percent", "0.25"),
+        ("percent", "2.75"),
+    }
 
 
 @pytest.mark.asyncio

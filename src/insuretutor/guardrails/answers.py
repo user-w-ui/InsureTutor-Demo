@@ -23,6 +23,8 @@ FORMULAS = {
 
 class AnswerRejected(ValueError):
     draft: DraftAnswer | None = None
+    claim_index: int | None = None
+    unsupported_quantities: tuple[tuple[str, str], ...] = ()
 
 
 def normalized(text: str) -> str:
@@ -105,6 +107,34 @@ def quantities(text: str) -> set[tuple[str, str]]:
             cur, num, mul = (m[1], m[2], m[3]) if before else (m[3], m[1], m[2])
             out.add((currencies[cur], _amount(num, mul)))
     return out
+
+
+def claim_quantities(text: str, source: str) -> set[tuple[str, str]]:
+    """Distinguish narrative 'first/once' from numerical limits and amounts.
+
+    Chinese 第一次 is equivalent to English 'first', which is already prose
+    rather than a digit. A distribution described as once per period is allowed
+    only when that exact period is explicitly stated in the cited sources.
+    """
+    text, source = normalized(text), normalized(source)
+    text = re.sub(r"第1次", "首次", text)
+
+    def cadence(match):
+        interval, unit = match[1], match[2]
+        english = {"年": "years?", "月": "months?", "天": "days?"}[unit]
+        if re.search(
+            rf"每\s*{re.escape(interval)}\s*{unit}|every\s+{re.escape(interval)}\s+{english}\b",
+            source,
+        ):
+            return match[0].replace("1次", "")
+        return match[0]
+
+    text = re.sub(rf"每({_NUMBER})(年|月|天)(?:派发|发放|支付|拨入)?1次", cadence, text)
+    # 'One of the distributions' identifies an event, rather than imposing a
+    # one-time limit; require a sourced recurring-distribution clause as well.
+    if re.search(r"每\s*\d+\s*(?:年|月|天)|every\s+\d+\s+(?:years?|months?|days?)\b", source):
+        text = re.sub(r"其中1次(?=派发|发放|支付|拨入)", "其中的", text)
+    return quantities(text)
 
 
 MESSAGES = {
@@ -361,7 +391,7 @@ def validate_answer(
     """Return a sanitized draft or reject it; Tutor controls correction/recovery."""
     draft = draft.model_copy(deep=True)
     all_user = "\n".join(user_questions)
-    for claim in draft.claims:
+    for index, claim in enumerate(draft.claims):
         if claim.kind == "boundary":
             claim.text = message(claim.boundary, language)
             continue
@@ -454,8 +484,12 @@ def validate_answer(
             # Derived amounts are permitted only in a marked death-benefit
             # calculation. No arithmetic evaluation or semantic guarantee here.
             allowed |= quantities(calc.steps) | quantities(calc.result) | inputs
-        if not quantities(claim.text) <= allowed:
-            raise AnswerRejected("unsupported_quantity")
+        unsupported = claim_quantities(claim.text, source) - allowed
+        if unsupported:
+            error = AnswerRejected("unsupported_quantity")
+            error.claim_index = index
+            error.unsupported_quantities = tuple(sorted(unsupported))
+            raise error
         if claim.kind == "application":
             claim.text = message("application", language) + " " + claim.text
     if draft.clarification_question:

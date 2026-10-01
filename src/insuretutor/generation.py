@@ -88,6 +88,8 @@ For schedules, use the brochure's start/interval wording; do not invent numbered
 occurrences or enumerate later anniversaries absent from the cited text. A user's policy
 duration selects a rate/range through application, not through an ordinary fact claim.
 Before submitting JSON, check EACH claim's numbers against its OWN cited evidence.
+When repeating a rate in a closing comparison, repeat its supporting evidence IDs
+in that paragraph as well. Citations in an earlier paragraph do not support this one.
 In a fact claim, every year, ordinal, amount and percentage must literally occur in
 those sources or their required notes/context. Do not compute extra schedule dates,
 number payout occurrences, or copy a figure from an uncited nearby unit. For a
@@ -244,6 +246,9 @@ class AgentGenerator:
                 if isinstance(exc, ValidationError)
                 else [{"issue": str(exc) if content_failure else "invalid_json"}]
             )
+            if content_failure and exc.claim_index is not None:
+                issues[0]["path"] = ["claims", exc.claim_index]
+                issues[0]["unsupported_quantities"] = exc.unsupported_quantities
             repair_data = {
                 "operation": "content_correction" if content_failure else "format_repair",
                 "issues": issues,
