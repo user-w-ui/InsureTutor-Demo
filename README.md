@@ -31,7 +31,7 @@ Dependencies are declared in `pyproject.toml` and pinned in `uv.lock`.
 The offline cleaner writes separately to [`data/cleaned/`](data/cleaned/README.md),
 leaving `raw data/` unchanged. Start with the [readable preview](data/cleaned/preview.md),
 [quality report](data/cleaned/report.json), and [table/note map](docs/data-cleaning-map.md).
-Local retrieval is implemented; the chat API, generation and guardrails remain planned.
+Local retrieval and the guarded chat CLI are implemented; HTTP, UI and Docker remain planned.
 
 From the repository root, using Python 3.11 or newer (no third-party dependencies
 are needed for cleaning or its tests):
@@ -104,21 +104,28 @@ up to 8 direct hits and 12,000 deduplicated source characters. Automatically com
 notes use no direct-hit slots. Responses are complete evidence bundles with original
 text, physical PDF pages and bounding boxes; this CLI does not generate answers.
 
-### Read-only agent tool (adapter implemented; conversation loop next)
+### Chat CLI
 
-Create a per-turn `EvidenceSearchSession`, then call `await session.initialize(question)`
-once with the full original question before starting the agent. Include the result's
-`to_agent_json()` in the model input as structured, untrusted evidence.
-`make_search_evidence_tool(session)` wraps the same Retriever as an SDK `function_tool`
-and requires initial retrieval to have completed. The agent will inspect initial
-evidence, answer directly when sufficient, or choose focused supplemental searches.
-Each result is complete; results are not manually ranked or merged across searches.
-Initial and supplemental evidence share the citation registry and 12,000 unique source
-characters. The default 6 searches include 1 initial search and up to 5 tool calls.
-Schema and actual SDK tool execution are tested without a model API; the Runner
-loop, answer generation and safety validation are the next step.
-See [implementation notes](docs/implementation-notes.zh-CN.md) for measured recall,
-latency and remaining retrieval gaps.
+Prepare the local E5 model above, then copy `.env.example` to `.env` and fill in
+`LLM_API_KEY`, `LLM_BASE_URL` and `LLM_MODEL`. The API must support Chat Completions
+function calls; provider JSON mode is unnecessary. Missing configuration or failed
+generation returns explicitly labelled original excerpts.
+The sample config uses `LLM_REASONING_EFFORT=medium` and `LLM_MAX_TOKENS=32768`;
+the turn timeout remains 60 seconds. Leave reasoning effort blank if the provider
+does not support it.
+
+```powershell
+uv run --locked --extra agent python -m insuretutor.chat
+uv run --locked --extra agent python -m insuretutor.chat --question "定期提款有什么条件？" --language zh-Hans
+uv run --locked --extra agent python -m insuretutor.chat --question "Withdrawal conditions?" --excerpts
+uv run --locked --extra agent python -m insuretutor.chat --evaluate tests/eval/items.json
+uv run --locked --extra agent python -m insuretutor.chat --evaluate tests/eval/chat-scenarios.json --output tmp/chat-scenarios.json
+```
+
+Interactive commands: `/new`, `/exit`. Language choices: `auto`, `en`, `zh-Hans`,
+`zh-Hant`. The CLI shows answer status, original quotes and physical PDF pages.
+Evaluation fixtures are test-only; their answers and rubrics never enter model inputs.
+Citation coverage requires human semantic review; see [implementation notes](docs/implementation-notes.zh-CN.md).
 
 ---
 
@@ -153,8 +160,7 @@ through FastEmbed; the model and tokenizer are bundled in the Docker image.
 
 See the [technical architecture](docs/architecture.zh-CN.md) for the complete design;
 [data and implementation details](docs/implementation-notes.zh-CN.md) are maintained
-separately. Cleaning, corpus construction, CPU retrieval, evidence assembly and the SDK search tool adapter are
-implemented; the conversation runtime remains planned.
+separately. The conversation core and CLI are implemented; HTTP, UI and Docker are next.
 
 ---
 
@@ -168,6 +174,10 @@ raw data/
 src/insuretutor/
   corpus.py                  Corpus models, offline builder, evidence assembly
   agent_tools.py             Read-only SDK search tool and per-turn citation registry
+  tutor.py / generation.py   Chat lifecycle and bounded Agents SDK loop
+  chat_models.py             Public chat and model-draft contracts
+  sessions.py / guardrails/  Bounded history, validation and server citations
+  chat.py                   Interactive and evaluation CLI
   ingest/                    cleaning (build-time only)
   retrieval/                 Offline CPU E5, BM25 + NumPy, RRF, evidence completion
   guardrails/                Refusal & scope policy
@@ -210,8 +220,8 @@ See [`docs/data-provenance.md`](docs/data-provenance.md) for the full log.
 - [x] Cleaned fragments and reviewed metadata integrated into `corpus.json`
 - [x] Local hybrid retrieval + complete evidence with citation anchors
 - [x] Read-only SDK search tool + per-turn budgets and citation registry
-- [ ] Agent query loop + answer generation + citation presentation
-- [ ] Guardrails
+- [x] Tutor + Agent query loop + answer validation + server citations (offline and configured API verified; quality limits in implementation notes)
+- [x] Bounded sessions, follow-ups and atomic excerpt fallback
 - [ ] API + frontend
 - [ ] Docker
 

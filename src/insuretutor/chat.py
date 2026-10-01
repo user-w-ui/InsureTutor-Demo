@@ -5,6 +5,8 @@ from __future__ import annotations
 import argparse
 import asyncio
 import json
+import platform
+import time
 from pathlib import Path
 
 from pydantic import ValidationError
@@ -33,14 +35,20 @@ def display(result: ChatResult):
     print(f"\nsearches={result.searches}; model_calls={result.model_calls}")
 
 
-async def evaluate(tutor: Tutor, fixture: Path) -> dict:
+async def evaluate(tutor: Tutor, fixture: Path, progress=None) -> dict:
     """Questions enter only as user turns; answers/rubrics never enter the model."""
     source = json.loads(fixture.read_text(encoding="utf-8"))
     rows = []
     for item in source["items"]:
-        turns = item.get("turns") or [{"question": item["question"]}]
+        turns = item.get("turns") or [
+            {
+                "question": item["question"],
+                "response_language": item.get("response_language", "auto"),
+            }
+        ]
         sid = None
         for index, turn in enumerate(turns):
+            started = time.perf_counter()
             result = await tutor.answer(
                 ChatTurn(
                     question=turn["question"],
@@ -51,7 +59,9 @@ async def evaluate(tutor: Tutor, fixture: Path) -> dict:
             sid = result.session_id
             expected = set(turn.get("expected_unit_ids", []))
             if not expected and index == len(turns) - 1:
-                expected = {c["unit_id"] for c in item.get("citations", [])}
+                expected = set(item.get("expected_unit_ids", [])) or {
+                    c["unit_id"] for c in item.get("citations", [])
+                }
             actual = {u for c in result.citations for u in c.unit_ids}
             rows.append(
                 {
@@ -64,13 +74,22 @@ async def evaluate(tutor: Tutor, fixture: Path) -> dict:
                     if expected
                     else None,
                     "needs_human_semantic_review": True,
+                    "elapsed_seconds": round(time.perf_counter() - started, 3),
                 }
             )
+            if progress:
+                progress(rows[-1])
     return {
         "generated_answers": sum(
             r["result"]["status"] not in {"excerpts", "insufficient"} for r in rows
         ),
         "total_turns": len(rows),
+        "environment": {
+            "python": platform.python_version(),
+            "platform": platform.platform(),
+            "reasoning_effort": tutor.generator.reasoning_effort if tutor.generator else None,
+            "max_tokens": tutor.generator.max_tokens if tutor.generator else None,
+        },
         "cases": rows,
         "note": "Citation coverage is not a semantic/arithmetic accuracy score. Review answers and safety manually.",
     }
@@ -78,12 +97,27 @@ async def evaluate(tutor: Tutor, fixture: Path) -> dict:
 
 async def run(args):
     retriever = HybridRetriever.from_local(args.corpus, args.index_dir, args.model_dir, 2)
-    config = ModelConfig.from_env()
-    generator = AgentGenerator.from_config(config) if config and not args.excerpts else None
+    generator = None
+    if not args.excerpts:
+        try:
+            config = ModelConfig.from_env()
+            generator = AgentGenerator.from_config(config) if config else None
+        except (ValueError, ImportError):
+            print("Model configuration or SDK dependency invalid; using source excerpt mode.")
     tutor = Tutor(retriever, generator)
     try:
         if args.evaluate:
-            report = await evaluate(tutor, args.evaluate)
+
+            def progress(row):
+                result = row["result"]
+                print(
+                    f"{row['id']} turn {row['turn']}: {result['status']} "
+                    f"(searches={result['searches']}, model_calls={result['model_calls']}, "
+                    f"reason={result['reason'] or 'none'})",
+                    flush=True,
+                )
+
+            report = await evaluate(tutor, args.evaluate, progress)
             args.output.parent.mkdir(parents=True, exist_ok=True)
             args.output.write_text(
                 json.dumps(report, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"

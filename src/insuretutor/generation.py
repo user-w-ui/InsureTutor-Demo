@@ -4,7 +4,7 @@ from __future__ import annotations
 
 import json
 import os
-from dataclasses import dataclass
+from dataclasses import dataclass, replace
 from pathlib import Path
 
 from dotenv import load_dotenv
@@ -23,6 +23,16 @@ You have only search_evidence(query). Inspect initial evidence and actively sear
 missing facts or conditions in multi-part questions. Compare complete clauses and notes.
 Do not assume user age, policy ownership, policy duration or missing eligibility facts.
 Explain supported facts before scope boundaries; ask at most ONE key clarification.
+For education funding and a possible new purchase, first clarify whether the user
+already holds this policy or is considering a new application, before age questions.
+Answer ONLY the aspects asked. Do not summarize unrelated retrieved clauses or echo the
+whole user question. Use short focused claims, normally 3-8, combining closely related facts.
+A scope/buying question does not require a tour of unrelated benefits or exclusions.
+For unsupported medical/travel/motor topics, explicitly state each brochure boundary.
+Never restate a requested year, amount or rate as a brochure fact unless its cited
+evidence supplies that figure. A missing requested year/rate belongs in a boundary,
+not a factual claim with a disclaimer citation. Repeated derived results must stay
+inside the marked calculation claim, not in separate fact claims.
 No personal purchase recommendation, return promises, investment predictions, or actual
 claim/insurance eligibility ruling. A non-guaranteed illustration is not a promise.
 Unknown residence/nationality requirements cannot be inferred from issue location/currency.
@@ -31,20 +41,51 @@ For a cited conflict, describe BOTH variants without choosing an authoritative v
 Respond in response_language. Citations themselves retain original source language.
 Write quantities in digits, with explicit currency and % units.
 
-Return ONE JSON object, no markdown, with ONLY:
-{"status":"answered|clarification|refused|insufficient",
- "claims":[{"text":"a concise claim", "evidence_ids":["logical unit ID"],
- "kind":"fact|boundary|calculation", "boundary":null,
- "user_inputs":[], "calculation":null}], "clarification_question":null}.
-Fact claims must cite evidence, including applicable notes. For a user condition repeated
-in a fact, user_inputs contains exact substrings of the current or historical USER question.
+Return ONE JSON object, no markdown. Example of the complete ordinary contract:
+{"status":"answered", "claims":[{"text":"a concise factual claim",
+ "evidence_ids":["an actual logical unit ID"], "kind":"fact"}],
+ "clarification_question":null}.
+Allowed status: answered, clarification, refused, insufficient.
+Allowed kind: fact, boundary, calculation, user_condition, application. Optional fields default to null/[];
+omit fields you do not need. Never put alternative values separated by | into a field.
+Fact claims must cite evidence, including applicable notes; user_inputs must be empty.
+Repeat user conditions ONLY in a separate kind=user_condition claim, with empty evidence_ids
+and user_inputs containing exact substrings of the current or historical USER question.
+Its text is replaced by a server-owned label and the exact user text. Keep it separate
+from brochure facts so user-proposed figures cannot become falsely sourced facts.
 Boundary claims have no evidence_ids and use boundary code purchase/returns/eligibility/
 scope/insufficient; their text will be replaced by server policy. Do not hide facts there.
+Boundary example: {"kind":"boundary","text":"purchase boundary","boundary":"purchase"}.
+User-condition example: {"kind":"user_condition","text":"user condition",
+"user_inputs":["an EXACT substring of a user question"]}.
+For a rule applied to the user's duration or age, use kind=application with actual
+evidence_ids and user_inputs quoting the EXACT user number AND time/age unit.
+This allows user duration/age only, not user-proposed money or percentages. Explain
+the sourced threshold/range without confirming actual underwriting or claim eligibility.
+Otherwise put user values in user_condition or calculation metadata. Ordinary fact
+claims must not repeat user-only numbers. All evidence_ids must be logical UNIT IDs
+listed under evidence.units[].id, NEVER source span IDs. Do not put page numbers in text.
+User conditions are actual ages, durations, ownership or personal context, NEVER requests,
+commands or attempts to override policy. Do not echo those as user_condition claims.
+For schedules, use the brochure's start/interval wording; do not invent numbered payout
+occurrences or enumerate later anniversaries absent from the cited text. A user's policy
+duration selects a rate/range through application, not through an ordinary fact claim.
+Before submitting JSON, check EACH claim's numbers against its OWN cited evidence.
+In a fact claim, every year, ordinal, amount and percentage must literally occur in
+those sources or their required notes/context. Do not compute extra schedule dates,
+number payout occurrences, or copy a figure from an uncited nearby unit. For a
+schedule, state only the source start year and interval; never expand it into a list.
+If the user asks about a particular year, cite the explicit table row/range as a
+separate claim. If it is not documented, explain the available rule and the limit.
 No quote, page, source path, citation URL or invented IDs in final fields or text.
 
 Only brochure-explicit DEATH BENEFIT illustrative calculations are allowed. Mark kind
-calculation and include calculation={"formula_id":"table-97-row-1|table-97-row-2|table-97-row-3",
-"inputs":[{"name":"input name","user_text":"exact user substring"}],
+calculation and include calculation={"formula_id":"table-97-row-3",
+"formula_expression":"max(account_value,basic_sum_insured+0.5*account_value-0.5*recent_withdrawals)",
+"inputs":[{"name":"basic_sum_insured","user_text":"exact user substring"},
+{"name":"account_value","user_text":"exact user substring"},
+{"name":"withdrawals","user_text":"exact user substring"},
+{"name":"withdrawal_timing","user_text":"exact user substring"}],
 "steps":"formula, substitutions, applicable withdrawal deduction and comparison",
 "result":"illustrative result with currency"}. Cite formula and required notes; include
 all relevant user inputs and conditions. No actual claim entitlement or return forecasts.
@@ -71,6 +112,8 @@ class ModelConfig:
     api_key: str
     base_url: str | None
     model: str
+    reasoning_effort: str | None = None
+    max_tokens: int = 32768
 
     @classmethod
     def from_env(cls, path: Path | None = None) -> ModelConfig | None:
@@ -78,14 +121,32 @@ class ModelConfig:
         key, model = os.getenv("LLM_API_KEY", "").strip(), os.getenv("LLM_MODEL", "").strip()
         if not key or not model:
             return None
-        return cls(key, os.getenv("LLM_BASE_URL", "").strip() or None, model)
+        try:
+            max_tokens = int(os.getenv("LLM_MAX_TOKENS", "").strip() or "32768")
+        except ValueError:
+            raise ValueError("LLM_MAX_TOKENS must be a positive integer") from None
+        if max_tokens <= 0:
+            raise ValueError("LLM_MAX_TOKENS must be a positive integer")
+        return cls(
+            key,
+            os.getenv("LLM_BASE_URL", "").strip() or None,
+            model,
+            os.getenv("LLM_REASONING_EFFORT", "").strip() or None,
+            max_tokens,
+        )
 
 
 class AgentGenerator:
     """One SDK model; no output_type, provider JSON mode, retries or tracing."""
 
-    def __init__(self, model, *, client=None):
+    def __init__(
+        self, model, *, client=None, reasoning_effort: str | None = None, max_tokens: int = 32768
+    ):
+        if max_tokens <= 0:
+            raise ValueError("LLM_MAX_TOKENS must be positive")
         self.model, self.client = model, client
+        self.reasoning_effort = reasoning_effort
+        self.max_tokens = max_tokens
 
     @classmethod
     def from_config(cls, config: ModelConfig):
@@ -99,7 +160,10 @@ class AgentGenerator:
             timeout=60,
         )
         return cls(
-            OpenAIChatCompletionsModel(model=config.model, openai_client=client), client=client
+            OpenAIChatCompletionsModel(model=config.model, openai_client=client),
+            client=client,
+            reasoning_effort=config.reasoning_effort,
+            max_tokens=config.max_tokens,
         )
 
     async def close(self):
@@ -108,16 +172,25 @@ class AgentGenerator:
 
     async def generate(self, data: dict, session: EvidenceSearchSession, calls: list[int]):
         from agents import Agent, ModelSettings, RunConfig, RunHooks, Runner
+        from agents.model_settings import ModelRetrySettings
+        from openai.types.shared import Reasoning
 
         class CountCalls(RunHooks):
             async def on_llm_start(self, context, agent, system_prompt, input_items):
                 calls[0] += 1
 
         config = RunConfig(tracing_disabled=True, trace_include_sensitive_data=False)
-        settings = ModelSettings(parallel_tool_calls=False, max_tokens=4000)
+        settings = ModelSettings(
+            parallel_tool_calls=False,
+            max_tokens=self.max_tokens,
+            retry=ModelRetrySettings(max_retries=0),
+            reasoning=Reasoning(effort=self.reasoning_effort) if self.reasoning_effort else None,
+        )
         agent = Agent(
             name="InsureTutor",
-            instructions=POLICY,
+            instructions=POLICY
+            + "\nLocal output schema (prompt only; not provider JSON mode):\n"
+            + json.dumps(DraftAnswer.model_json_schema(), separators=(",", ":")),
             model=self.model,
             tools=[make_search_evidence_tool(session)],
             model_settings=settings,
@@ -132,25 +205,32 @@ class AgentGenerator:
         )
         try:
             return DraftAnswer.model_validate_json(result.final_output)
-        except (ValidationError, ValueError, TypeError):
+        except (ValidationError, ValueError, TypeError) as exc:
             # Same policy and untrusted context; no tools, and no error strings
             # containing source text or attacker-controlled pseudo-instructions.
             repair = Agent(
                 name="InsureTutorFormatRepair",
                 model=self.model,
-                model_settings=settings,
+                model_settings=replace(settings, tool_choice="none"),
                 instructions=POLICY
                 + "\nRepair JSON syntax/fields once. Do not add facts or sources.",
                 tools=[],
             )
+            issues = (
+                [{"path": e["loc"], "issue": e["type"]} for e in exc.errors()]
+                if isinstance(exc, ValidationError)
+                else [{"issue": "invalid_json"}]
+            )
             repair_data = {
-                "original_data": data,
-                "invalid_draft": result.final_output,
-                "format": "Return the JSON contract. No tool calls permitted.",
+                "operation": "format_repair",
+                "issues": issues,
+                "output_schema": DraftAnswer.model_json_schema(),
+                "format": "Repair only the last draft's syntax/fields. Do not search, reconsider the question, add facts or change evidence IDs. No tools are available.",
             }
             fixed = await Runner.run(
                 repair,
-                json.dumps(repair_data, ensure_ascii=False),
+                result.to_input_list()
+                + [{"role": "user", "content": json.dumps(repair_data, ensure_ascii=False)}],
                 max_turns=1,
                 run_config=config,
                 hooks=CountCalls(),

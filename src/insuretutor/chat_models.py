@@ -41,7 +41,7 @@ class Calculation(StrictModel):
 class Claim(StrictModel):
     text: str = Field(min_length=1, max_length=2000)
     evidence_ids: list[str] = Field(default_factory=list, max_length=24)
-    kind: Literal["fact", "boundary", "calculation"] = "fact"
+    kind: Literal["fact", "boundary", "calculation", "user_condition", "application"] = "fact"
     boundary: Boundary | None = None
     # Mark repeated user conditions so they cannot masquerade as brochure facts.
     user_inputs: list[str] = Field(default_factory=list, max_length=8)
@@ -52,7 +52,18 @@ class Claim(StrictModel):
         if self.kind == "boundary":
             if self.boundary is None or self.evidence_ids or self.calculation or self.user_inputs:
                 raise ValueError("Boundary uses only a server-owned boundary code")
-        elif not self.evidence_ids or self.boundary is not None:
+        elif self.kind == "user_condition":
+            if (
+                not self.user_inputs
+                or self.evidence_ids
+                or self.boundary is not None
+                or self.calculation
+            ):
+                raise ValueError("User conditions contain only exact user inputs")
+        elif self.kind == "application":
+            if not self.evidence_ids or not self.user_inputs or self.boundary or self.calculation:
+                raise ValueError("Condition application needs evidence and exact user conditions")
+        elif not self.evidence_ids or self.boundary is not None or self.user_inputs:
             raise ValueError("Factual claims need evidence IDs")
         if (self.kind == "calculation") != (self.calculation is not None):
             raise ValueError("Calculation metadata must match claim kind")

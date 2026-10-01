@@ -15,6 +15,7 @@ from insuretutor.guardrails.answers import (
     AnswerRejected,
     EvidenceRegistry,
     message,
+    required_boundaries,
     validate_answer,
 )
 from insuretutor.retrieval import Retriever
@@ -60,6 +61,7 @@ class Tutor:
                             "question": turn.question,
                             "response_language": language,
                             "history": [h.as_data() for h in conversation.history],
+                            "initial_citable_unit_ids": sorted(search.citable_units),
                             "initial_evidence": json.loads(initial.to_agent_json()),
                             "limits": {
                                 "remaining_searches": initial.remaining_searches,
@@ -87,7 +89,15 @@ class Tutor:
                             conflict = any(
                                 registry.units[u].conflict or u in registry.conflicts for u in used
                             )
-                            explanation = "\n\n".join(c.text for c in draft.claims)
+                            explanation = "\n\n".join(
+                                c.text
+                                + (
+                                    "\n" + c.calculation.steps + "\n" + c.calculation.result
+                                    if c.calculation
+                                    else ""
+                                )
+                                for c in draft.claims
+                            )
                             if not explanation:
                                 explanation = message(
                                     "insufficient" if draft.status == "insufficient" else "scope",
@@ -128,6 +138,10 @@ class Tutor:
             )
             if reset:
                 result.notices.insert(0, message("reset", language))
+            if result.reason:
+                codes, topics = required_boundaries(turn.question)
+                result.notices.extend(message(code, language) for code in codes)
+                result.notices.extend(message(topic, language) for topic in topics)
             # Excerpts and failures are not validated conversational answers.
             if result.reason is None:
                 registry = EvidenceRegistry(search)

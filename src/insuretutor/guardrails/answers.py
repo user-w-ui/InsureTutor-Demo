@@ -9,10 +9,10 @@ from decimal import Decimal
 from opencc import OpenCC
 
 from insuretutor.agent_tools import EvidenceSearchSession
-from insuretutor.chat_models import Citation, DraftAnswer
+from insuretutor.chat_models import Citation, Claim, DraftAnswer
 
 _CC = OpenCC("t2s")
-_NUMBER = r"\d+(?:,\d{3})*(?:\.\d+)?"
+_NUMBER = r"(?:\d{1,3}(?:,\d{3})+(?!\d)|\d+)(?:\.\d+)?"
 _CURRENCY = r"us\$|usd|hk\$|hkd|mop\$?|美元|港元|澳门元"
 FORMULAS = {
     "table-97-row-1": "max(account_value,basic_sum_insured-recent_withdrawals)",
@@ -27,6 +27,7 @@ class AnswerRejected(ValueError):
 
 def normalized(text: str) -> str:
     text = _CC.convert(unicodedata.normalize("NFKC", text)).lower()
+    text = text.replace("\\$", "$").replace("\\%", "%")
     text = re.sub(r"\b(?:us\s+dollars?|u\.s\.\s+dollars?)\b", "usd", text)
     text = re.sub(r"\b(?:hk|hong kong)\s+dollars?\b", "hkd", text)
     text = re.sub(r"\b(?:macau\s+)?patacas?\b", "mop", text)
@@ -53,7 +54,9 @@ def normalized(text: str) -> str:
 
     text = re.sub(rf"百分之([{chars}]+)", lambda m: cn_number(m) + "%", text)
     text = re.sub(
-        rf"(?<![0-9{chars}])([{chars}]+)(?=\s*(?:年|个月|月|岁|次|天|美元|港元|澳门元|%))", cn_number, text
+        rf"(?<![0-9{chars}])([{chars}]+)(?=\s*(?:年|个月|月|岁|次|天|美元|港元|澳门元|%))",
+        cn_number,
+        text,
     )
     text = re.sub(r"百分之(\d+(?:\.\d+)?)", r"\1%", text)
     for word, digit in (
@@ -137,6 +140,18 @@ MESSAGES = {
         "Conversation context was reset (expired, evicted or unknown session).",
         "会话上下文已重置（已过期、被清理或会话不存在）。",
     ),
+    "user_condition": ("User-provided condition:", "用户给定条件："),
+    "application": ("Based on the user-provided conditions:", "按用户给定条件："),
+    "medical": (
+        "This brochure does not record hospital medical-expense reimbursement terms.",
+        "本册未记载住院医疗费用报销条款。",
+    ),
+    "travel": ("This brochure does not record travel-insurance cover.", "本册未记载旅游保险保障。"),
+    "motor": ("This brochure does not record motor-insurance cover.", "本册未记载汽车保险保障。"),
+    "ownership_question": (
+        "Do you already hold this policy, or are you considering a new application?",
+        "你已经持有本册计划的保单，还是准备新投保？",
+    ),
     "excerpts": (
         "Source excerpt mode: no generated answer was accepted. The following is original brochure text, not a personalized answer.",
         "原文摘录模式：未采用生成答案。以下为宣传册原文，不是针对个人情况的回答。",
@@ -158,8 +173,7 @@ def check_scope(text: str, user_text: str = ""):
         r"\b(?:you should buy|i recommend|suitable for you|best for you|you should purchase)\b",
         r"\b(?:i suggest (?:buying|choosing)|you ought to buy|this plan is perfect for you)\b",
         r"(?:推荐|建议)(?:购买|投保|买入)|(?:稳赚|包赚|保本保息)",
-        r"(?:保证|确保|必定|一定).{0,12}(?:收益|回报|赚钱|获利)",
-        r"\b(?:guaranteed returns?|will definitely earn|guarantee (?:a |your )?return)\b",
+        r"\b(?:you are eligible|you will receive (?:a |the )?payout|your claim will be paid)\b|(?:你|您)(?:符合投保资格|一定获赔|必然获赔)",
         r"(?:system prompt|api[_ -]?key|系统提示|密钥)\s*[:：=]",
         r"https?://|file://|/sources/|raw data[/\\]|#page=",
         r"ignore (?:all |the |previous )?(?:instructions|rules|policy)|忽略.{0,8}(?:指令|规则|政策)",
@@ -169,6 +183,17 @@ def check_scope(text: str, user_text: str = ""):
     # factual channel remains deliberately conservative.
     if any(re.search(p, t) for p in patterns):
         raise AnswerRejected("scope_violation")
+    for pattern in (
+        r"(?:保证|确保|必定|一定).{0,12}(?:收益|回报|赚钱|获利)",
+        r"\b(?:guaranteed returns?|will definitely earn|guarantee (?:a |your )?return)\b",
+        r"\breturns? (?:is|are|will be) guaranteed\b",
+    ):
+        for match in re.finditer(pattern, t):
+            prefix = t[max(0, match.start() - 16) : match.start()]
+            if not re.search(
+                r"(?:not |non[- ]|no |cannot |can't |不|非|未|无法|不能|不是|并非)$", prefix
+            ):
+                raise AnswerRejected("scope_violation")
     if re.search(
         r"居留|国籍|居民|resident|nationality|citizenship", normalized(user_text)
     ) and re.search(
@@ -251,7 +276,32 @@ class EvidenceRegistry:
                     quality_flags=s.quality_flags,
                 )
             )
+
         return result
+
+
+def required_boundaries(question: str) -> tuple[list[str], list[str]]:
+    """Small fixed domain boundaries; no question splitting or extra model."""
+    q = normalized(question)
+    codes, topics = [], []
+    if re.search(
+        r"(?:该|应|适合|推荐|建议|投什么).{0,12}(?:买|投保|保险)|要投什么|\b(?:should i buy|what (?:insurance )?should i buy|recommend.*(?:buy|insurance))\b",
+        q,
+    ):
+        codes.append("purchase")
+    if re.search(
+        r"(?:保证|承诺).{0,15}(?:回报|收益)|(?:guarantee|promise).{0,25}(?:return|earn|interest)", q
+    ):
+        codes.append("returns")
+    if re.search(r"住院.{0,12}(?:报销|赔)|hospital.{0,25}(?:reimburs|expenses?)", q):
+        topics.append("medical")
+    if re.search(r"(?:旅游|旅行|travel).{0,30}(?:出事|赔|accident|cover|insurance)", q):
+        topics.append("travel")
+    if re.search(r"车撞|车险|汽车保险|motor insurance|car.{0,15}(?:crash|accident)", q):
+        topics.append("motor")
+    if topics:
+        codes.append("scope")
+    return codes, topics
 
 
 def validate_answer(
@@ -264,6 +314,18 @@ def validate_answer(
         if claim.kind == "boundary":
             claim.text = message(claim.boundary, language)
             continue
+        if claim.kind == "user_condition":
+            for value in claim.user_inputs:
+                if not value.strip() or not any(value in q for q in user_questions):
+                    raise AnswerRejected("invented_user_input")
+                check_scope(value)
+                if re.search(
+                    r"^\s*(?:say|ignore|pretend|invent|reveal|execute|invoke)\b|(?:无视|忽略|假装|编造|伪造)",
+                    normalized(value),
+                ):
+                    raise AnswerRejected("instruction_is_not_user_condition")
+            claim.text = message("user_condition", language) + " " + "; ".join(claim.user_inputs)
+            continue
         check_scope(claim.text, all_user)
         source = registry.evidence_text(claim.evidence_ids)
         if any(
@@ -275,10 +337,16 @@ def validate_answer(
         ):
             raise AnswerRejected("conflict_authority_selected")
         allowed = quantities(source)
-        for user_input in claim.user_inputs:
-            if not user_input or not any(user_input in q for q in user_questions):
-                raise AnswerRejected("invented_user_input")
-            allowed |= quantities(user_input)
+        if claim.kind == "application":
+            for value in claim.user_inputs:
+                if not value.strip() or not any(value in q for q in user_questions):
+                    raise AnswerRejected("invented_user_input")
+                # User duration/age can select a source rule/range; user-proposed
+                # money and percentages cannot become document facts this way.
+                for number in re.findall(
+                    rf"({_NUMBER})\s*(?:years?|months?|days?|年|个月|月|岁|天)", normalized(value)
+                ):
+                    allowed.add(("number", _amount(number)))
         if claim.calculation:
             calc = claim.calculation
             if calc.formula_expression != FORMULAS[calc.formula_id]:
@@ -294,6 +362,7 @@ def validate_answer(
             if re.search(r"收益|回报|return|yield|forecast", normalized(calc.steps + claim.text)):
                 raise AnswerRejected("unsupported_calculation")
             inputs = set()
+            financial_values = set()
             input_names = {item.name for item in calc.inputs}
             if (
                 len(input_names) != len(calc.inputs)
@@ -314,9 +383,19 @@ def validate_answer(
                 ):
                     raise AnswerRejected("invented_calculation_input")
                 inputs |= quantities(item.user_text)
-            if not inputs <= quantities(calc.steps):
+                if item.name != "withdrawal_timing":
+                    q = quantities(item.user_text)
+                    amounts = {v for k, v in q if k in {"USD", "HKD", "MOP"}}
+                    financial_values |= {
+                        ("number", v)
+                        for k, v in q
+                        if k == "number" and (not amounts or v in amounts)
+                    }
+            # Formula substitutions can omit repeated currency labels. Timing is
+            # verified against user text, not demanded as a literal formula term.
+            if not financial_values <= quantities(calc.steps):
                 raise AnswerRejected("calculation_input_omitted")
-            if calc.result not in claim.text or not quantities(calc.result):
+            if not quantities(calc.result):
                 raise AnswerRejected("missing_calculation_result")
             input_currencies = {k for k, _ in inputs if k in {"USD", "HKD", "MOP"}}
             result_currencies = {
@@ -329,17 +408,51 @@ def validate_answer(
             allowed |= quantities(calc.steps) | quantities(calc.result) | inputs
         if not quantities(claim.text) <= allowed:
             raise AnswerRejected("unsupported_quantity")
+        if claim.kind == "application":
+            claim.text = message("application", language) + " " + claim.text
     if draft.clarification_question:
         check_scope(draft.clarification_question, all_user)
         if quantities(draft.clarification_question):
             raise AnswerRejected("numeric_assumption_in_clarification")
         if len(re.findall(r"[?？]", draft.clarification_question)) > 1:
             raise AnswerRejected("multiple_clarifications")
-    if language == "en" and re.search(
-        r"[\u3400-\u9fff]",
-        "\n".join([c.text for c in draft.claims] + [draft.clarification_question or ""]),
+    codes, topics = required_boundaries(user_questions[-1])
+    present = {c.boundary for c in draft.claims if c.kind == "boundary"}
+    for code in codes:
+        if code not in present:
+            draft.claims.append(Claim(kind="boundary", text=message(code, language), boundary=code))
+    if topics:
+        scope = next(c for c in draft.claims if c.boundary == "scope")
+        scope.text = (
+            message("scope", language) + " " + " ".join(message(t, language) for t in topics)
+        )
+    q = normalized(user_questions[-1])
+    if (
+        "purchase" in codes
+        and re.search(r"上学|升学|大学|学费|孙子|grandchild|grandson|school|education", q)
+        and not re.search(
+            r"已有|持有|已投保|我份保单|保单.{0,15}生效|没有保单|还没有保单|新买|新投保|already hold|existing policy|do not (?:own|hold)|in force",
+            normalized(all_user),
+        )
     ):
-        raise AnswerRejected("response_language_mismatch")
+        draft.clarification_question = message("ownership_question", language)
+        draft.status = "clarification"
+    if language == "en":
+        prose = "\n".join(
+            [c.text for c in draft.claims if c.kind != "user_condition"]
+            + [
+                part
+                for c in draft.claims
+                if c.calculation
+                for part in (c.calculation.steps, c.calculation.result)
+            ]
+            + [draft.clarification_question or ""]
+        )
+        han, latin = len(re.findall(r"[\u3400-\u9fff]", prose)), len(re.findall(r"[a-zA-Z]", prose))
+        # English explanations may name short original Chinese product/option
+        # labels. A predominantly Chinese answer still fails the explicit choice.
+        if han and (latin < 20 or han > latin * 0.2):
+            raise AnswerRejected("response_language_mismatch")
     if language in {"zh-Hans", "zh-Hant"}:
         convert = OpenCC("t2s" if language == "zh-Hans" else "s2t").convert
         for claim in draft.claims:
