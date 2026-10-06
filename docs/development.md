@@ -54,10 +54,12 @@ uv run --locked --extra agent python -m insuretutor.retrieval evaluate --output 
 # Real LLM runs require .env and consume provider tokens.
 uv run --locked --extra agent python -m insuretutor.chat --evaluate tests/eval/items.json --output tmp/chat-evaluation.json
 uv run --locked --extra agent python -m insuretutor.chat --evaluate tests/eval/chat-scenarios.json --output tmp/chat-scenarios.json
+uv run --locked --extra agent python -m insuretutor.chat --evaluate tests/misuse/misuse-scenarios.json --output tmp/misuse-scenarios.json
 ```
 
 CLI commands: `/new`, `/exit`; languages: `auto/en/zh-Hans/zh-Hant`.
-[Evaluation questions and rubrics](../tests/eval/README.md) stay in tests and never
+[Evaluation questions and rubrics](../tests/eval/README.md) and the
+[misuse scenarios](../tests/misuse/README.md) stay in tests and never
 enter runtime prompts or indexes. Generated answers need semantic review;
 citation coverage and a non-excerpt status do not prove correctness.
 

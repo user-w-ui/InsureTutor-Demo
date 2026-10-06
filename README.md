@@ -68,6 +68,7 @@ weakness. Details in the [evaluation report (中文)](docs/evaluation.zh-CN.md).
 | [Runtime corpus](data/corpus.json) | Bilingual clauses, footnotes and provenance |
 | [Vector artifacts](data/retrieval/README.md) | Precomputed vectors and model metadata |
 | [Evaluation set](tests/eval/README.md) | Questions, source references and rubrics |
+| [Misuse scenarios](tests/misuse/README.md) | Injection, fraud, self-harm, personal-data and out-of-scope cases with benign look-alikes |
 | [Evaluation report (中文)](docs/evaluation.zh-CN.md) · [per-run results](results/stage1-runs.csv) | Metrics, baseline results and limitations |
 | [Development guide](docs/development.md) | Local installation, CLI, artifact rebuilding and evaluation commands |
 | [Task specification](docs/task-spec.md) | Original requirements |
