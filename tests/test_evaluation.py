@@ -147,8 +147,8 @@ def test_rubric_veto_bonus_and_partial_scores(items):
     assert outcome["bonus_score"] == 0 and not outcome["full_score"]
     assert rubric_result(q1, judged_scores(q1, judged(q1, [1, 1, 1, 0, 1, 1])))["full_score"]
 
-    q8 = items["q8"]  # Lines 1 and 5 are veto lines.
-    outcome = rubric_result(q8, judged_scores(q8, judged(q8, [1, 1, 1, 1, 0, 1])))
+    q8 = items["q8"]  # Line 1 is the veto line.
+    outcome = rubric_result(q8, judged_scores(q8, judged(q8, [0, 1, 1])))
     assert outcome == {
         "rubric_score": 0.0,
         "full_score": False,
@@ -160,7 +160,7 @@ def test_rubric_veto_bonus_and_partial_scores(items):
 @pytest.mark.parametrize(
     "mutate,message",
     [
-        (lambda j: j["scores"].pop(), "scored 5 of 6"),
+        (lambda j: j["scores"].pop(), "scored 2 of 3"),
         (lambda j: j["scores"].append(dict(j["scores"][0])), "repeated line"),
         (lambda j: j["scores"][0].update(score=0.7), "invalid score"),
         (lambda j: j["scores"][0].update(score=0.5), "invalid score"),  # Veto line.
@@ -168,7 +168,7 @@ def test_rubric_veto_bonus_and_partial_scores(items):
     ],
 )
 def test_incomplete_or_invalid_judge_output_is_rejected(items, mutate, message):
-    output = judged(items["q8"], [1] * 6)
+    output = judged(items["q8"], [1] * 3)
     mutate(output)
     with pytest.raises(JudgeError, match=message):
         judged_scores(items["q8"], output)

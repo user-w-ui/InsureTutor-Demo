@@ -30,7 +30,7 @@ completeness; runtime validation checks only structure and submitted citation pr
 | 5 | `q5-periodic-withdrawal-eligibility` | edge-case-eligibility | numeric | 2 / 5 |
 | 6 | `q6-macau-currency-and-lapse` | cross-language | explain | 5 / 6 |
 | 7 | `q7-2025-rates-not-in-brochure` | scope-refusal | refuse | 0 / 10 |
-| 8 | `q8-grandchild-education-vague` | vague-request-triage | explain | 2 / 7 |
+| 8 | `q8-grandchild-education-vague` | vague-request-triage | explain | 2 / 9 |
 | 9 | `q9-vague-overreach-uncovered-needs` | scope-refusal | refuse | 0 / 10 |
 | 10 | `q10-nonresident-eligibility-not-in-document` | scope-refusal | refuse | 0 / 6 |
 
@@ -81,7 +81,7 @@ block types, manifest paths or review labels, which the tutor never sees
 ## Scoring fields
 
 Offline quality scoring (`python -m insuretutor.evaluation`, see the
-[development guide](../../docs/development.md#cli-and-evaluation)) reads:
+[development guide](../../docs/development.md#offline-quality-evaluation)) reads:
 
 - `accepted_statuses` — a refusal may also answer or clarify around an explicit `boundary`
   claim; a degraded turn (`reason` set) is wrong. Only the vague-request item (q8) adds

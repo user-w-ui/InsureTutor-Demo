@@ -52,6 +52,13 @@ while it is answered, the page shows each search and agent step as it happens, t
 the validated answer with that process collapsed above it.
 **New chat** or a page refresh starts a new conversation.
 
+## Evaluation
+
+Offline baseline, 10 questions × 5 rounds with a Sonnet rubric judge: answer status
+100% correct, citation recall 92%, citation precision 79%, rubric score 89%. Factual,
+cross-language and refusal questions hold up; the vague purchase question is the main
+weakness. Details in the [evaluation report (中文)](docs/evaluation.zh-CN.md).
+
 ## Key links
 
 | Location | Contents |
@@ -61,6 +68,7 @@ the validated answer with that process collapsed above it.
 | [Runtime corpus](data/corpus.json) | Bilingual clauses, footnotes and provenance |
 | [Vector artifacts](data/retrieval/README.md) | Precomputed vectors and model metadata |
 | [Evaluation set](tests/eval/README.md) | Questions, source references and rubrics |
+| [Evaluation report (中文)](docs/evaluation.zh-CN.md) · [per-run results](results/stage1-runs.csv) | Metrics, baseline results and limitations |
 | [Development guide](docs/development.md) | Local installation, CLI, artifact rebuilding and evaluation commands |
 | [Task specification](docs/task-spec.md) | Original requirements |
 
@@ -77,12 +85,14 @@ src/insuretutor/
   sessions.py / guardrails/ History, format/reference checks and citations
   references.py             Web reference groups
   chat.py                   Interactive / evaluation CLI
+  evaluation.py             Offline quality evaluation: real answers, judged rubrics, metrics
   api/                      FastAPI entry point
   web/                      Static chat UI and vendored PDF.js
 data/                       Cleaned data, corpus, tokenizer and vector artifacts
 raw data/                   Original PDF and frozen MinerU extraction
-docs/                       Architecture, development guide and source research
+docs/                       Architecture, development guide, evaluation report and source research
 tests/                      Offline contracts and evaluation fixtures
+results/                    Published per-run evaluation results
 scripts/start-demo.ps1      Build, wait and open the web page
 Dockerfile                 Locked runtime dependencies and cached model download
 docker-compose.yml         Local-only port and runtime LLM configuration

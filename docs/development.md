@@ -61,6 +61,30 @@ CLI commands: `/new`, `/exit`; languages: `auto/en/zh-Hans/zh-Hant`.
 enter runtime prompts or indexes. Generated answers need semantic review;
 citation coverage and a non-excerpt status do not prove correctness.
 
+### Offline quality evaluation
+
+Method, metric definitions and results are in the [evaluation report](evaluation.zh-CN.md).
+A run has three steps; all artifacts stay in ignored `tmp/eval/`:
+
+```powershell
+# 1. Real answers (needs .env, consumes provider tokens). Re-running the same
+#    command resumes; --items q1,q8 limits the run to selected items.
+uv run --locked --extra agent python -m insuretutor.evaluation run --rounds 5 --output tmp/eval/stage1/<run>
+
+# 2. Judge prompts for answers that have no judge output yet (JSON: name, prompt).
+uv run --locked --extra agent python -m insuretutor.evaluation judge-tasks tmp/eval/stage1/<run>
+
+# 3. Validate judge outputs, write runs.csv / rubric.csv / summary.md and print the summary.
+uv run --locked --extra agent python -m insuretutor.evaluation score tmp/eval/stage1/<run>
+```
+
+The judge is a Claude Code subagent (Sonnet), one per answer, given one prompt from step 2
+verbatim: it is `tests/eval/judge-prompt.md` with the item, answer and output paths filled in.
+It reads only those two files and writes `judge/<round>-<item>.json`. If `score` rejects an
+output (missing or repeated line, invalid score), move that file aside and judge the answer again.
+Publish the per-run table by copying `runs.csv` to `results/`; `rubric.csv` holds judge reasons
+and stays in `tmp/`.
+
 ## Docker operations and configuration
 
 ```sh
