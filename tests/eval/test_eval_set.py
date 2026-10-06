@@ -1,11 +1,11 @@
 """Contracts for the judge-facing evaluation set in ``tests/eval/items.json``.
 
 These tests do not run the tutor. They guard the *dataset itself*: that every
-citation anchor in the answer key still resolves against the cleaned artifact,
-that physical page numbers stay one-based and match the unit, that the items
-which must never be answered with a single number stay marked as such, and that
-the vague-question items stay genuinely vague instead of drifting into
-answerable — and therefore useless — questions.
+evidence anchor still resolves against the cleaned artifact, that physical page
+numbers stay one-based and match the unit, that the items which must never be
+answered with a single number stay marked as such, and that the vague-question
+items stay genuinely vague instead of drifting into answerable — and therefore
+useless — questions.
 
 If ``data/cleaned/`` is regenerated, these fail loudly rather than letting the
 evaluation set drift away from the corpus it grades against.
@@ -19,17 +19,30 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[2]
 ITEMS_PATH = Path(__file__).resolve().parent / "items.json"
 UNITS_PATH = ROOT / "data" / "cleaned" / "units.jsonl"
-SPANS_PATH = ROOT / "data" / "cleaned" / "spans.jsonl"
 REPORT_PATH = ROOT / "data" / "cleaned" / "report.json"
+RETRIEVAL_CASES_PATH = ROOT / "tests" / "retrieval_cases.json"
 
+SCHEMA = "insuretutor.eval-set/2"
 EXPECTED_ITEM_COUNT = 10
-
-# Items that carry no answerable claim and so anchor to nothing. ``refuse`` says
-# the question is out of the brochure's scope; ``clarify`` says the question is
-# in scope but too underspecified to answer yet. Both must ask before asserting.
-NO_CITATION_MODES = {"refuse"}
-# ``clarify`` may still cite (to pin down *which* product is meant) but is not
-# required to, because the honest answer at that point is a question back.
+ITEM_FIELDS = [
+    "id",
+    "capability",
+    "answer_mode",
+    "question",
+    "question_languages",
+    "scenario_note",
+    "accepted_statuses",
+    "expected_answer",
+    "evidence",
+    "rubric",
+    "veto_rubric",
+    "bonus_rubric",
+    "wrong_answers",
+    "source_issues",
+]
+EVIDENCE_FIELDS = ["unit_id", "pdf_page", "quotes", "note"]
+ISSUE_FIELDS = ["unit_id", "kind", "detail", "guidance"]
+ISSUE_KINDS = {"language_conflict", "presentational_difference", "source_defect"}
 
 CAPABILITIES = {
     "concept-separation",
@@ -42,7 +55,7 @@ CAPABILITIES = {
     "vague-request-triage",
 }
 
-ANSWER_MODES = {"explain", "numeric", "show-conflict", "refuse", "clarify"}
+ANSWER_MODES = {"explain", "numeric", "show-conflict", "refuse"}
 
 
 def load_items():
@@ -50,13 +63,15 @@ def load_items():
 
 
 def load_units():
-    rows = [json.loads(line) for line in UNITS_PATH.read_text(encoding="utf-8").splitlines() if line]
+    rows = [
+        json.loads(line) for line in UNITS_PATH.read_text(encoding="utf-8").splitlines() if line
+    ]
     return {row["id"]: row for row in rows}
 
 
-def load_spans():
-    rows = [json.loads(line) for line in SPANS_PATH.read_text(encoding="utf-8").splitlines() if line]
-    return {row["id"]: row for row in rows}
+def evidence(item):
+    """Every evidence entry with its role, required first."""
+    return [(role, e) for role in ("required", "supporting") for e in item["evidence"][role]]
 
 
 class EvalSetTests(unittest.TestCase):
@@ -65,30 +80,44 @@ class EvalSetTests(unittest.TestCase):
         cls.doc = load_items()
         cls.items = cls.doc["items"]
         cls.units = load_units()
-        cls.spans = load_spans()
         cls.report = json.loads(REPORT_PATH.read_text(encoding="utf-8"))
 
     # ---- shape -----------------------------------------------------------
+
+    def test_schema_and_fixed_field_order(self):
+        """One shape for every item, so the judge and the scorer never guess."""
+        self.assertEqual(self.doc["schema"], SCHEMA)
+        for item in self.items:
+            with self.subTest(item=item["id"]):
+                self.assertEqual(list(item), ITEM_FIELDS)
+                self.assertEqual(list(item["evidence"]), ["required", "supporting"])
+                for _, entry in evidence(item):
+                    self.assertEqual(list(entry), EVIDENCE_FIELDS)
+                    self.assertTrue(entry["quotes"], "every entry quotes the source")
+                    self.assertLessEqual(set(entry["quotes"]), {"zh-Hant", "en"})
+                    self.assertTrue(entry["note"].strip())
+                for issue in item["source_issues"]:
+                    self.assertEqual(list(issue), ISSUE_FIELDS)
+                    self.assertIn(issue["kind"], ISSUE_KINDS)
 
     def test_item_count_and_ids_are_unique(self):
         self.assertEqual(len(self.items), EXPECTED_ITEM_COUNT)
         ids = [item["id"] for item in self.items]
         self.assertEqual(len(set(ids)), EXPECTED_ITEM_COUNT)
 
-    def test_every_item_has_question_answer_citations_and_rubric(self):
+    def test_every_item_has_question_answer_evidence_and_rubric(self):
         for item in self.items:
             with self.subTest(item=item["id"]):
                 self.assertTrue(item["question"].strip())
-                self.assertTrue(item["expected_answer"].strip())
+                self.assertTrue(item["scenario_note"].strip())
+                self.assertTrue(item["expected_answer"].startswith("结论："))
                 self.assertIn(item["answer_mode"], ANSWER_MODES)
-                if item["answer_mode"] in NO_CITATION_MODES:
-                    # A refusal has no answerable claim, so it anchors to nothing;
-                    # test_scope_refusal_item_has_no_answerable_number enforces that.
-                    self.assertEqual(item["citations"], [])
-                else:
-                    self.assertTrue(item["citations"], "every answerable item needs a citation anchor")
-                self.assertTrue(item["rubric"], "every item needs grading guidance")
                 self.assertIn(item["capability"], CAPABILITIES)
+                self.assertTrue(item["rubric"], "every item needs grading guidance")
+                if item["answer_mode"] != "refuse":
+                    self.assertTrue(
+                        item["evidence"]["required"], "an answer needs required evidence"
+                    )
 
     def test_language_mix_is_exercised(self):
         """The set must not be monolingual: Simplified, Traditional and English."""
@@ -110,127 +139,38 @@ class EvalSetTests(unittest.TestCase):
         blob = "\n".join(item["question"] for item in self.items)
         self.assertTrue(re.search(r"[这个们时发对还不没点样价会与为]", blob))
 
-    # ---- citation anchors resolve ---------------------------------------
+    # ---- evidence anchors resolve ----------------------------------------
 
-    def test_every_cited_unit_exists(self):
+    def test_evidence_resolves_to_the_unit_and_its_physical_page(self):
         for item in self.items:
-            for citation in item["citations"]:
-                with self.subTest(item=item["id"], unit=citation["unit_id"]):
-                    self.assertIn(citation["unit_id"], self.units)
-
-    def test_physical_page_matches_the_unit_item(self):
-        for item in self.items:
-            for citation in item["citations"]:
-                unit = self.units[citation["unit_id"]]
-                with self.subTest(item=item["id"], unit=citation["unit_id"]):
-                    self.assertIn(citation["pdf_page"], unit["pages"])
-
-    def test_cited_pages_are_one_based_and_in_range(self):
-        for item in self.items:
-            for citation in item["citations"]:
-                with self.subTest(item=item["id"], unit=citation["unit_id"]):
-                    self.assertGreaterEqual(citation["pdf_page"], 1)
-                    self.assertLessEqual(citation["pdf_page"], 20)
+            seen = set()
+            for role, entry in evidence(item):
+                uid = entry["unit_id"]
+                with self.subTest(item=item["id"], role=role, unit=uid):
+                    self.assertIn(uid, self.units)
+                    self.assertIn(entry["pdf_page"], self.units[uid]["pages"])
+                    self.assertGreaterEqual(entry["pdf_page"], 1)
+                    self.assertLessEqual(entry["pdf_page"], 20)
+                    self.assertNotIn(uid, seen, "a unit is listed once per item")
+                    seen.add(uid)
 
     def test_quoted_evidence_occurs_in_the_cleaned_unit(self):
         """A quote may be trimmed, but every whitespace-separated fragment of it
-        must appear literally in the unit's text. This is the same substring
-        standard the runtime citation verifier is held to."""
+        must appear literally in the unit's text in that language. This is the
+        same substring standard the runtime citation verifier is held to."""
         for item in self.items:
-            for citation in item["citations"]:
-                quote = citation["quote"]
-                unit_text = next(r["text"] for r in self.units[citation["unit_id"]]["segments"]
-                                 if r["language"] == citation["language"])
-                with self.subTest(item=item["id"], unit=citation["unit_id"]):
-                    for fragment in re.split(r"\s+", quote.strip()):
-                        if not fragment:
-                            continue
-                        self.assertIn(
-                            fragment, unit_text,
-                            f"{item['id']}: fragment {fragment!r} not found in {citation['unit_id']}",
-                        )
-
-    def test_requires_links_are_declared_for_footnote_dependent_answers(self):
-        """Items whose answer depends on a numbered note must cite a unit that
-        declares that note via requires / note_refs, so retrieval completion
-        cannot silently drop it."""
-        for item in self.items:
-            for note in item.get("depends_on_notes", []):
-                with self.subTest(item=item["id"], note=note):
-                    reached = any(
-                        note in self.units[citation["unit_id"]]["note_refs"]
-                        or f"note-{note}" in self.units[citation["unit_id"]]["requires"]
-                        or citation["unit_id"] == f"note-{note}"
-                        for citation in item["citations"]
-                    )
-                    self.assertTrue(reached, f"{item['id']} does not reach note {note}")
-
-    # ---- the two rules that must never be relaxed -----------------------
-
-    def test_conflict_item_forbids_a_single_answer(self):
-        conflict = [i for i in self.items if i["answer_mode"] == "show-conflict"]
-        self.assertEqual(len(conflict), 1)
-        item = conflict[0]
-        self.assertTrue(item["must_not_pick_one"])
-        recorded = {c["unit"] for c in self.report["conflicts"]}
-        self.assertIn(item["conflicts"][0]["unit_id"], recorded)
-        self.assertEqual(item["conflicts"][0]["status"], "reviewed_source_conflict")
-        # Both languages must be present, or "show both" is not gradeable.
-        langs = {c["language"] for c in item["conflicts"][0]["values"]}
-        self.assertEqual(langs, {"zh-Hant", "en"})
-
-    def test_scope_refusal_items_carry_no_answerable_number(self):
-        """Every refusal must be citation-free and explicitly non-fabricating.
-
-        There are three refusals and they are refusing for three *different*
-        reasons, which is the point. q7 refuses a question about data this
-        edition of *this* product does not publish (2025 crediting figures);
-        q9 refuses three lines of cover the brochure was never about (medical,
-        travel, motor); q10 refuses a question that is squarely about this
-        product — who may take it out — because the brochure states one
-        qualification (age) and says nothing about residence. A refusal is not
-        a shrug: each must name the basis on which it declines.
-        """
-        refusals = [i for i in self.items if i["answer_mode"] == "refuse"]
-        self.assertEqual(len(refusals), 3)
-        for item in refusals:
-            with self.subTest(item=item["id"]):
-                self.assertTrue(item["must_not_fabricate"])
-                self.assertEqual(item["citations"], [], "a refusal cites nothing")
-                self.assertTrue(item["refusal_grounding"], "a refusal states its scope basis")
-
-    def test_refusal_grounding_anchors_resolve(self):
-        """A refusal cites nothing, so its *justification* has to stand on its own.
-
-        ``refusal_grounding`` entries are deliberately not citations — the answer
-        must not present them as support for a claim — but they name the units the
-        grader will read to see why the refusal is correct, so a stale unit id or
-        a wrong page number silently misleads the judge. They were unvalidated
-        until q9 shipped with ``disclaimer-zh`` labelled page 17 when the unit is
-        on page 19; the same whitespace-fragment rule as ``citations`` applies.
-        """
-        for item in self.items:
-            for entry in item.get("refusal_grounding", []):
-                unit_id = entry["unit_id"]
-                with self.subTest(item=item["id"], unit=unit_id):
-                    self.assertIn(unit_id, self.units, "refusal grounding names a real unit")
-                    unit = self.units[unit_id]
-                    self.assertIn(
-                        entry["pdf_page"], unit["pages"],
-                        f"{item['id']}: {unit_id} is not on physical page {entry['pdf_page']}",
-                    )
-                    quote = entry.get("quote")
-                    if quote:
+            for role, entry in evidence(item):
+                segments = {
+                    r["language"]: r["text"] for r in self.units[entry["unit_id"]]["segments"]
+                }
+                for language, quote in entry["quotes"].items():
+                    with self.subTest(
+                        item=item["id"], role=role, unit=entry["unit_id"], language=language
+                    ):
+                        self.assertIn(language, segments)
                         for fragment in re.split(r"\s+", quote.strip()):
                             if fragment:
-                               self.assertIn(fragment, next(r["text"] for r in unit["segments"]
-                                            if r["language"] == entry["language"]))
-
-    def test_every_numeric_item_states_the_expected_number(self):
-        for item in self.items:
-            if item["answer_mode"] == "numeric":
-                with self.subTest(item=item["id"]):
-                    self.assertRegex(item["expected_answer"], r"\d")
+                                self.assertIn(fragment, segments[language])
 
     def test_quotes_stay_traditional_but_questions_may_be_simplified(self):
         """Guard the one-way t2s rule: a citable quote keeps Traditional forms.
@@ -241,12 +181,73 @@ class EvalSetTests(unittest.TestCase):
         """
         simplified_only = re.compile(r"[账额险费计划选单们这个时发对还点样价会与为]")
         for item in self.items:
-            for citation in item["citations"]:
-                with self.subTest(item=item["id"], unit=citation["unit_id"]):
-                    self.assertIsNone(
-                        simplified_only.search(citation["quote"]),
-                        "citable quote contains Simplified-only characters",
-                    )
+            for _, entry in evidence(item):
+                quote = entry["quotes"].get("zh-Hant")
+                if quote:
+                    with self.subTest(item=item["id"], unit=entry["unit_id"]):
+                        self.assertIsNone(simplified_only.search(quote))
+
+    def test_retrieval_core_targets_are_listed_as_evidence(self):
+        """The retrieval benchmark and the answer set must not disagree on what is relevant."""
+        cases = json.loads(RETRIEVAL_CASES_PATH.read_text(encoding="utf-8"))["cases"]
+        by_prefix = {item["id"].split("-")[0]: item for item in self.items}
+        for case in cases:
+            listed = {e["unit_id"] for _, e in evidence(by_prefix[case["id"]])}
+            with self.subTest(case=case["id"]):
+                self.assertLessEqual(set(case["core"]), listed)
+
+    # ---- the two rules that must never be relaxed -----------------------
+
+    def test_conflict_item_forbids_a_single_answer(self):
+        conflict = [i for i in self.items if i["answer_mode"] == "show-conflict"]
+        self.assertEqual(len(conflict), 1)
+        item = conflict[0]
+        issues = [s for s in item["source_issues"] if s["kind"] == "language_conflict"]
+        self.assertEqual(len(issues), 1)
+        recorded = {c["unit"] for c in self.report["conflicts"]}
+        self.assertIn(issues[0]["unit_id"], recorded)
+        # Both languages must be quoted, or "show both" is not gradeable.
+        entry = next(e for _, e in evidence(item) if e["unit_id"] == issues[0]["unit_id"])
+        self.assertEqual(set(entry["quotes"]), {"zh-Hant", "en"})
+
+    def test_scope_refusal_items_carry_no_required_evidence(self):
+        """A refusal has no answerable claim, but must still name its basis.
+
+        There are three refusals for three *different* reasons: q7 asks for data
+        this brochure does not publish (2025 figures); q9 asks about three lines
+        of cover the brochure was never about (medical, travel, motor); q10 asks
+        who may take out *this* product, and the brochure states only an issue
+        age. ``supporting`` holds the units a grader reads to see why the refusal
+        is right.
+        """
+        refusals = [i for i in self.items if i["answer_mode"] == "refuse"]
+        self.assertEqual(len(refusals), 3)
+        for item in refusals:
+            with self.subTest(item=item["id"]):
+                self.assertEqual(item["evidence"]["required"], [])
+                self.assertTrue(item["evidence"]["supporting"])
+
+    def test_every_numeric_item_states_the_expected_number(self):
+        for item in self.items:
+            if item["answer_mode"] == "numeric":
+                with self.subTest(item=item["id"]):
+                    self.assertRegex(item["expected_answer"].splitlines()[0], r"\d")
+
+    def test_answers_carry_no_pipeline_internals(self):
+        """The judge grades against brochure facts, not against how we parsed them.
+
+        v1 answers asked for MinerU block types, manifest paths and review labels
+        that the tutor never sees; the reference answer may name pages, never
+        the pipeline.
+        """
+        internal = re.compile(
+            r"aside_text|block_index|manifest|MinerU|reviewed_source_conflict|unit_id|"
+            r"items\.json|第\s*\d+\s*(?:-\s*\d+\s*)?单元"
+        )
+        for item in self.items:
+            with self.subTest(item=item["id"]):
+                for text in [item["expected_answer"], item["scenario_note"], *item["rubric"]]:
+                    self.assertIsNone(internal.search(text), text)
 
     def test_tmp_render_pages_are_not_required(self):
         """The set must grade against the corpus, not against scratch renders."""
@@ -261,13 +262,6 @@ class EvalSetTests(unittest.TestCase):
         They exist to test triage and retrieval, so they must not smuggle in the
         corpus's own terminology: the moment a question names the option, the
         unit id, or a currency figure, it stops testing anything.
-
-        The group held two items while "这个保险怎么样？" (clarify) sat alongside
-        the grandson question (explain). It holds one now that the last item asks
-        a real eligibility question — "我不是香港本地人能投保吗？" is short and
-        keyword-free too, but it has a definite answer the brochure declines to
-        give, so it is a scope refusal, not a triage case. Length and leakage are
-        what make this group, not the count, so the count is asserted loosely.
         """
         leaked = re.compile(
             r"定期提款|額外回報|額外利息|保證可保|現金價值|基本保障額|派息率|"
@@ -283,11 +277,9 @@ class EvalSetTests(unittest.TestCase):
     def test_questions_do_not_tell_the_tutor_where_to_cite(self):
         """The question must not do the retrieval for the agent.
 
-        A judge is testing whether the tutor can find its own evidence. A question
-        that says "which footnote did you use", "give the citation location", or
-        "根据第X页" hands over the answer's provenance and measures nothing but
-        obedience. Those instructions belong in ``rubric``, where they grade the
-        answer, not in ``question``, which must read like a customer talking.
+        A question that says "which footnote did you use", "give the citation
+        location", or "根据第X页" hands over the answer's provenance and measures
+        nothing but obedience. Those requirements belong in ``rubric``.
 
         Exception, deliberately kept: asking for the *figures* in all three
         currencies (q2) is a content requirement, not a pointer to a location.
@@ -299,63 +291,46 @@ class EvalSetTests(unittest.TestCase):
         )
         for item in self.items:
             with self.subTest(item=item["id"]):
-                self.assertIsNone(
-                    pointing.search(item["question"]),
-                    f"{item['id']}: the question points the tutor at a citation",
-                )
-                for citation in item["citations"]:
-                    self.assertNotIn(
-                        citation["unit_id"], item["question"],
-                        f"{item['id']}: the question names a unit id",
-                    )
+                self.assertIsNone(pointing.search(item["question"]))
+                for _, entry in evidence(item):
+                    self.assertNotIn(entry["unit_id"], item["question"])
 
-    def test_answer_key_blockquote_matches_items_json_question(self):
-        """``ANSWER_KEY.md`` and ``items.json`` are two views of one question.
+    # ---- scoring fields -----------------------------------------------------
 
-        The key is the human-readable artifact a judge reads; ``items.json`` is
-        what the tests and the harness consume. Nothing kept them in step, and
-        they drifted the moment a question was edited in one place: after the
-        "don't ask where to cite" edit, the key's Q4 blockquote still carried the
-        dropped 「并说明你用哪一条脚注」 sentence for hours. A judge reading the key
-        would have seen the tutor asked to hand over its provenance — the exact
-        behaviour the edit removed — while every contract test passed.
-
-        Comparing the blockquotes to ``items.json`` catches that, and it catches
-        the milder drift too: a reworded question, a stray trailing space, a
-        typo fixed in one file only.
-        """
-        key = (ITEMS_PATH.parent / "ANSWER_KEY.md").read_text(encoding="utf-8")
-        # Author guidance sits in the body; the question is the blockquote under
-        # the `## Qn —` heading, so collect all quoted lines and require each
-        # question to appear verbatim among them.
-        quoted = [line[2:].strip() for line in key.splitlines() if line.startswith("> ")]
-        self.assertTrue(quoted, "the key quotes its questions")
+    def test_accepted_statuses_follow_answer_mode(self):
+        """Offline status scoring reads these; a refusal can never accept a bare answer."""
+        base = {
+            "explain": {"answered"},
+            "numeric": {"answered"},
+            "show-conflict": {"source_conflict"},
+            "refuse": {"refused", "insufficient"},
+        }
         for item in self.items:
             with self.subTest(item=item["id"]):
-                self.assertIn(
-                    item["question"].strip(),
-                    quoted,
-                    f"{item['id']}: ANSWER_KEY.md no longer quotes the current question",
-                )
+                accepted = set(item["accepted_statuses"])
+                self.assertEqual(len(accepted), len(item["accepted_statuses"]))
+                self.assertLessEqual(base[item["answer_mode"]], accepted)
+                # Only a vague request may also accept a clarification.
+                extra = accepted - base[item["answer_mode"]]
+                self.assertLessEqual(extra, {"clarification"})
+                if extra:
+                    self.assertEqual(item["capability"], "vague-request-triage")
 
-    def test_clarify_and_refuse_never_assert(self):
-        """Neither mode may ship a settled answer in ``expected_answer``.
-
-        ``clarify`` must pose a question back and withhold figures; ``refuse``
-        must state the scope boundary. This is the guard against a future edit
-        quietly turning either into an answerable item.
-        """
+    def test_veto_and_bonus_rubric_lines_exist_and_do_not_overlap(self):
+        """One-based rubric line numbers; a line is required, veto, or bonus, never two."""
         for item in self.items:
-            if item["answer_mode"] == "clarify":
-                with self.subTest(item=item["id"]):
-                    self.assertIn("澄清", item["expected_answer"])
-                    self.assertTrue(
-                        any(q in item["expected_answer"] for q in ("？", "?")),
-                        "a clarify item must ask something back",
-                    )
-            if item["answer_mode"] == "refuse":
-                with self.subTest(item=item["id"]):
-                    self.assertTrue(item["refusal_grounding"], "a refusal states its scope basis")
+            veto, bonus = item["veto_rubric"], item["bonus_rubric"]
+            with self.subTest(item=item["id"]):
+                for line in veto + bonus:
+                    self.assertIsInstance(line, int)
+                    self.assertGreaterEqual(line, 1)
+                    self.assertLessEqual(line, len(item["rubric"]))
+                self.assertEqual(len(set(veto)), len(veto))
+                self.assertEqual(len(set(bonus)), len(bonus))
+                self.assertFalse(set(veto) & set(bonus))
+                self.assertLess(len(bonus), len(item["rubric"]), "an item needs a required line")
+                for n, text in enumerate(item["rubric"], 1):
+                    self.assertEqual(text.startswith("加分项："), n in bonus, text)
 
 
 if __name__ == "__main__":

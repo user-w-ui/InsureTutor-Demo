@@ -177,16 +177,17 @@ class CorpusTests(unittest.TestCase):
         items = json.loads((ROOT / "tests/eval/items.json").read_text(encoding="utf-8"))["items"]
         self.assertGreaterEqual(len(items), 7)
         for item in items:
-            for citation in item["citations"]:
-                uid = citation["unit_id"]
+            for entry in item["evidence"]["required"] + item["evidence"]["supporting"]:
+                uid = entry["unit_id"]
                 bundle = assemble_evidence(self.corpus, [uid])
                 unit = self.units[uid]
-                self.assertIn(citation["pdf_page"], unit.pages)
+                self.assertIn(entry["pdf_page"], unit.pages)
                 sources = {s.id: s for s in bundle.source_spans}
-                self.assertTrue(any(sources[sid].pdf_page == citation["pdf_page"]
+                self.assertTrue(any(sources[sid].pdf_page == entry["pdf_page"]
                                     for sid in unit.source_span_ids + unit.context_span_ids))
-                for word in citation["quote"].split():
-                    self.assertTrue(any(word in r.text for r in unit.segments))
+                for quote in entry["quotes"].values():
+                    for word in quote.split():
+                        self.assertTrue(any(word in r.text for r in unit.segments))
 
     def test_offline_rebuild_is_byte_identical_and_inputs_remain_frozen(self):
         manifest_path = ROOT / "data/cleaned/manifest.json"

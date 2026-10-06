@@ -60,7 +60,7 @@ async def evaluate(tutor: Tutor, fixture: Path, progress=None) -> dict:
             expected = set(turn.get("expected_unit_ids", []))
             if not expected and index == len(turns) - 1:
                 expected = set(item.get("expected_unit_ids", [])) or {
-                    c["unit_id"] for c in item.get("citations", [])
+                    e["unit_id"] for e in item.get("evidence", {}).get("required", [])
                 }
             actual = {u for c in result.citations for u in c.unit_ids}
             rows.append(
