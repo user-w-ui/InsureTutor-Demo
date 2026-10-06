@@ -11,7 +11,7 @@ from dotenv import load_dotenv
 from pydantic import ValidationError
 
 from insuretutor.agent_tools import EvidenceSearchSession, make_search_evidence_tool
-from insuretutor.chat_models import DraftAnswer
+from insuretutor.chat_models import DraftAnswer, StageProgress
 from insuretutor.corpus import ROOT
 from insuretutor.guardrails.answers import AnswerRejected
 
@@ -212,15 +212,31 @@ class AgentGenerator:
             await self.client.close()
 
     async def generate(
-        self, data: dict, session: EvidenceSearchSession, calls: list[int], *, validate=None
+        self,
+        data: dict,
+        session: EvidenceSearchSession,
+        calls: list[int],
+        *,
+        validate=None,
+        progress=None,
     ):
         from agents import Agent, ModelSettings, RunConfig, RunHooks, Runner
         from agents.model_settings import ModelRetrySettings
         from openai.types.shared import Reasoning
 
-        class CountCalls(RunHooks):
+        def stage(name: str, **data):
+            if progress is not None:
+                progress(StageProgress(stage=name, **data))
+
+        class ProgressHooks(RunHooks):
+            # Lifecycle events only; model tokens and reasoning are never forwarded.
             async def on_llm_start(self, context, agent, system_prompt, input_items):
                 calls[0] += 1
+                if agent.name == "InsureTutor":
+                    stage("thinking", model_call=calls[0])
+
+            async def on_tool_start(self, context, agent, tool):
+                stage("searching")
 
         config = RunConfig(tracing_disabled=True, trace_include_sensitive_data=False)
         settings = ModelSettings(
@@ -245,9 +261,10 @@ class AgentGenerator:
             payload,
             max_turns=7,
             run_config=config,
-            hooks=CountCalls(),
+            hooks=ProgressHooks(),
         )
         try:
+            stage("validating")
             draft = DraftAnswer.model_validate_json(result.final_output)
             return validate(draft) if validate else draft
         except (ValidationError, ValueError, TypeError) as exc:
@@ -291,14 +308,16 @@ class AgentGenerator:
                     else "Repair only syntax/fields. Do not add facts or change evidence IDs. No tools are available."
                 ),
             }
+            stage("repairing")
             fixed = await Runner.run(
                 repair,
                 result.to_input_list()
                 + [{"role": "user", "content": json.dumps(repair_data, ensure_ascii=False)}],
                 max_turns=1,
                 run_config=config,
-                hooks=CountCalls(),
+                hooks=ProgressHooks(),
             )
+            stage("validating")
             try:
                 draft = DraftAnswer.model_validate_json(fixed.final_output)
             except (ValidationError, ValueError, TypeError) as exc:

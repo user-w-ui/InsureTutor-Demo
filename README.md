@@ -48,6 +48,8 @@ No host Python or model installation is required. Run from the repository root:
 The first build downloads dependencies and the pinned E5 model (about 487 MB);
 subsequent builds reuse the model cache. Embeddings run locally; only answer
 generation calls the configured LLM API. Select a language and send a question;
+while it is answered, the page shows each search and agent step as it happens, then
+the validated answer with that process collapsed above it.
 **New chat** or a page refresh starts a new conversation.
 
 ## Key links

@@ -88,7 +88,14 @@ do not support it. A host-local API needs a container-accessible address;
 `localhost` inside Docker points to the container itself.
 
 `GET /api/health` reports retrieval readiness and `agent/excerpts` mode without
-calling the LLM API. Container restart clears the in-memory sessions.
+calling the LLM API. To watch the progress events the web page uses (`stage`, `search`,
+then `final` or `error`), stream a turn with curl (`curl.exe` in PowerShell 7):
+
+```sh
+curl -N -H "Content-Type: application/json" -d '{"question":"What are the withdrawal conditions?"}' http://127.0.0.1:8000/api/chat/stream
+```
+
+Container restart clears the in-memory sessions.
 Missing, damaged or mismatched artifacts fail at startup; there is no automatic
 rebuild or model download at runtime.
 

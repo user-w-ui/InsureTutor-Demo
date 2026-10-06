@@ -115,3 +115,26 @@ class ChatResult(StrictModel):
     searches: int = 0
     model_calls: int = 0
     context_reset: bool = False
+
+
+# Progress events: an allowlist of display fields, never evidence bodies,
+# prompts or keys. Model-written queries are untrusted display text.
+class SearchHit(StrictModel):
+    unit_id: str
+    title: str
+    pages: list[int]
+
+
+class StageProgress(StrictModel):
+    stage: Literal["retrieving", "thinking", "searching", "validating", "repairing", "fallback"]
+    model_call: int | None = None
+    reason: str | None = None
+
+
+class SearchProgress(StrictModel):
+    kind: Literal["initial", "supplement"]
+    query: str | None = Field(default=None, max_length=200)
+    status: Literal["evidence", "no_evidence", "search_limit", "evidence_budget", "invalid_query"]
+    hits: list[SearchHit] = Field(default_factory=list, max_length=8)
+    required_added: int = 0
+    remaining_searches: int

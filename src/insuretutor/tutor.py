@@ -3,13 +3,15 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
 import re
+from collections.abc import Callable
 
 from opencc import OpenCC
 
 from insuretutor.agent_tools import EvidenceSearchSession
-from insuretutor.chat_models import ChatResult, ChatTurn
+from insuretutor.chat_models import ChatResult, ChatTurn, SearchProgress, StageProgress
 from insuretutor.generation import AgentGenerator, FormatFailure
 from insuretutor.guardrails.answers import (
     AnswerRejected,
@@ -43,13 +45,29 @@ class Tutor:
         self.retriever, self.generator = retriever, generator
         self.sessions, self.timeout = sessions or SessionStore(), timeout
 
-    async def answer(self, turn: ChatTurn) -> ChatResult:
+    async def answer(
+        self,
+        turn: ChatTurn,
+        progress: Callable[[StageProgress | SearchProgress], None] | None = None,
+    ) -> ChatResult:
+        """Optional progress receives display-only lifecycle events, never answer text."""
+
+        def emit(event):
+            if progress is None:
+                return
+            # Display failures never change the answer.
+            with contextlib.suppress(Exception):
+                progress(event)
+
         language = response_language(turn.question, turn.response_language)
         async with self.sessions.use(turn.session_id) as (conversation, reset):
-            search = EvidenceSearchSession(self.retriever, response_language=language)
+            search = EvidenceSearchSession(
+                self.retriever, response_language=language, on_search=emit
+            )
             calls = [0]
             try:
                 async with asyncio.timeout(self.timeout):
+                    emit(StageProgress(stage="retrieving"))
                     initial = await search.initialize(turn.question)
                     if self.generator is None:
                         result = self._fallback(
@@ -67,11 +85,12 @@ class Tutor:
                                 "remaining_source_characters": initial.remaining_source_characters,
                             },
                         }
+
                         def validate(draft):
                             return validate_answer(draft, EvidenceRegistry(search), language)
 
                         draft = await self.generator.generate(
-                            data, search, calls, validate=validate
+                            data, search, calls, validate=validate, progress=emit
                         )
                         registry = EvidenceRegistry(search)
                         ids = list(
@@ -129,6 +148,8 @@ class Tutor:
                 if type(exc).__name__ == "MaxTurnsExceeded":
                     reason = "turn_limit"
                 result = self._fallback(search, conversation.id, language, reason)
+            if result.reason is not None:
+                emit(StageProgress(stage="fallback", reason=result.reason))
             result.searches, result.model_calls, result.context_reset = (
                 search.calls,
                 calls[0],

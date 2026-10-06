@@ -6,7 +6,7 @@ from typing import Literal
 from pydantic import Field
 
 from insuretutor.chat_models import ChatResult, Citation, StrictModel
-from insuretutor.corpus import Corpus, assemble_evidence
+from insuretutor.corpus import Corpus, LanguageRecord, SourceSpan, assemble_evidence
 
 
 class ReferenceSource(Citation):
@@ -28,6 +28,18 @@ class ReferenceGroup(StrictModel):
 
 class ChatResponse(ChatResult):
     reference_groups: list[ReferenceGroup] = Field(default_factory=list)
+
+
+def display_title(uid: str, record: LanguageRecord, spans: dict[str, SourceSpan]) -> str:
+    """Shared reference/progress label: the record title or a short first source line."""
+    if record.title:
+        return record.title
+    note = re.fullmatch(r"note-(\d+)", uid)
+    if note:
+        return f"Note {note[1]}" if record.language == "en" else f"附註 {note[1]}"
+    # Use a source excerpt rather than invent a semantic title.
+    title = spans[record.source_span_ids[0]].evidence_text.splitlines()[0]
+    return title[:80] + ("…" if len(title) > 80 else "")
 
 
 def with_references(result: ChatResult, corpus: Corpus) -> ChatResponse:
@@ -81,19 +93,10 @@ def with_references(result: ChatResult, corpus: Corpus) -> ChatResponse:
                         role="body" if sid in record.source_span_ids else "context",
                     )
                 )
-            title = record.title
-            if not title:
-                note = re.fullmatch(r"note-(\d+)", uid)
-                if note:
-                    title = f"Note {note[1]}" if record.language == "en" else f"附註 {note[1]}"
-                else:
-                    # Use a source excerpt rather than invent a semantic title.
-                    title = spans[record.source_span_ids[0]].evidence_text.splitlines()[0]
-                    title = title[:80] + ("…" if len(title) > 80 else "")
             versions.append(
                 ReferenceVersion(
                     language=record.language,
-                    title=title,
+                    title=display_title(uid, record, spans),
                     sources=sources,
                 )
             )

@@ -8,7 +8,7 @@ import os
 import re
 import time
 import uuid
-from collections.abc import Callable
+from collections.abc import AsyncGenerator, Callable
 from contextlib import asynccontextmanager
 from dataclasses import dataclass
 from pathlib import Path
@@ -17,10 +17,11 @@ from dotenv import load_dotenv
 from fastapi import FastAPI, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.responses import FileResponse, JSONResponse
+from fastapi.sse import EventSourceResponse, ServerSentEvent
 from fastapi.staticfiles import StaticFiles
 from starlette.exceptions import HTTPException
 
-from insuretutor.chat_models import ChatTurn
+from insuretutor.chat_models import ChatTurn, SearchProgress
 from insuretutor.corpus import ROOT, Corpus
 from insuretutor.generation import AgentGenerator, ModelConfig
 from insuretutor.references import ChatResponse, with_references
@@ -54,11 +55,66 @@ def load_runtime() -> Runtime:
     return Runtime(Tutor(retriever, generator), retriever.corpus, PDF, generator)
 
 
+async def chat_events(
+    runtime: Runtime, turn: ChatTurn, request_id: str, started: float, tasks: set
+) -> AsyncGenerator[ServerSentEvent, None]:
+    """Display-only progress, then the same validated response as /api/chat.
+
+    The turn runs as its own task: a client disconnect stops these events but, as
+    with /api/chat, the turn still completes, updates history and is logged.
+    """
+    queue: asyncio.Queue[ServerSentEvent] = asyncio.Queue()
+
+    def elapsed() -> int:
+        return round((time.perf_counter() - started) * 1000)
+
+    def emit(event):
+        queue.put_nowait(
+            ServerSentEvent(
+                event="search" if isinstance(event, SearchProgress) else "stage",
+                data={**event.model_dump(exclude_none=True), "elapsed_ms": elapsed()},
+            )
+        )
+
+    async def run():
+        status = reason = None
+        try:
+            result = await runtime.tutor.answer(turn, progress=emit)
+            response = with_references(result, runtime.corpus)
+            status, reason = result.status, result.reason
+            data = {"response": response.model_dump(mode="json"), "elapsed_ms": elapsed()}
+            event = ServerSentEvent(event="final", data=data)
+        except Exception as exc:  # noqa: BLE001 -- the stream already returned HTTP 200
+            # Server-owned codes only; exception text may carry prompts or keys.
+            code = "sessions_busy" if isinstance(exc, SessionCapacityError) else "internal_error"
+            status, reason = "error", code
+            data = {"code": code, "request_id": request_id, "elapsed_ms": elapsed()}
+            event = ServerSentEvent(event="error", data=data)
+        logger.info(
+            "request=%s elapsed_ms=%.0f http=200 status=%s reason=%s stream=1",
+            request_id,
+            elapsed(),
+            status,
+            reason,
+        )
+        queue.put_nowait(event)
+
+    task = asyncio.create_task(run())
+    tasks.add(task)
+    task.add_done_callback(tasks.discard)
+    while True:
+        event = await queue.get()
+        yield event
+        if event.event in {"final", "error"}:
+            return
+
+
 def create_app(runtime_factory: Callable[[], Runtime] = load_runtime) -> FastAPI:
     @asynccontextmanager
     async def lifespan(app: FastAPI):
         try:
             app.state.runtime = await asyncio.to_thread(runtime_factory)
+            app.state.turn_tasks = set()  # Strong references for detached stream turns.
         except Exception:  # noqa: BLE001 -- redact startup configuration exceptions
             # Startup exceptions may carry configuration values or local paths.
             raise RuntimeError(
@@ -87,7 +143,7 @@ def create_app(runtime_factory: Callable[[], Runtime] = load_runtime) -> FastAPI
     @app.middleware("http")
     async def request_metadata(request: Request, call_next):
         request.state.request_id = uuid.uuid4().hex
-        started = time.perf_counter()
+        request.state.started = started = time.perf_counter()
         try:
             response = await call_next(request)
         except Exception:  # noqa: BLE001 -- prevent payload-bearing exception logs
@@ -96,7 +152,9 @@ def create_app(runtime_factory: Callable[[], Runtime] = load_runtime) -> FastAPI
         if request.url.path == "/" or request.url.path.startswith("/static/"):
             # Revalidate frontend assets after rebuilding the container.
             response.headers["Cache-Control"] = "no-cache"
-        if request.url.path == "/api/chat":
+        stream = request.url.path == "/api/chat/stream"
+        if request.url.path == "/api/chat" or (stream and response.status_code != 200):
+            # Accepted streams are logged by their turn task when it completes.
             logger.info(
                 "request=%s elapsed_ms=%.0f http=%s status=%s reason=%s",
                 request.state.request_id,
@@ -105,6 +163,7 @@ def create_app(runtime_factory: Callable[[], Runtime] = load_runtime) -> FastAPI
                 getattr(request.state, "answer_status", "error"),
                 getattr(request.state, "answer_reason", None),
             )
+        if request.url.path == "/api/chat" or stream:
             response.headers["Cache-Control"] = "no-store"
         return response
 
@@ -133,6 +192,17 @@ def create_app(runtime_factory: Callable[[], Runtime] = load_runtime) -> FastAPI
         response = with_references(result, runtime.corpus)
         request.state.answer_status, request.state.answer_reason = result.status, result.reason
         return response
+
+    @app.post("/api/chat/stream", response_class=EventSourceResponse)
+    async def chat_stream(turn: ChatTurn, request: Request):
+        async for event in chat_events(
+            request.app.state.runtime,
+            turn,
+            request.state.request_id,
+            request.state.started,
+            request.app.state.turn_tasks,
+        ):
+            yield event
 
     @app.get("/api/health")
     async def health(request: Request):

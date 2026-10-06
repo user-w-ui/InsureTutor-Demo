@@ -750,3 +750,28 @@ async def test_format_and_reference_repair_reports_all_bad_ids(corpus):
     assert [i["claim_number"] for i in issues] == [1, 2]
     assert [i["evidence_ids"] for i in issues] == [["invented-a"], ["invented-b"]]
     assert model.seen[-1]["tools"] == []
+
+
+@pytest.mark.asyncio
+async def test_repeated_boundary_codes_render_once(corpus):
+    # One scope boundary per unsupported topic would repeat identical server text.
+    claims = [
+        {"kind": "boundary", "text": topic, "boundary": "scope"}
+        for topic in ["medical", "travel", "motor"]
+    ] + [
+        {
+            "kind": "fact",
+            "text": "Periodic withdrawal applies after 10 years.",
+            "evidence_ids": ["note-6"],
+        },
+        {"kind": "boundary", "text": "purchase", "boundary": "purchase"},
+    ]
+    payload = json.dumps({"status": "refused", "claims": claims})
+    result, _, _, _ = await answer(corpus, [payload], question="能保住院、旅游和车险吗？")
+    assert [(c.kind, c.boundary) for c in result.claims] == [
+        ("boundary", "scope"),
+        ("fact", None),
+        ("boundary", "purchase"),
+    ]
+    assert result.explanation.count("超出本册范围") == 1
+    assert result.reason is None and result.model_calls == 1

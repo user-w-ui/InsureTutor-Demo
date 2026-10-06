@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import asyncio
+import contextlib
 import json
+from collections.abc import Callable
 from typing import Literal
 
 from pydantic import BaseModel, ConfigDict
 
+from insuretutor.chat_models import SearchHit, SearchProgress
 from insuretutor.corpus import EvidenceBundle
+from insuretutor.references import display_title
 from insuretutor.retrieval import QueryContext, Retriever
 from insuretutor.retrieval.embedding import QueryInputError, normalize_search
 
@@ -108,6 +112,33 @@ class SearchResult(BaseModel):
             }
         return json.dumps(payload, ensure_ascii=False, separators=(",", ":"))
 
+    def progress(self, kind: str, query: str | None, language: str) -> SearchProgress:
+        """Display summary: hit labels (as on reference links) and physical pages, no bodies."""
+        hits, bundle = [], self.evidence
+        if bundle is not None:
+            record_language = "en" if language == "en" else "zh-Hant"
+            units = {u.id: u for u in bundle.units}
+            spans = {s.id: s for s in bundle.source_spans}
+            for uid in bundle.selected_unit_ids[:8]:
+                record = next(r for r in units[uid].segments if r.language == record_language)
+                hits.append(
+                    SearchHit(
+                        unit_id=uid,
+                        title=display_title(uid, record, spans),
+                        pages=sorted(
+                            {spans[s].pdf_page for s in record.source_span_ids if s in spans}
+                        ),
+                    )
+                )
+        return SearchProgress(
+            kind=kind,
+            query=query[:200] if query is not None else None,
+            status=self.status,
+            hits=hits,
+            required_added=len(bundle.units) - len(hits) if bundle is not None else 0,
+            remaining_searches=self.remaining_searches,
+        )
+
 
 class EvidenceSearchSession:
     """New instance per user turn: bounded searches plus the citation allowlist.
@@ -125,6 +156,7 @@ class EvidenceSearchSession:
         response_language: str = "auto",
         max_calls: int = 6,
         character_budget: int = 12_000,
+        on_search: Callable[[SearchProgress], None] | None = None,
     ):
         if min(max_calls, character_budget) <= 0:
             raise ValueError("Search limits must be positive")
@@ -143,6 +175,14 @@ class EvidenceSearchSession:
         self.sent_units: set[str] = set()
         self.sent_sources: set[str] = set()
         self.source_aliases: dict[str, str] = {}
+        self.on_search = on_search
+
+    def _notify(self, kind: str, query: str | None, result: SearchResult) -> None:
+        if self.on_search is None:
+            return
+        # Progress display never changes retrieval.
+        with contextlib.suppress(Exception):
+            self.on_search(result.progress(kind, query, self.response_language))
 
     def agent_json(self, result: SearchResult) -> str:
         """Serialize only new definitions; every returned result remains registered."""
@@ -184,6 +224,8 @@ class EvidenceSearchSession:
                 )
             self._initial_started = True
             self.initial_result = await self._search(original_question, expand_sentences=True)
+            # The user's own question is not echoed back as a display query.
+            self._notify("initial", None, self.initial_result)
             return self.initial_result
 
     async def search(self, query: str) -> SearchResult:
@@ -196,7 +238,9 @@ class EvidenceSearchSession:
                 raise RuntimeError(
                     "Initialize original-question retrieval before supplemental search"
                 )
-            return await self._search(query)
+            result = await self._search(query)
+            self._notify("supplement", query, result)
+            return result
 
     async def _search(self, query: str, *, expand_sentences: bool = False) -> SearchResult:
         # Caller holds the session lock. Normalize only the cache key here;

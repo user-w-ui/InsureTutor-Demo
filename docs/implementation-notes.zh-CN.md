@@ -146,7 +146,7 @@ SessionStore 保留 128 个会话、空闲 TTL 30 分钟、最近 6 轮已接受
 - 已提交的证据／公式 ID 必须属于本轮提供的 bundle；未召回、旧轮或虚构 ID 不可引用。
 - 必需单元、来源片段、表头和上下文必须可完整解析；原文、页码、bbox 与链接由服务端生成。
 - 未附引用的段落正常展示。引用有效不证明来源支持主张、回答完整、安全或算术正确。
-- `boundary` 使用固定代码并替换为服务端文案；`user_condition` 展示标签及模型提交的用户文本；
+- `boundary` 使用固定代码并替换为服务端文案，同一代码只保留首条，避免逐话题重复同一句；`user_condition` 展示标签及模型提交的用户文本；
   `application` 保留模型正文并添加条件标签。后两者不进行用户输入语义核验。
 - 算例提示词只允许本册身故保障三项公式；服务端检查公式引用，不核对输入、不复算结果。
 - 格式与无效引用共用最多一次无工具修复，不填补漏答、漏引或润色内容。仍失败则整份摘录；
@@ -164,8 +164,35 @@ HTTP 接口、错误码和布局见架构；`reference_groups` 只从本轮引�
 不重复检索或调用模型。语言切换展示两份原文；旧轮引用在当前页面内仍可点击。
 
 正式网页为 `src/insuretutor/web/`，PDF.js 5.4.149、worker 及许可证本地提供。
-等待上限 75 秒，一次显示已通过格式／引用校验的完整响应；网络失败保留问题。
+网页使用 `/api/chat/stream`（`fetch` + `ReadableStream` 解析 SSE，`EventSource` 不支持 POST），
+等待上限 75 秒；完整响应仍在通过格式／引用校验后一次显示，网络失败或流中断保留问题。
 日志只记录请求 ID、耗时、状态及原因码，不记录问题、答案、完整提示、证据正文或密钥。
+
+### 流式过程事件
+
+Tutor 的 `answer(turn, progress=None)` 接收只读回调；`/api/chat` 与 CLI 不传回调，行为不变。
+事件模型在 `chat_models.py`（`StageProgress`、`SearchProgress`），字段白名单、`extra=forbid`；
+HTTP 层为每个事件附加自请求开始的 `elapsed_ms`。回调异常被吞掉，不影响检索或作答。
+
+| 事件 | 来源与内容 |
+| --- | --- |
+| `stage` | `retrieving`（Tutor 首轮前）、`thinking`（`RunHooks.on_llm_start`，附第 n 次模型调用）、`searching`（`on_tool_start`）、`validating`（每次本地校验前）、`repairing`（无工具修复前）、`fallback`（附服务端原因码） |
+| `search` | `EvidenceSearchSession` 每次检索后产生：`kind`、补查查询（截断 200 字，首轮不回显原问）、状态、最多 8 个直接命中、自动补入的必需单元数、剩余检索次数 |
+| `final` | `{response, elapsed_ms}`，`response` 与 `/api/chat` 响应体相同；降级同样以 `final` 结束 |
+| `error` | `sessions_busy` 或 `internal_error` 及请求 ID，不含异常文本 |
+
+命中标签与引用链接共用 `references.display_title`：有标题用标题，`note-N` 显示附注编号，
+否则取首个来源片段首行（最多 80 字）；英文回答用英文记录，其余用繁中原文。事件不含完整来源正文、
+系统提示、模型 token、推理文本或密钥。同一模型回合可连续请求多次补查，会先出现多个 `searching`。
+请求体校验失败仍在流开始前返回 422 JSON。本轮作为独立任务运行，任务引用保存在 `app.state`；
+客户端断开只停止推送，任务继续完成、写入历史并记录一行日志（与 `/api/chat` 断开时行为一致，
+已用 ASGI 断开实验确认）。流式请求的日志在任务完成时写出，附 `stream=1`。
+
+`reasoning_content` 调研（未实现）：openai-agents 0.22.3 的 Chat Completions 非流式路径会把消息上的
+`reasoning_content`（DeepSeek 等）、`reasoning` 或 `thinking_blocks` 转为 `ResponseReasoningItem`，
+保持 `Runner.run` 时可在 `on_llm_end(response)` 按每次模型调用整段取得；token 级推理需要改用
+`Runner.run_streamed`。OpenAI 官方 Chat Completions 不返回推理文本。推理可能复述证据、系统提示或注入指令，
+展示前需要单独的脱敏／摘要设计。
 
 Docker 为 Python 3.12 slim、uv 0.11.15、锁定运行依赖与 agent extra、非 root、单 worker。
 构建阶段缓存固定 E5 模型层；运行无宿主源码／模型挂载，Compose 只在运行时注入 LLM 配置。
@@ -175,6 +202,18 @@ Docker 为 Python 3.12 slim、uv 0.11.15、锁定运行依赖与 agent extra、�
 
 ## 验证记录与已知限制
 
+- 2026-10-06 流式过程展示：全量离线测试 175 项、305 个子检查通过（含边界去重回归；新增 8 项流式测试：事件顺序、
+  与 `/api/chat` 结果一致、未配置模型／格式修复降级、超时、错误脱敏、断开后完成、回调失败隔离）；
+  改动模块 Ruff 通过。Docker 真实模型下 q3（额外回报率与保证利率）三次流式运行：
+
+  | 运行 | 首轮检索 | 模型调用（秒） | 补查 | 总耗时 | 结果 |
+  | --- | ---: | --- | ---: | ---: | --- |
+  | 1 | 0.06 s | 5.8／13.8 | 2 次，各约 0.02 s | 19.8 s | answered，3 检索／2 调用 |
+  | 2 | 0.06 s | 10.3／2.6／27.0 | 4 次，各约 0.02 s | 40.2 s | answered，5 检索／3 调用 |
+  | 3 | 0.07 s | 6.1／12.3 | 2 次，约 0.11／0.02 s | 18.6 s | answered，3 检索／2 调用 |
+
+  耗时主要在模型调用；校验约 0.02 s。客户端到达时间与服务端 `elapsed_ms` 同步，固定偏移约 0.12 s，
+  无缓冲。浏览器确认进度列表、补查占位替换与答案上方的折叠记录；真实容器中断开连接后本轮仍完成并记录日志。
 - 本次交付整理：166 项离线测试、305 个子检查通过；包含冻结输入与语料重建字节一致性。
   修改的运行时模块 Ruff 通过；未为风格告警改写哈希固定的离线构建源码。
   一键脚本实际构建、等待健康并打开网页；容器资源与工作区文件哈希一致，PDF Range、

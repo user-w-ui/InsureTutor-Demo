@@ -39,6 +39,18 @@ const words = {
   reference_rejected: ['Citation validation failed; showing original evidence.', '引用校验未通过，展示原文证据。', '引用校驗未通過，展示原文證據。'],
   turn_limit: ['The agent reached its turn limit; showing available original evidence.', 'Agent 达到回合上限，展示已取得的原文证据。', 'Agent 達到回合上限，展示已取得的原文證據。'],
   degraded: ['The answer fell back to original evidence; the failure layer is unknown.', '回答已降级为原文证据，未识别失败层级。', '回答已降級為原文證據，未識別失敗層級。'],
+  process: ['Retrieval process', '检索过程', '檢索過程'],
+  processSummary: ['{s} searches · {m} model calls · {t}s', '{s} 次检索 · {m} 次模型调用 · {t} 秒', '{s} 次檢索 · {m} 次模型呼叫 · {t} 秒'],
+  stage_retrieving: ['Initial search with your full question', '用完整问题进行首轮检索', '用完整問題進行首輪檢索'],
+  stage_thinking: ['Agent is checking the evidence · model call {n}', 'Agent 正在核对证据 · 第 {n} 次模型调用', 'Agent 正在核對證據 · 第 {n} 次模型呼叫'],
+  stage_searching: ['Agent requested a supplementary search', 'Agent 发起补查', 'Agent 發起補查'],
+  stage_validating: ['Checking answer format and citations', '校验回答格式与引用', '校驗回答格式與引用'],
+  stage_repairing: ['One format repair, without new searches', '一次格式修复，不再检索', '一次格式修復，不再檢索'],
+  search_initial: ['Initial search', '首轮检索', '首輪檢索'], search_supplement: ['Supplementary search', '补查', '補查'],
+  hitCount: ['{n} direct hits', '直接命中 {n} 条', '直接命中 {n} 條'], requiredAdded: ['+{n} required notes', '另补 {n} 条必需条款', '另補 {n} 條必需條款'],
+  remaining: ['{n} searches left', '剩余 {n} 次检索', '剩餘 {n} 次檢索'],
+  search_no_evidence: ['no matching evidence', '无匹配证据', '無匹配證據'], search_search_limit: ['search limit reached', '已达检索上限', '已達檢索上限'],
+  search_evidence_budget: ['evidence budget full; result not added', '证据预算已满，结果未加入', '證據預算已滿，結果未加入'], search_invalid_query: ['invalid query', '查询无效', '查詢無效'],
 };
 const referenceRejectionReasons = new Set([
   'unknown_or_missing_evidence', 'missing_source', 'invalid_source_id',
@@ -60,6 +72,7 @@ function t(key) { return words[key]?.[['en', 'zh-Hans', 'zh-Hant'].indexOf(langu
 function element(tag, text = '', className = '') {
   const node = document.createElement(tag); node.textContent = text; node.className = className; return node;
 }
+function fill(key, values) { return t(key).replace(/\{(\w)\}/g, (_, name) => String(values[name])); }
 function displayText(text) { return (text || '').replace(/\\([$%*])/g, '$1'); }
 function updatePdfStatus() { $('viewer-status').textContent = t(pdfStatus); $('viewer-status').classList.toggle('error', pdfFailed); }
 function translate() {
@@ -184,6 +197,53 @@ function updateCitation() {
   $('citation-detail').scrollTop = 0;
 }
 
+// SSE over a POST response body (EventSource is GET-only). Returns true at final/error.
+async function readEvents(response, onEvent) {
+  const reader = response.body.getReader(); const decoder = new TextDecoder(); let buffer = '';
+  try {
+    for (;;) {
+      const { value, done } = await reader.read();
+      buffer += decoder.decode(value || new Uint8Array(), { stream: !done });
+      const blocks = buffer.split(/\r?\n\r?\n/); buffer = done ? '' : blocks.pop();
+      for (const block of blocks) {
+        let name = 'message'; const data = [];
+        for (const line of block.split(/\r?\n/)) {
+          if (line.startsWith('event:')) name = line.slice(6).trim();
+          else if (line.startsWith('data:')) data.push(line.slice(5).replace(/^ /, ''));
+        }
+        if (data.length && onEvent(name, JSON.parse(data.join('\n')))) return true;
+      }
+      if (done) return false;
+    }
+  } finally { reader.cancel().catch(() => {}); }
+}
+// Progress text is display-only; model-written queries stay in text nodes.
+function addProgress(steps, name, data) {
+  const seconds = `${(data.elapsed_ms / 1000).toFixed(1)}s`;
+  let item;
+  if (name === 'stage') {
+    const text = data.stage === 'fallback' ? t(reasonMessageKey(data.reason)) : fill(`stage_${data.stage}`, { n: data.model_call });
+    item = element('li', '', `progress-step stage-${data.stage}`); item.append(element('span', text), element('time', seconds));
+  } else if (name === 'search') {
+    item = element('li', '', `progress-step search-step${data.status === 'evidence' ? '' : ' search-empty'}`);
+    const head = element('div', '', 'progress-head'); head.append(element('strong', t(`search_${data.kind}`)));
+    if (data.query) head.append(element('q', data.query));
+    head.append(element('time', seconds)); item.append(head);
+    const facts = [data.status === 'evidence' ? fill('hitCount', { n: data.hits.length }) : t(`search_${data.status}`)];
+    if (data.required_added) facts.push(fill('requiredAdded', { n: data.required_added }));
+    facts.push(fill('remaining', { n: data.remaining_searches })); item.append(element('p', facts.join(' · '), 'progress-facts'));
+    if (data.hits.length) {
+      const hits = element('ul', '', 'progress-hits');
+      data.hits.forEach((hit) => { const title = displayText(hit.title).replace(/\s+/g, ' '); hits.append(element('li', `${title.length > 36 ? title.slice(0, 36) + '…' : title} · p.${hit.pages.join(', ') || '?'}`)); });
+      item.append(hits);
+    }
+    // A finished search replaces the earliest pending "search requested" placeholder;
+    // one model turn may request several searches before the first completes.
+    const placeholder = steps.querySelector('.stage-searching');
+    if (data.kind === 'supplement' && placeholder) { placeholder.replaceWith(item); return; }
+  } else return;
+  steps.append(item);
+}
 async function submit(event) {
   event.preventDefault(); if (pending || !ready) return;
   const question = $('question-input').value;
@@ -201,17 +261,34 @@ async function submit(event) {
   answerRow.append(element('span', 'i', 'speaker tutor-speaker'), content);
   $('conversation').append(questionRow, answerRow);
   setPending(true); const started = Date.now();
-  const updateWaiting = () => { content.textContent = `${t('waiting')} · ${Math.floor((Date.now() - started) / 1000)}s`; $('conversation').scrollTop = $('conversation').scrollHeight; };
-  updateWaiting(); const timer = setInterval(updateWaiting, 1000);
+  const waiting = element('p', '', 'waiting-status'); const steps = element('ol', '', 'progress-steps'); content.append(waiting, steps);
+  // Follow new steps only while the reader is already at the bottom; scrolling up
+  // to read earlier steps is never overridden by the timer or later events.
+  const conversation = $('conversation');
+  const scrollDown = () => { conversation.scrollTop = conversation.scrollHeight; };
+  const atBottom = () => conversation.scrollHeight - conversation.scrollTop - conversation.clientHeight < 40;
+  const updateWaiting = () => { waiting.textContent = `${t('waiting')} · ${Math.floor((Date.now() - started) / 1000)}s`; };
+  updateWaiting(); scrollDown(); const timer = setInterval(updateWaiting, 1000);
   const controller = new AbortController(); const timeout = setTimeout(() => controller.abort(), 75000);
   try {
-    const response = await fetch('/api/chat', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
+    const response = await fetch('/api/chat/stream', { method: 'POST', headers: { 'Content-Type': 'application/json' }, signal: controller.signal,
       body: JSON.stringify({ question, session_id: sessionId, response_language: $('response-language').value }) });
-    const data = await response.json();
-    if (!response.ok) { const error = new Error(data.error?.code || 'internal_error'); error.requestId = data.error?.request_id; throw error; }
+    if (!response.ok) { const data = await response.json().catch(() => ({})); const error = new Error(data.error?.code || 'internal_error'); error.requestId = data.error?.request_id; throw error; }
+    let final = null;
+    await readEvents(response, (name, payload) => {
+      if (name === 'final') { final = payload; return true; }
+      if (name === 'error') { const error = new Error(payload.code || 'internal_error'); error.requestId = payload.request_id; throw error; }
+      const follow = atBottom(); addProgress(steps, name, payload); if (follow) scrollDown(); return false;
+    });
+    if (!final) throw new Error('network');
+    const data = final.response;
     sessionId = data.session_id;
     if ($('response-language').value === 'auto') { language = data.response_language; translate(); }
     clearInterval(timer); content.replaceChildren();
+    // Keep the validated answer primary; the process stays available, collapsed.
+    const process = element('details', '', 'process-log');
+    process.append(element('summary', `${t('process')} · ${fill('processSummary', { s: data.searches, m: data.model_calls, t: (final.elapsed_ms / 1000).toFixed(1) })}`), steps);
+    content.append(process);
     const turn = { id: ++turnNumber, result: data }; turns.set(turn.id, turn); renderAnswer(turn, content);
     if (data.reference_groups.length) selectGroup(turn, data.reference_groups[0], data.response_language === 'en' ? 'en' : 'zh-Hant');
     $('conversation').scrollTop = Math.max(0, answerRow.offsetTop - $('conversation').offsetTop - 14);

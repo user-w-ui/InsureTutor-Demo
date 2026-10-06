@@ -178,6 +178,17 @@ def validate_answer(draft: DraftAnswer, registry: EvidenceRegistry, language: st
         error.claim_index = issues[0]["path"][1]
         error.issues = tuple(issues)
         raise error
+    # Boundary text is server-owned, one fixed sentence per code; a model listing
+    # one boundary per unsupported topic would otherwise repeat that sentence.
+    codes = set()
+    claims = []
+    for claim in draft.claims:
+        if claim.kind == "boundary":
+            if claim.boundary in codes:
+                continue
+            codes.add(claim.boundary)
+        claims.append(claim)
+    draft.claims = claims
     if language in {"zh-Hans", "zh-Hant"}:
         convert = OpenCC("t2s" if language == "zh-Hans" else "s2t").convert
         for claim in draft.claims:
