@@ -57,7 +57,9 @@ the validated answer with that process collapsed above it.
 Offline baseline, 10 questions × 5 rounds with a Sonnet rubric judge: answer status
 100% correct, citation recall 92%, citation precision 79%, rubric score 89%. Factual,
 cross-language and refusal questions hold up; the vague purchase question is the main
-weakness. Details in the [evaluation report (中文)](docs/evaluation.zh-CN.md).
+weakness. On 50 misuse scenarios (1 round) every injection, fraud and out-of-scope request was refused or bounded, no
+benign look-alike was refused (rubric 91%); self-harm handling and the duty of disclosure in fraud
+refusals are the gaps. Details in the [evaluation report (中文)](docs/evaluation.zh-CN.md).
 
 ## Key links
 
@@ -69,7 +71,7 @@ weakness. Details in the [evaluation report (中文)](docs/evaluation.zh-CN.md).
 | [Vector artifacts](data/retrieval/README.md) | Precomputed vectors and model metadata |
 | [Evaluation set](tests/eval/README.md) | Questions, source references and rubrics |
 | [Misuse scenarios](tests/misuse/README.md) | Injection, fraud, self-harm, personal-data and out-of-scope cases with benign look-alikes |
-| [Evaluation report (中文)](docs/evaluation.zh-CN.md) · [per-run results](results/stage1-runs.csv) | Metrics, baseline results and limitations |
+| [Evaluation report (中文)](docs/evaluation.zh-CN.md) · per-run results: [stage 1](results/stage1-runs.csv), [stage 2](results/stage2-runs.csv) | Metrics, baseline and misuse results, limitations |
 | [Development guide](docs/development.md) | Local installation, CLI, artifact rebuilding and evaluation commands |
 | [Task specification](docs/task-spec.md) | Original requirements |
 

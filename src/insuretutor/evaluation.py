@@ -1,4 +1,4 @@
-"""Offline quality evaluation over tests/eval: real answers, judged rubrics, metrics.
+"""Offline quality evaluation over tests/eval or tests/misuse: real answers, judged rubrics, metrics.
 
 Rubrics, expected answers and judge scores never enter Tutor prompts or indexes;
 the Tutor answers each question as an ordinary user turn. Run artifacts stay in
@@ -24,8 +24,15 @@ from insuretutor.chat_models import ChatResult, ChatTurn, StageProgress
 from insuretutor.corpus import ROOT, Corpus, assemble_evidence
 from insuretutor.retrieval.embedding import sha256
 
-ITEMS = ROOT / "tests/eval/items.json"
-JUDGE_PROMPT = ROOT / "tests/eval/judge-prompt.md"
+# Each set pairs its items with its fixed judge prompt; both share the scoring fields.
+SETS = {
+    "eval": (ROOT / "tests/eval/items.json", ROOT / "tests/eval/judge-prompt.md"),
+    "misuse": (ROOT / "tests/misuse/misuse-scenarios.json", ROOT / "tests/misuse/judge-prompt.md"),
+}
+ITEMS, JUDGE_PROMPT = SETS["eval"]
+# Misuse refusals list little or no supporting evidence, so any related clause they cite
+# would count against them; that set reports precision for explain items only.
+NO_PRECISION = {"misuse": {"refuse", "care"}}
 CORPUS = ROOT / "data/corpus.json"
 SCORES = {0, 0.5, 1}
 
@@ -178,7 +185,9 @@ def write_json(path: Path, data) -> None:
     path.write_text(json.dumps(data, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 
-async def run(output: Path, rounds: int, prefixes: list[str], stage: str) -> None:
+async def run(
+    output: Path, rounds: int, prefixes: list[str], stage: str, dataset: str = "eval"
+) -> None:
     from insuretutor.generation import POLICY, AgentGenerator, ModelConfig
     from insuretutor.retrieval.hybrid import HybridRetriever
     from insuretutor.tutor import Tutor
@@ -186,7 +195,8 @@ async def run(output: Path, rounds: int, prefixes: list[str], stage: str) -> Non
     config = ModelConfig.from_env()
     if config is None:
         raise SystemExit("LLM is not configured; evaluation needs real model answers.")
-    items = [i for i in load_items() if not prefixes or i["id"].split("-")[0] in prefixes]
+    items_path, prompt_path = SETS[dataset]
+    items = [i for i in load_items(items_path) if not prefixes or i["id"].split("-")[0] in prefixes]
     if not items:
         raise SystemExit("No evaluation items selected.")
     generator = AgentGenerator.from_config(config)
@@ -196,6 +206,7 @@ async def run(output: Path, rounds: int, prefixes: list[str], stage: str) -> Non
             output / "config.json",
             {
                 "stage": stage,
+                "set": dataset,
                 "rounds": rounds,
                 "items": [i["id"] for i in items],
                 "model": config.model,
@@ -205,12 +216,13 @@ async def run(output: Path, rounds: int, prefixes: list[str], stage: str) -> Non
                 "timeout_seconds": tutor.timeout,
                 # Stage 3 ablation switch; the default runtime always allows search.
                 "supplemental_search": True,
-                "judge": "Claude Code subagent, Sonnet 5.5, tests/eval/judge-prompt.md",
+                "judge": "Claude Code subagent, Sonnet 5.5, "
+                + prompt_path.relative_to(ROOT).as_posix(),
                 "sha256": {
                     "policy": hashlib.sha256(POLICY.encode()).hexdigest(),
                     "corpus": sha256(CORPUS),
-                    "items": sha256(ITEMS),
-                    "judge_prompt": sha256(JUDGE_PROMPT),
+                    "items": sha256(items_path),
+                    "judge_prompt": sha256(prompt_path),
                 },
                 "git": git_state(),
                 "python": platform.python_version(),
@@ -264,9 +276,16 @@ async def run(output: Path, rounds: int, prefixes: list[str], stage: str) -> Non
 # ---- judge tasks and scoring ---------------------------------------------------------
 
 
+def run_set(run_dir: Path) -> str:
+    config = run_dir / "config.json"
+    if not config.exists():
+        return "eval"
+    return json.loads(config.read_text(encoding="utf-8")).get("set", "eval")
+
+
 def judge_tasks(run_dir: Path) -> list[dict]:
     """Filled judge prompts for answers without a judge output yet."""
-    template = JUDGE_PROMPT.read_text(encoding="utf-8")
+    template = SETS[run_set(run_dir)][1].read_text(encoding="utf-8")
     tasks = []
     for answer in sorted((run_dir / "answers").glob("*.json")):
         output = run_dir / "judge" / answer.name
@@ -287,22 +306,29 @@ def judge_tasks(run_dir: Path) -> list[dict]:
     return tasks
 
 
+def item_order(item_id: str) -> tuple[str, int]:
+    prefix = item_id.split("-")[0]
+    return prefix[0], int(prefix[1:])
+
+
+def load_run_items(run_dir: Path) -> dict[str, dict]:
+    paths = sorted((run_dir / "items").glob("*.json"), key=lambda p: item_order(p.stem))
+    return {p.stem: json.loads(p.read_text(encoding="utf-8")) for p in paths}
+
+
 def load_records(run_dir: Path) -> list[dict]:
     records = {}
     for line in (run_dir / "raw.jsonl").read_text(encoding="utf-8").splitlines():
         if line:
             record = json.loads(line)
             records[(record["round"], record["item_id"])] = record
-    # items.json order (q1…q10), not string order (q1, q10, q2…).
-    order = {item["id"]: n for n, item in enumerate(load_items())}
-    return [records[key] for key in sorted(records, key=lambda k: (k[0], order.get(k[1], 0)))]
+    # Numeric order (q1…q10, m01…m50), not string order (q1, q10, q2…).
+    return [records[key] for key in sorted(records, key=lambda k: (k[0], item_order(k[1])))]
 
 
 def score_records(run_dir: Path, corpus: Corpus) -> tuple[list[dict], list[dict]]:
-    items = {
-        p.stem: json.loads(p.read_text(encoding="utf-8"))
-        for p in (run_dir / "items").glob("*.json")
-    }
+    items = load_run_items(run_dir)
+    skipped = NO_PRECISION.get(run_set(run_dir), set())
     rows, lines, errors = [], [], []
     for record in load_records(run_dir):
         item, result = items[record["item_id"]], ChatResult.model_validate(record["result"])
@@ -321,7 +347,9 @@ def score_records(run_dir: Path, corpus: Corpus) -> tuple[list[dict], list[dict]
                 "reason": result.reason,
                 "status_correct": status_correct(item, result),
                 "citation_recall": citation_recall(item, result),
-                "citation_precision": citation_precision(item, result, corpus),
+                "citation_precision": None
+                if item["answer_mode"] in skipped
+                else citation_precision(item, result, corpus),
                 **rubric_result(item, scores),
                 "elapsed_ms": record["elapsed_ms"],
                 "searches": result.searches,
@@ -353,7 +381,20 @@ def score_records(run_dir: Path, corpus: Corpus) -> tuple[list[dict], list[dict]
     return rows, lines
 
 
-def summarize(rows: list[dict]) -> dict:
+def item_groups(items: dict[str, dict]) -> dict[str, list[str]]:
+    """Misuse items split into harmful (under-blocking) and benign (over-refusal), then category."""
+    if not any("category" in i for i in items.values()):
+        return {}
+    groups = {
+        "harmful": [k for k, i in items.items() if i["answer_mode"] in {"refuse", "care"}],
+        "benign": [k for k, i in items.items() if i["answer_mode"] == "explain"],
+    }
+    for key, item in items.items():
+        groups.setdefault(item["category"], []).append(key)
+    return groups
+
+
+def summarize(rows: list[dict], groups: dict[str, list[str]] | None = None) -> dict:
     """Average each item over its rounds first, then macro-average across items."""
     per_item = {}
     for item_id in dict.fromkeys(r["item_id"] for r in rows):
@@ -375,6 +416,13 @@ def summarize(rows: list[dict]) -> dict:
     return {
         "per_item": per_item,
         "overall": {m: mean([v[m] for v in per_item.values()]) for m in metrics},
+        "groups": {
+            name: {
+                "items": len(ids),
+                **{m: mean([per_item[i][m] for i in ids if i in per_item]) for m in metrics},
+            }
+            for name, ids in (groups or {}).items()
+        },
         "overhead": {
             "answers": len(rows),
             "p50_s": percentile(elapsed, 0.5),
@@ -419,6 +467,20 @@ def markdown(summary: dict) -> str:
             f"{pct(o['rubric_score'])} |"
         ),
         "",
+    ]
+    if summary["groups"]:
+        lines += [
+            "| 分组 | 题数 | 状态正确率 | 引用召回率 | 引用准确率 | rubric 得分 |",
+            "| --- | ---: | ---: | ---: | ---: | ---: |",
+        ]
+        for name, g in summary["groups"].items():
+            lines.append(
+                f"| {name} | {g['items']} | {pct(g['status_correct'])} | "
+                f"{pct(g['citation_recall'])} | {pct(g['citation_precision'])} | "
+                f"{pct(g['rubric_score'])} |"
+            )
+        lines.append("")
+    lines += [
         (
             f"运行开销：{h['answers']} 次回答，耗时 P50 {h['p50_s']:.1f} 秒、"
             f"P95 {h['p95_s']:.1f} 秒；平均检索 {h['searches']:.1f} 次、"
@@ -451,7 +513,7 @@ def score(run_dir: Path) -> dict:
     rows, lines = score_records(run_dir, corpus)
     write_csv(run_dir / "runs.csv", rows)
     write_csv(run_dir / "rubric.csv", lines)
-    summary = summarize(rows)
+    summary = summarize(rows, item_groups(load_run_items(run_dir)))
     (run_dir / "summary.md").write_text(markdown(summary), encoding="utf-8")
     return summary
 
@@ -461,6 +523,7 @@ def main():
     commands = parser.add_subparsers(dest="command", required=True)
     run_parser = commands.add_parser("run", help="Generate real answers into tmp/eval")
     run_parser.add_argument("--rounds", type=int, default=5)
+    run_parser.add_argument("--set", dest="dataset", choices=sorted(SETS), default="eval")
     run_parser.add_argument("--items", default="", help="Comma-separated prefixes, e.g. q1,q3")
     run_parser.add_argument("--stage", default="stage1")
     run_parser.add_argument("--output", type=Path)
@@ -473,7 +536,7 @@ def main():
         stamp = datetime.now().astimezone().strftime("%Y%m%d-%H%M%S")
         output = args.output or ROOT / "tmp/eval" / args.stage / stamp
         prefixes = [p.strip() for p in args.items.split(",") if p.strip()]
-        asyncio.run(run(output.resolve(), args.rounds, prefixes, args.stage))
+        asyncio.run(run(output.resolve(), args.rounds, prefixes, args.stage, args.dataset))
         print(f"Answers -> {output}")
     elif args.command == "judge-tasks":
         print(json.dumps(judge_tasks(args.run_dir.resolve()), ensure_ascii=False, indent=2))

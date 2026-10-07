@@ -9,6 +9,7 @@ import pytest
 from insuretutor.chat_models import Calculation, CalculationInput, ChatResult, Citation, Claim
 from insuretutor.corpus import Corpus, assemble_evidence
 from insuretutor.evaluation import (
+    SETS,
     JudgeError,
     answer_view,
     citation_precision,
@@ -268,3 +269,51 @@ def test_judge_tasks_and_score_end_to_end(items, tmp_path):
     assert [r["veto_failed"] for r in rows] == ["0", "1"]
     assert rows[0]["citation_recall"] == ""  # Refusal: not applicable.
     assert "全题平均" in (tmp_path / "summary.md").read_text(encoding="utf-8")
+
+
+def test_misuse_runs_use_their_judge_prompt_order_and_groups(tmp_path):
+    misuse = {i["id"].split("-")[0]: i for i in load_items(SETS["misuse"][0])}
+    picked = {
+        # Harmful, prompt injection; its citation would count against it, so precision is N/A.
+        "m10": result("refused", [BOUNDARY, Claim(text="clause", evidence_ids=["note-4"])]),
+        "m02": result("answered"),  # harmful but answered without a boundary
+        "m35": result("answered"),  # benign look-alike
+    }
+    for name in ("items", "answers", "judge"):
+        (tmp_path / name).mkdir()
+    (tmp_path / "config.json").write_text(json.dumps({"set": "misuse"}), encoding="utf-8")
+    records = []
+    for key, answer in picked.items():
+        item = misuse[key]
+        (tmp_path / "items" / f"{item['id']}.json").write_text(json.dumps(item), encoding="utf-8")
+        view = answer_view(item, 1, answer)
+        (tmp_path / "answers" / f"r1-{item['id']}.json").write_text(
+            json.dumps(view), encoding="utf-8"
+        )
+        records.append(
+            {
+                "round": 1,
+                "item_id": item["id"],
+                "elapsed_ms": 1000,
+                "events": [],
+                "result": answer.model_dump(mode="json"),
+            }
+        )
+    (tmp_path / "raw.jsonl").write_text(
+        "\n".join(json.dumps(r) for r in records) + "\n", encoding="utf-8"
+    )
+    tasks = judge_tasks(tmp_path)
+    assert all("安全测评" in t["prompt"] for t in tasks)  # The misuse template, not tests/eval.
+    for key in picked:
+        item = misuse[key]
+        (tmp_path / "judge" / f"r1-{item['id']}.json").write_text(
+            json.dumps(judged(item, [1] * len(item["rubric"]))), encoding="utf-8"
+        )
+    summary = score(tmp_path)
+    assert list(summary["per_item"]) == [misuse[k]["id"] for k in ("m02", "m10", "m35")]
+    groups = summary["groups"]
+    assert groups["harmful"]["items"] == 2 and groups["harmful"]["status_correct"] == 0.5
+    assert summary["per_item"][misuse["m10"]["id"]]["citation_precision"] is None
+    assert groups["benign"]["status_correct"] == 1
+    assert groups["prompt-injection"]["items"] == 2
+    assert "| harmful | 2 |" in (tmp_path / "summary.md").read_text(encoding="utf-8")
